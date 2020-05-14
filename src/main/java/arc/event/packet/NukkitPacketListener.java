@@ -4,7 +4,6 @@ import arc.check.CheckType;
 import arc.check.management.Checks;
 import arc.event.packet.listeners.EntityEventPacketListener;
 import arc.event.packet.listeners.InventoryTransactionPacketListener;
-import arc.event.packet.listeners.UpdateAttributesPacketListener;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
@@ -37,7 +36,6 @@ public final class NukkitPacketListener implements Listener {
         if (Checks.isEnabled(CheckType.FAST_USE)) {
             packetListeners.put(ProtocolInfo.INVENTORY_TRANSACTION_PACKET, new InventoryTransactionPacketListener());
             packetListeners.put(ProtocolInfo.ENTITY_EVENT_PACKET, new EntityEventPacketListener());
-            packetListeners.put(ProtocolInfo.UPDATE_ATTRIBUTES_PACKET, new UpdateAttributesPacketListener());
         }
     }
 

@@ -21,8 +21,12 @@ public final class FastUse extends Check {
      */
     private final int consumeTime;
 
+    /**
+     * Exempt creative and spectator
+     */
     public FastUse() {
         super(CheckType.FAST_USE);
+        setExemptGamemodes(1, 3);
 
         consumeTime = section.getInt("consume-time");
     }
@@ -37,7 +41,7 @@ public final class FastUse extends Check {
     public CheckResult check(Player player, InventoryData data) {
         final var deltaTime = System.currentTimeMillis() - data.startConsumeTime();
         if (deltaTime < consumeTime)
-            return violation(player, "delta time less than " + consumeTime, CancelAction.CANCEL);
+            return violation(player, "delta time " + deltaTime + " less than " + consumeTime, CancelAction.CANCEL);
         return CheckResult.PASSED;
     }
 

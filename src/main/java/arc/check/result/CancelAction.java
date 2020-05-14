@@ -23,6 +23,6 @@ public enum CancelAction {
     /**
      * Do nothing.
      */
-    NONE;
+    NONE
 
 }

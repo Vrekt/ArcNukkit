@@ -82,4 +82,5 @@ public final class InventoryData {
     public void eatingPackets(int eatingPackets) {
         this.eatingPackets = eatingPackets;
     }
+
 }

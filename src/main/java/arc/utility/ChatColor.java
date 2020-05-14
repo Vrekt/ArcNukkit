@@ -1,44 +1,41 @@
 package arc.utility;
 
 /**
- * Trying to replicate Bukkits ChatColor stuff.
+ * Utility for chat colors.
  */
-public enum ChatColor {
+public final class ChatColor {
 
-    RED("§c"),
+    public static final String IDENTIFIER = "\u00A7";
 
-    BLACK("§0"),
+    public static final String RED = IDENTIFIER + "c";
 
-    DARK_BLUE("§1"),
+    public static final String BLACK = IDENTIFIER + "0";
 
-    DARK_GREEN("§2"),
+    public static final String DARK_BLUE = IDENTIFIER + "1";
 
-    DARK_AQUA("§3"),
+    public static final String DARK_GREEN = IDENTIFIER + "2";
 
-    DARK_RED("§4"),
+    public static final String DARK_AQUA = IDENTIFIER + "3";
 
-    DARK_PURPLE("§5"),
+    public static final String DARK_RED = IDENTIFIER + "4";
 
-    GOLD("§6"),
-    GRAY("§7"),
-    DARK_GRAY("§8"),
-    BLUE("§9"),
-    GREEN("§a"),
-    AQUA("§b"),
-    LIGHT_PURPLE("§d"),
-    YELLOW("§e"),
-    WHITE("§f");
+    public static final String DARK_PURPLE = IDENTIFIER + "5";
 
-    private final String color;
+    public static final String GOLD = IDENTIFIER + "6";
 
-    ChatColor(String color) {
-        this.color = color;
-    }
+    public static final String GRAY = IDENTIFIER + "7";
 
-    /**
-     * @return the color
-     */
-    public String color() {
-        return color;
-    }
+    public static final String DARK_GRAY = IDENTIFIER + "8";
+
+    public static final String BLUE = IDENTIFIER + "9";
+
+    public static final String GREEN = IDENTIFIER + "a";
+
+    public static final String AQUA = IDENTIFIER + "b";
+
+    public static final String LIGHT_PURPLE = IDENTIFIER + "d";
+
+    public static final String YELLOW = IDENTIFIER + "e";
+
+    public static final String WHITE = IDENTIFIER + "f";
 }

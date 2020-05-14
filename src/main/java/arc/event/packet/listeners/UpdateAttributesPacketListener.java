@@ -8,6 +8,7 @@ import cn.nukkit.network.protocol.UpdateAttributesPacket;
 
 /**
  * Listens for the packet UpdateAttributesPacket
+ * TODO: Unused
  */
 public final class UpdateAttributesPacketListener implements PacketListener {
 

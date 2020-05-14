@@ -6,6 +6,7 @@ import arc.event.PlayerConnectionListener;
 import arc.event.inventory.PlayerInventoryListener;
 import arc.event.packet.NukkitPacketListener;
 import arc.utility.ChatColor;
+import arc.violation.PlayerViolationManager;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 
@@ -23,6 +24,11 @@ public final class Arc extends PluginBase {
      */
     private static Config configuration;
 
+    /**
+     * The player violation manager.
+     */
+    private static PlayerViolationManager violationManager;
+
     @Override
     public void onLoad() {
 
@@ -30,19 +36,27 @@ public final class Arc extends PluginBase {
 
     @Override
     public void onEnable() {
-        getLogger().info(ChatColor.RED.color() + "*THIS IS AN EXPERIMENTAL AND VERY EARLY VERSION OF ARC.**");
-        getLogger().info(ChatColor.RED.color() + "*EXPECT BUGS, CRASHES, WIP CHECKS, RANDOM LOG MESSAGES**");
+        getLogger().info(ChatColor.RED + "*THIS IS AN EXPERIMENTAL AND VERY EARLY VERSION OF ARC.**");
+        getLogger().info(ChatColor.RED + "*EXPECT BUGS, CRASHES, WIP CHECKS, RANDOM LOG MESSAGES**");
         plugin = this;
 
+        getLogger().info(ChatColor.GREEN + "Saving default configuration....");
         saveDefaultConfig();
         configuration = getConfig();
 
-        populatePlayers();
+        getLogger().info(ChatColor.GREEN + "Loading current online players...");
+
+        getLogger().info(ChatColor.GREEN + "Registering events");
+        violationManager = new PlayerViolationManager(this);
+        getServer().getScheduler().scheduleRepeatingTask(violationManager, 20, false);
 
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerInventoryListener(), this);
         getServer().getPluginManager().registerEvents(new NukkitPacketListener(), this);
 
+        populatePlayers();
+
+        getLogger().info(ChatColor.GREEN + "Done!");
     }
 
     @Override
@@ -57,6 +71,9 @@ public final class Arc extends PluginBase {
     private void populatePlayers() {
         for (final var player : getServer().getOnlinePlayers().values()) {
             InventoryData.putData(player);
+            violationManager.onPlayerConnect(player);
+
+            // TODO: For now just add this for debug purposes.
             player.addAttachment(Arc.plugin(), Permissions.PERMISSION_NOTIFY);
         }
     }
@@ -73,5 +90,12 @@ public final class Arc extends PluginBase {
      */
     public static Config configuration() {
         return Arc.configuration;
+    }
+
+    /**
+     * @return the violation manager.
+     */
+    public static PlayerViolationManager violationManager() {
+        return Arc.violationManager;
     }
 }

@@ -10,6 +10,9 @@ import java.util.Map;
  */
 public final class ViolationData {
 
+    /**
+     * The violation history for each check
+     */
     private final Map<CheckType, Integer> violationHistory = new HashMap<>();
 
     /**
@@ -30,19 +33,10 @@ public final class ViolationData {
     }
 
     /**
-     * Remove violation level for a certain check.
-     *
-     * @param check the check.
+     * @return {@code true} if this data has any violations
      */
-    public void removeViolationsForCheck(CheckType check) {
-        violationHistory.remove(check);
-    }
-
-    /**
-     * Clear violation data.
-     */
-    public void clearData() {
-        violationHistory.clear();
+    public boolean hasAnyViolations() {
+        return !violationHistory.isEmpty();
     }
 
 }

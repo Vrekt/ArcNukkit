@@ -1,9 +1,10 @@
 package arc.check;
 
+import arc.Arc;
+import arc.check.exemption.Exemptions;
 import arc.check.management.Checks;
 import arc.check.result.CancelAction;
 import arc.check.result.CheckResult;
-import arc.violation.Violations;
 import cn.nukkit.Player;
 
 import java.util.HashSet;
@@ -50,6 +51,16 @@ public abstract class Check extends CheckConfigBase {
     }
 
     /**
+     * See if we can check this player.
+     *
+     * @param player the player
+     * @return {@code true} if we can.
+     */
+    public boolean canCheck(Player player) {
+        return !Exemptions.isPlayerExempt(player, this);
+    }
+
+    /**
      * @return the check
      */
     public CheckType check() {
@@ -63,7 +74,8 @@ public abstract class Check extends CheckConfigBase {
      * @return a check result.
      */
     protected CheckResult violation(Player player, String information, CancelAction action) {
-        Violations.handleViolation(player, this, information);
+        Arc.violationManager().handlePlayerViolation(player, this, information);
+
         if (cancel()) {
             return new CheckResult(true, action);
         } else {

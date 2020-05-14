@@ -32,4 +32,4 @@ fastuse:
   cancel: true
 
   # The time it takes to consume an item in milliseconds.
-  consume-time: 1200
+  consume-time: 1600

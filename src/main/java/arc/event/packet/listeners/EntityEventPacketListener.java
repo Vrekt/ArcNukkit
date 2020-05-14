@@ -17,15 +17,10 @@ public final class EntityEventPacketListener implements PacketListener {
 
         // we are eating an item.
         if (packet.event == EntityEventPacket.EATING_ITEM) {
+            // update our inventory data for each eating packet.
             final var data = InventoryData.getData(player);
-            final var currentPackets = data.eatingPackets();
-            if (currentPackets == 0) {
-                // set we are consuming.
-                data.isConsuming(true);
-                data.startConsumeTime(System.currentTimeMillis());
-            }
-
-            data.eatingPackets(currentPackets + 1);
+            final var currentPackets = data.eatingPackets() + 1;
+            data.eatingPackets(currentPackets);
         }
     }
 }
