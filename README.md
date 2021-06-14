@@ -13,8 +13,8 @@
 - More to come soon...
 
 # Permissions
-- arc.violations: Allows you to view violations.
-- arc.bypass: Allows you to bypass all checks.
+- `arc.violations`: Allows you to view violations.
+- `arc.bypass`: Allows you to bypass all checks.
 - WIP
 
 # Checks
