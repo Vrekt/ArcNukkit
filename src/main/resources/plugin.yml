@@ -1,0 +1,35 @@
+name: Arc
+main: me.vrekt.arc.Arc
+version: 1.0
+description: An anticheat for Nukkit.
+author: Vrekt
+api: ["1.0.0"]
+
+permissions:
+  arc.commands.toggleviolations:
+    description: Allows the player to toggle their violations.
+  arc.commands.cancelban:
+    description: Allows the player to cancel bans.
+  arc.commands.reloadconfig:
+    description: Allows the player to reload Arcs configuration.
+  arc.commands.base:
+    description: Allows the player to execute /arc
+  arc.commands.all:
+    description: Allows the player to use all Arc commands.
+  arc.commands.summary:
+    description: Allows the player to access player summary information.
+  arc.commands.timings:
+    description: Allows the player to view timings information.
+  arc.commands.exempt:
+    description: Allows the player to exempt others or themselves.
+  arc.bypass:
+    default: false
+    description: Allows the player to bypass all Arc checks.
+  arc.violations:
+    description: Allows the player to view player violations as they come in.
+    children:
+      arc.violations.debug:
+        description: Allows the player to view extra debug information with violations.
+  arc.administrator:
+    description: Allows the player permission to manage Arc.
+    default: false

@@ -5,12 +5,12 @@ plugins {
 group 'me.vrekt'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 11
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile files('nukkit.jar')
+    implementation files('nukkit.jar')
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+
 }
