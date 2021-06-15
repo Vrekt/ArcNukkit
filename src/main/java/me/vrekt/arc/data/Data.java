@@ -1,6 +1,7 @@
 package me.vrekt.arc.data;
 
 import cn.nukkit.Player;
+import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.data.player.PlayerData;
 
 /**
@@ -15,6 +16,7 @@ public interface Data {
      */
     static void removeAll(Player player) {
         PlayerData.remove(player);
+        MovingData.remove(player);
     }
 
 }

@@ -1,5 +1,6 @@
 package me.vrekt.arc.check;
 
+import me.vrekt.arc.check.moving.MorePackets;
 import me.vrekt.arc.check.player.FastUse;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.configuration.Configurable;
@@ -24,6 +25,7 @@ public final class CheckManager extends Configurable implements Closeable {
      */
     public void initialize() {
         add(new FastUse());
+        add(new MorePackets());
     }
 
     /**

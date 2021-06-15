@@ -44,6 +44,7 @@ public final class FastUse extends Check {
      * @return the result
      */
     public boolean check(Player player, PlayerData data) {
+        if (!enabled() || exempt(player)) return false;
         final long time = System.currentTimeMillis() - data.consumeStartTime();
         if (time <= consumeTime) {
             final CheckResult result = new CheckResult();

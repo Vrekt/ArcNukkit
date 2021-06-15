@@ -1,6 +1,8 @@
 package me.vrekt.arc.check;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
+import cn.nukkit.scheduler.TaskHandler;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.configuration.ArcConfiguration;
@@ -46,6 +48,11 @@ public abstract class Check extends Configurable {
      * If this check is permanently disabled.
      */
     protected boolean permanentlyDisabled;
+
+    /**
+     * The scheduled task.
+     */
+    protected TaskHandler task;
 
     /**
      * Initialize the check
@@ -204,6 +211,26 @@ public abstract class Check extends Configurable {
      */
     protected boolean exempt(Player player, ExemptionType type) {
         return EXEMPTION_MANAGER.isPlayerExempt(player, type);
+    }
+
+    /**
+     * Schedule
+     *
+     * @param runnable the runnable
+     * @param every    timer
+     */
+    protected void schedule(Runnable runnable, int every) {
+        task = Server.getInstance().getScheduler().scheduleRepeatingTask(Arc.plugin(), runnable, every);
+    }
+
+    /**
+     * Cancel the scheduled task.
+     */
+    protected void cancelScheduled() {
+        if (task != null && !task.isCancelled()) {
+            task.cancel();
+            task = null;
+        }
     }
 
     @Override

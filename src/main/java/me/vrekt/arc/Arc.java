@@ -7,7 +7,7 @@ import me.vrekt.arc.check.CheckManager;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.exemption.ExemptionManager;
 import me.vrekt.arc.listener.connection.PlayerConnectionListener;
-import me.vrekt.arc.listener.packet.NukkitPacketListener;
+import me.vrekt.arc.listener.packet.NukkitPacketHandler;
 import me.vrekt.arc.listener.player.PlayerListener;
 import me.vrekt.arc.punishment.PunishmentManager;
 import me.vrekt.arc.violation.ViolationManager;
@@ -58,6 +58,7 @@ public final class Arc extends PluginBase {
         arc = this;
 
         getLogger().info(TextFormat.DARK_GREEN + "Initializing Arc " + IPL_VERSION);
+
         getLogger().info(TextFormat.DARK_GREEN + "Reading main configuration...");
 
         saveDefaultConfig();
@@ -68,10 +69,11 @@ public final class Arc extends PluginBase {
         violationManager.initialize(arcConfiguration);
         punishmentManager.initialize(arcConfiguration);
         exemptionManager.initialize(arcConfiguration);
+        loadOnlinePlayers();
 
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        getServer().getPluginManager().registerEvents(new NukkitPacketListener(), this);
+        getServer().getPluginManager().registerEvents(new NukkitPacketHandler(exemptionManager), this);
 
         getLogger().info(TextFormat.DARK_GREEN + "Saving configuration...");
         saveConfig();
@@ -82,6 +84,18 @@ public final class Arc extends PluginBase {
     @Override
     public void onDisable() {
 
+    }
+
+    /**
+     * Load online players.
+     */
+    private void loadOnlinePlayers() {
+        getServer().getOnlinePlayers()
+                .values()
+                .forEach(player -> {
+                    Arc.arc().violations().onPlayerJoin(player);
+                    Arc.arc().exemptions().onPlayerJoin(player);
+                });
     }
 
     /**
@@ -132,5 +146,4 @@ public final class Arc extends PluginBase {
     public PunishmentManager punishment() {
         return punishmentManager;
     }
-
 }

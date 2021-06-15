@@ -34,6 +34,8 @@ public final class PlayerListener implements Listener {
     public void onConsumeItem(PlayerItemConsumeEvent event) {
         final Player player = event.getPlayer();
         final PlayerData data = PlayerData.get(player);
+        data.isConsuming(false);
+
         final boolean result = fastUse.check(player, data);
         event.setCancelled(result);
     }

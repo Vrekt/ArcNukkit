@@ -25,6 +25,17 @@ permissions:
   arc.bypass:
     default: false
     description: Allows the player to bypass all Arc checks.
+    children:
+      arc.bypass.player:
+        description: Allows the player to bypass Player related checks.
+        children:
+          arc.bypass.player.fastuse:
+            description: Allows the player to bypass the FastUse check.
+      arc.bypass.moving:
+        description: Allows the player to bypass Moving related checks.
+        children:
+          arc.bypass.moving.morepackets:
+            description: Allows the player to bypass the MorePackets check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
     children:

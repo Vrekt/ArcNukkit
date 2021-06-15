@@ -7,7 +7,12 @@ public enum CheckType {
     /**
      * Checks if the player is using items too fast.
      */
-    FAST_USE("FastUse", CheckCategory.PLAYER);
+    FAST_USE("FastUse", CheckCategory.PLAYER),
+
+    /**
+     * Checks if the player is sending too many movement packets.
+     */
+    MORE_PACKETS("MorePackets", CheckCategory.MOVING);
 
     /**
      * The name

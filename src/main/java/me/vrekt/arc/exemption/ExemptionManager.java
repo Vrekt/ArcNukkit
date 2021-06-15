@@ -82,6 +82,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
         if (exemptions != null) {
             exemptionsMapped = exemptions.isExempt(check);
         }
+
         return (exemptFromCheck || exemptFlying || exemptionsMapped);
     }
 
