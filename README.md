@@ -4,7 +4,7 @@
 
 *This version is a fork of my Bukkit/Spigot version of Arc.*
 
-*Most of the base is the same as the Bukkit one, meaning it has alot of the same features!*
+*Most of the base is the same as the Bukkit one, meaning it has a-lot of the same features!*
 
 # Features
 - Extensive configuration and permission system
@@ -12,13 +12,29 @@
 - Performant
 - More to come soon...
 
-# Permissions
-- `arc.violations`: Allows you to view violations.
-- `arc.bypass`: Allows you to bypass all checks.
-- WIP
+# Permissions 
+Arc has a very extensive permissions system. You can choose to bypass all checks, a category all together or a singular check.
+
+*Bypass all checks*
+- `arc.bypass` Allows you to bypass all checks.
+
+*Bypass all checks within a category*
+- `arc.bypass.moving` Allows you to bypass all moving checks.
+
+*Bypass a singular check*
+- `arc.bypass.moving.morepackets` Allows you to bypass the MorePackets check.
+
+*View player violations as they come in*
+- `arc.violations` Allows you to view violations.
+
+# Configuration
+Configuration documentation for checks has not been written yet.
+
+However, you can view documentation for all the other configuration values in the config.yml file in this repository.
 
 # Checks
 - FastUse
+- MorePackets
 - TODO.
 
 
