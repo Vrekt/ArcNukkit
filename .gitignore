@@ -1,0 +1,12 @@
+/.idea/
+/gradlew
+/gradlew.bat
+/nukkit.jar
+/settings.gradle
+/Nukkit/
+/out/
+/gradle/
+/.gradle/
+/build/
+*.jar
+*.class
