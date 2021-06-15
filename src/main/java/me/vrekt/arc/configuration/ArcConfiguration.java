@@ -136,7 +136,7 @@ public final class ArcConfiguration extends Configurable {
     }
 
     /**
-     * @return the {@link FileConfiguration} from {@link Arc}
+     * @return the {@link Config} from {@link Arc}
      */
     public Config fileConfiguration() {
         return Arc.arc().getConfig();

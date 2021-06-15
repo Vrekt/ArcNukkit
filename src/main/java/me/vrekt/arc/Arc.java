@@ -58,7 +58,6 @@ public final class Arc extends PluginBase {
         arc = this;
 
         getLogger().info(TextFormat.DARK_GREEN + "Initializing Arc " + IPL_VERSION);
-
         getLogger().info(TextFormat.DARK_GREEN + "Reading main configuration...");
 
         saveDefaultConfig();

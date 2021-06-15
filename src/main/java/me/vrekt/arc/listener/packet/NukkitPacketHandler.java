@@ -53,7 +53,9 @@ public final class NukkitPacketHandler implements Listener {
      * Register player type listeners.
      */
     private void registerPlayerListeners() {
-        packetListeners.put(ProtocolInfo.MOVE_PLAYER_PACKET, new MovePlayerPacketListener(this));
+        if (Arc.arc().checks().getCheck(CheckType.MORE_PACKETS).enabled()) {
+            packetListeners.put(ProtocolInfo.MOVE_PLAYER_PACKET, new MovePlayerPacketListener(this));
+        }
     }
 
     /**

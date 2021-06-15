@@ -7,6 +7,7 @@ import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.data.moving.MovingData;
+import me.vrekt.arc.violation.result.ViolationResult;
 
 /**
  * Checks if the player is sending too many movement related packets.
@@ -59,8 +60,8 @@ public final class MorePackets extends Check {
         final CheckResult result = new CheckResult();
         if (moveCount > maxMovesPerSecond) {
             populateResult(result, "Too many move packets per second", moveCount, maxMovesPerSecond);
-            checkViolation(player, result);
-            data.cancelMovePlayerPacket(true);
+            final ViolationResult vr = checkViolation(player, result);
+            data.cancelMovePlayerPacket(vr.cancel());
 
             kickPlayerIfThresholdReached(player, moveCount);
         } else {
