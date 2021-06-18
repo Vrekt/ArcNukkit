@@ -15,6 +15,14 @@
 # Permissions 
 Arc has a very extensive permissions system. You can choose to bypass all checks, a category all together or a singular check.
 
+*Command access*
+- `arc.commands.all` Allows access to all /arc commands.
+- `arc.commands.base` Allows access to the base /arc command.
+- `arc.commands.toggleviolations` Allows a player to toggle violations.
+- `arc.commands.cancelban` Allows a player to cancel a pending ban.
+- `arc.commands.reloadconfig` Allows a player to reload the Arc configuration.
+- `arc.commands.debug` Allows a player to view debug information with each violation.
+
 *Bypass all checks*
 - `arc.bypass` Allows you to bypass all checks.
 
@@ -35,6 +43,7 @@ However, you can view documentation for all the other configuration values in th
 # Checks
 - FastUse
 - MorePackets
+- Flight
 - TODO.
 
 
