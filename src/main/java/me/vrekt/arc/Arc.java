@@ -1,12 +1,15 @@
 package me.vrekt.arc;
 
+import cn.nukkit.command.PluginCommand;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.check.CheckManager;
+import me.vrekt.arc.command.ArcCommand;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.exemption.ExemptionManager;
 import me.vrekt.arc.listener.connection.PlayerConnectionListener;
+import me.vrekt.arc.listener.moving.MovingEventListener;
 import me.vrekt.arc.listener.packet.NukkitPacketHandler;
 import me.vrekt.arc.listener.player.PlayerListener;
 import me.vrekt.arc.punishment.PunishmentManager;
@@ -73,7 +76,9 @@ public final class Arc extends PluginBase {
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new NukkitPacketHandler(exemptionManager), this);
+        getServer().getPluginManager().registerEvents(new MovingEventListener(), this);
 
+        verifyCommand();
         getLogger().info(TextFormat.DARK_GREEN + "Saving configuration...");
         saveConfig();
 
@@ -83,6 +88,18 @@ public final class Arc extends PluginBase {
     @Override
     public void onDisable() {
 
+    }
+
+    /**
+     * Verify the command /arc exists.
+     */
+    private void verifyCommand() {
+        final PluginCommand<?> command = (PluginCommand<?>) getServer().getPluginCommand("arc");
+        if (command == null) {
+            getLogger().critical("/arc command not found! You will not be able to use this command.");
+        } else {
+            command.setExecutor(new ArcCommand());
+        }
     }
 
     /**

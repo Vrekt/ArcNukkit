@@ -1,5 +1,6 @@
 package me.vrekt.arc.check.result;
 
+import cn.nukkit.level.Location;
 import cn.nukkit.utils.TextFormat;
 
 /**
@@ -28,6 +29,16 @@ public final class CheckResult {
      * Information builder.
      */
     private StringBuilder informationBuilder;
+
+    /**
+     * The cancel location
+     */
+    private Location cancel;
+
+    /**
+     * The cancel type
+     */
+    private CancelType cancelType;
 
     /**
      * Empty
@@ -95,6 +106,16 @@ public final class CheckResult {
     }
 
     /**
+     * Set where to cancel to
+     *
+     * @param location the location
+     */
+    public void cancelTo(Location location, CancelType type) {
+        this.cancel = location;
+        this.cancelType = type;
+    }
+
+    /**
      * @return if the player has failed
      */
     public boolean failed() {
@@ -106,6 +127,31 @@ public final class CheckResult {
      */
     public String information() {
         return informationBuilder.toString();
+    }
+
+    /**
+     * @return the cancel location
+     */
+    public Location cancel() {
+        return cancel;
+    }
+
+    /**
+     * @return the cancel type
+     */
+    public CancelType cancelType() {
+        return cancelType;
+    }
+
+    /**
+     * Reset this result
+     */
+    public void reset() {
+        if (result == Result.FAILED) {
+            cancel = null;
+            result = Result.PASSED;
+            informationBuilder.setLength(0);
+        }
     }
 
 }

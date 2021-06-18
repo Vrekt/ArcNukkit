@@ -170,7 +170,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @return {@code true} if so
      */
     private boolean isExemptWhenFlying(CheckType check) {
-        return false;
+        return check == CheckType.FLIGHT;
     }
 
     @Override

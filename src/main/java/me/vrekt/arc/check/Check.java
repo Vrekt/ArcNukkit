@@ -2,8 +2,10 @@ package me.vrekt.arc.check;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.level.Location;
 import cn.nukkit.scheduler.TaskHandler;
 import me.vrekt.arc.Arc;
+import me.vrekt.arc.check.result.CancelType;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.configuration.Configurable;
@@ -189,6 +191,23 @@ public abstract class Check extends Configurable {
      */
     protected ViolationResult checkViolation(Player player, CheckResult result) {
         if (result.failed()) return VIOLATION_MANAGER.violation(player, this, result);
+        return ViolationResult.EMPTY;
+    }
+
+    /**
+     * Process the check result.
+     *
+     * @param player the player
+     * @param result the result
+     * @param cancel the cancel location
+     * @param type   the type of cancel
+     */
+    protected ViolationResult checkViolation(Player player, CheckResult result, Location cancel, CancelType type) {
+        if (result.failed()) {
+            final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
+            if (vr.cancel()) result.cancelTo(cancel, type);
+            return vr;
+        }
         return ViolationResult.EMPTY;
     }
 
