@@ -7,6 +7,7 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.command.commands.CancelBanSubCommand;
+import me.vrekt.arc.command.commands.DebugSubCommand;
 import me.vrekt.arc.command.commands.ReloadConfigSubCommand;
 import me.vrekt.arc.command.commands.ToggleViolationsSubCommand;
 import me.vrekt.arc.permissions.Permissions;
@@ -25,12 +26,14 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         addSubCommand("violations", new ToggleViolationsSubCommand());
         addSubCommand("reload", new ReloadConfigSubCommand());
         addSubCommand("cancelban", new CancelBanSubCommand());
+        addSubCommand("debug", new DebugSubCommand());
 
         // initialize help message.
         final String prefix = Arc.arc().configuration().prefix();
         helpLine(Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS, prefix + TextFormat.DARK_AQUA + " /arc violations - " + TextFormat.GRAY + "Toggle violations on or off.");
         helpLine(Permissions.ARC_COMMANDS_RELOAD_CONFIG, prefix + TextFormat.DARK_AQUA + " /arc reload - " + TextFormat.GRAY + "Reloads the configuration.");
         helpLine(Permissions.ARC_COMMANDS_CANCEL_BAN, prefix + TextFormat.DARK_AQUA + " /arc cancelban <player> - " + TextFormat.GRAY + "Cancel a pending player ban.");
+        helpLine(Permissions.ARC_COMMANDS_DEBUG, prefix + TextFormat.DARK_AQUA + "/arc debug - " + TextFormat.GRAY + "Allows viewing of debug information.");
     }
 
     @Override

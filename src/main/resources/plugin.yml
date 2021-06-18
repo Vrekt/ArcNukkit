@@ -12,16 +12,12 @@ permissions:
     description: Allows the player to cancel bans.
   arc.commands.reloadconfig:
     description: Allows the player to reload Arcs configuration.
+  arc.commands.debug:
+    description: Allows the player to view debug information.
   arc.commands.base:
     description: Allows the player to execute /arc
   arc.commands.all:
     description: Allows the player to use all Arc commands.
-  arc.commands.summary:
-    description: Allows the player to access player summary information.
-  arc.commands.timings:
-    description: Allows the player to view timings information.
-  arc.commands.exempt:
-    description: Allows the player to exempt others or themselves.
   arc.bypass:
     default: false
     description: Allows the player to bypass all Arc checks.

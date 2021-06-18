@@ -6,9 +6,7 @@ import me.vrekt.arc.Arc;
 import me.vrekt.arc.command.commands.ArcSubCommand;
 import me.vrekt.arc.permissions.Permissions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,11 +23,6 @@ public abstract class ArcBaseCommand {
      * Map of help-lines
      */
     private final Map<String, String> helpLines = new HashMap<>();
-
-    /**
-     * Help-lines without permissions
-     */
-    private final List<String> singularHelpLines = new ArrayList<>();
 
     /**
      * Add a sub command
@@ -49,15 +42,6 @@ public abstract class ArcBaseCommand {
      */
     protected void helpLine(String permission, String line) {
         helpLines.put(permission, line);
-    }
-
-    /**
-     * Add a help line without permissions
-     *
-     * @param line the line
-     */
-    protected void helpLine(String line) {
-        singularHelpLines.add(line);
     }
 
     /**
@@ -120,10 +104,6 @@ public abstract class ArcBaseCommand {
      */
     protected boolean printHelpLines(CommandSender sender) {
         final StringBuilder builder = new StringBuilder();
-        singularHelpLines.forEach(line -> {
-            builder.append(line);
-            builder.append("\n");
-        });
         helpLines.forEach((permission, line) -> {
             if (sender.hasPermission(permission)) {
                 builder.append(line);

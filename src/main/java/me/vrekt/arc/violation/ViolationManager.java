@@ -15,9 +15,9 @@ import me.vrekt.arc.violation.result.ViolationResult;
 
 import java.io.Closeable;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,7 +33,7 @@ public final class ViolationManager extends Configurable implements Closeable {
     /**
      * A list of players who can view violations/debug information
      */
-    private final Set<Player> violationViewers = ConcurrentHashMap.newKeySet();
+    private final ConcurrentMap<Player, Boolean> violationViewers = new ConcurrentHashMap<>();
 
     /**
      * Keeps track of when to expire history
@@ -77,7 +77,7 @@ public final class ViolationManager extends Configurable implements Closeable {
         } else {
             history.put(player.getUniqueId(), new Violations());
         }
-        if (Permissions.canViewViolations(player)) violationViewers.add(player);
+        if (Permissions.canViewViolations(player)) violationViewers.put(player, false);
     }
 
     /**
@@ -117,9 +117,11 @@ public final class ViolationManager extends Configurable implements Closeable {
                     .prefix()
                     .value();
 
+            final String violationMessageWithDebug = violationMessage + "\n(" + result.information() + ")";
+
             // build the text component and then send to all viewers.
             // TODO: Unfortunately no hover event
-            violationViewers.forEach(viewer -> viewer.sendMessage(violationMessage));
+            violationViewers.forEach((viewer, isDebug) -> viewer.sendMessage(isDebug ? violationMessageWithDebug : violationMessage));
         }
 
         // add a cancel result if this check should cancel.
@@ -147,7 +149,7 @@ public final class ViolationManager extends Configurable implements Closeable {
      * @return {@code true} if so
      */
     public boolean isViolationViewer(Player player) {
-        return violationViewers.contains(player);
+        return violationViewers.containsKey(player);
     }
 
     /**
@@ -161,9 +163,24 @@ public final class ViolationManager extends Configurable implements Closeable {
             violationViewers.remove(player);
             return false;
         } else {
-            violationViewers.add(player);
+            violationViewers.put(player, false);
             return true;
         }
+    }
+
+    /**
+     * Toggle debug viewer
+     *
+     * @param player the player
+     * @return {@code true} if the player is now a debug viewer.
+     */
+    public boolean toggleDebugViewer(Player player) {
+        if (violationViewers.containsKey(player)) {
+            final boolean state = violationViewers.get(player);
+            violationViewers.put(player, !state);
+            return !state;
+        }
+        return false;
     }
 
     /**

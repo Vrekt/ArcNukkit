@@ -101,7 +101,7 @@ public final class CheckResult {
      */
     public void parameter(String parameter, Object value) {
         if (informationBuilder == null) informationBuilder = new StringBuilder();
-        informationBuilder.append("\n").append(TextFormat.GRAY);
+        informationBuilder.append(" ").append(TextFormat.GRAY);
         informationBuilder.append(parameter).append("=").append(value.toString());
     }
 
