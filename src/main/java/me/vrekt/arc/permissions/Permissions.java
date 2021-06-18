@@ -45,24 +45,14 @@ public final class Permissions {
     public static final String ARC_COMMANDS_RELOAD_CONFIG = "arc.commands.reloadconfig";
 
     /**
+     * The permission for viewing debug information
+     */
+    public static final String ARC_COMMANDS_DEBUG = "arc.commands.debug";
+
+    /**
      * The permission to execute all arc commands
      */
     public static final String ARC_COMMANDS_ALL = "arc.commands.all";
-
-    /**
-     * The permission to view player summaries.
-     */
-    public static final String ARC_COMMANDS_SUMMARY = "arc.commands.summary";
-
-    /**
-     * The permission to view timings
-     */
-    public static final String ARC_COMMANDS_TIMINGS = "arc.commands.timings";
-
-    /**
-     * The permission to exempt from certain checks
-     */
-    public static final String ARC_COMMANDS_EXEMPT = "arc.commands.exempt";
 
     /**
      * Check if the player can view violations

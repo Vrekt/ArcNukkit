@@ -23,7 +23,7 @@ public final class Arc extends PluginBase {
     /**
      * IPL version
      */
-    private static final String IPL_VERSION = "1.0";
+    private static final String IPL_VERSION = "1.2";
 
     /**
      * The instance of this class
