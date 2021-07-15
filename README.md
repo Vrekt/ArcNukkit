@@ -41,9 +41,23 @@ Configuration documentation for checks has not been written yet.
 However, you can view documentation for all the other configuration values in the config.yml file in this repository.
 
 # Checks
-- FastUse
-- MorePackets
-- Flight
-- TODO.
+
+Please note not all checks are finished, and not all checks fully block that certain cheat, **YET**
+
+###### Flight
+- Jumping too high
+- Climbing a ladder too fast
+- Jumping for too long (air jump, spider, etc)
+- More to come.
+
+###### FastUse
+- Checks if the player is eating too fast.
+
+###### MorePackets
+- Prevents the player from sending too many movement packets.
+- Prevents things like timer and regeneration
+- Prevents blink
+
+**TODO**
 
 
