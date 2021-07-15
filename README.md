@@ -12,6 +12,9 @@
 - Performant
 - More to come soon...
 
+# Requirements
+- Java 11.
+
 # Permissions 
 Arc has a very extensive permissions system. You can choose to bypass all checks, a category all together or a singular check.
 
