@@ -89,3 +89,6 @@ Please note not all checks are finished, and not all checks fully block that cer
 - Prevents the player from using timer cheats and regeneration.
 - Prevents the player from 'blinking'
 
+# Configuration
+
+You can view each configuration value and what they mean/do in the wiki [here](https://github.com/Vrekt/ArcNukkit/wiki)
