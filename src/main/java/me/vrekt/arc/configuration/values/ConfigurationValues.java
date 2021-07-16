@@ -1,6 +1,5 @@
 package me.vrekt.arc.configuration.values;
 
-import cn.nukkit.permission.BanList;
 import me.vrekt.arc.configuration.types.BanLengthType;
 import me.vrekt.arc.configuration.types.BanListType;
 
@@ -19,9 +18,6 @@ public enum ConfigurationValues {
     GLOBAL_BROADCAST_BAN(new ConfigurationValue<>("global-broadcast-ban", false)),
     GLOBAL_BROADCAST_BAN_MESSAGE(new ConfigurationValue<>("global-broadcast-ban-message", "&c%player% was banned for %check% for %time% %type%")),
     GLOBAL_VIOLATIONS_BAN_MESSAGE(new ConfigurationValue<>("global-violations-ban-message", "%prefix% &9%player%&f will be banned for &c%check%&f in &c%time%&f seconds.")),
-    ENABLE_CHECK_TIMINGS(new ConfigurationValue<>("enable-check-timings", true)),
-    ENABLE_TPS_HELPER(new ConfigurationValue<>("enable-tps-helper", true)),
-    TPS_HELPER_LIMIT(new ConfigurationValue<>("tps-helper-limit", 17)),
     VIOLATION_NOTIFY_MESSAGE(new ConfigurationValue<>("violation-notify-message", "%prefix% &9%player%&f has violated check &c%check%&8(&c%level%&8)&7")),
     ARC_COMMAND_NO_PERMISSION_MESSAGE(new ConfigurationValue<>("arc-command-no-permission-message", "Unknown command. Type /help for help.")),
     ARC_PREFIX(new ConfigurationValue<>("arc-prefix", "&8[&cArc&8]")),

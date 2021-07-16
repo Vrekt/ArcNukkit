@@ -23,17 +23,15 @@ public final class ArcConfiguration extends Configurable {
     private final KickConfiguration kickConfiguration = new KickConfiguration();
 
     /**
-     * If check timings should be enabled.
-     * If the TPS helper should be enabled.
      * If the event API should be enabled.
      */
-    private boolean enableCheckTimings, enableTpsHelper, enableEventApi;
+    private boolean enableEventApi;
 
     /**
      * TPS helper limit
      * The time after leaving violation data times out
      */
-    private int tpsHelperLimit, violationDataTimeout;
+    private int violationDataTimeout;
 
     /**
      * Violation notify message
@@ -55,9 +53,6 @@ public final class ArcConfiguration extends Configurable {
         kickConfiguration.read(configuration);
         banConfiguration.read(configuration);
 
-        enableCheckTimings = getBoolean(configuration, ConfigurationValues.ENABLE_CHECK_TIMINGS);
-        enableTpsHelper = getBoolean(configuration, ConfigurationValues.ENABLE_TPS_HELPER);
-        tpsHelperLimit = getInteger(configuration, ConfigurationValues.TPS_HELPER_LIMIT);
         violationNotifyMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationValues.VIOLATION_NOTIFY_MESSAGE)));
         commandNoPermissionMessage = TextFormat.colorize('&', getString(configuration, ConfigurationValues.ARC_COMMAND_NO_PERMISSION_MESSAGE));
         prefix = TextFormat.colorize('&', getString(configuration, ConfigurationValues.ARC_PREFIX));
@@ -80,31 +75,10 @@ public final class ArcConfiguration extends Configurable {
     }
 
     /**
-     * @return if check timings are enabled
-     */
-    public boolean enableCheckTimings() {
-        return enableCheckTimings;
-    }
-
-    /**
-     * @return if TPS helper is enabled.
-     */
-    public boolean enableTpsHelper() {
-        return enableTpsHelper;
-    }
-
-    /**
      * @return if event API is enabled.
      */
     public boolean enableEventApi() {
         return enableEventApi;
-    }
-
-    /**
-     * @return TPS helper limit
-     */
-    public int tpsHelperLimit() {
-        return tpsHelperLimit;
     }
 
     /**
@@ -139,21 +113,22 @@ public final class ArcConfiguration extends Configurable {
      * @return the {@link Config} from {@link Arc}
      */
     public Config fileConfiguration() {
-        return Arc.arc().getConfig();
+        return Arc.getInstance().getConfig();
     }
 
     /**
      * Reload the configuration
      */
     public void reloadConfiguration() {
-        Arc.plugin().reloadConfig();
+        Arc.getPlugin().reloadConfig();
 
-        final Config configuration = Arc.plugin().getConfig();
+        final Config configuration = Arc.getPlugin().getConfig();
         read(configuration);
 
-        Arc.arc().checks().reload(this);
-        Arc.arc().violations().reload(this);
-        Arc.arc().punishment().reload(this);
+        Arc.getInstance().getCheckManager().reload(this);
+        Arc.getInstance().getViolationManager().reload(this);
+        Arc.getInstance().getExemptionManager().reload(this);
+        Arc.getInstance().getPunishmentManager().reload(this);
     }
 
 }

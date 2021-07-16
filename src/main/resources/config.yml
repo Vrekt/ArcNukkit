@@ -59,15 +59,6 @@ global-broadcast-ban-message: "%prefix% &c%player% was banned for %check% for %t
 # - %time% - The time banned for
 global-violations-ban-message: "%prefix% &9%player%&f will be banned for &c%check%&f in &c%time%&f seconds."
 
-# If check timings should be enabled.
-enable-check-timings: true
-
-# If the TPS helper should be enabled.
-enabled-tps-helper: true
-
-# If the TPS drops below this amount TPS helper will engage.
-tps-helper-limit: 17
-
 # The message to display when a violation occurs
 # Valid parameters:
 # - %prefix% - the prefix

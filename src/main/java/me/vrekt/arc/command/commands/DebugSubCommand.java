@@ -34,6 +34,6 @@ public final class DebugSubCommand extends ArcSubCommand {
      * @return {@code true} if debug info is on.
      */
     private boolean toggleState(Player player) {
-        return Arc.arc().violations().toggleDebugViewer(player);
+        return Arc.getInstance().getViolationManager().toggleDebugViewer(player);
     }
 }

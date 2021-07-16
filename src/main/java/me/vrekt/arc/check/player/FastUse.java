@@ -48,10 +48,10 @@ public final class FastUse extends Check {
         final long time = System.currentTimeMillis() - data.consumeStartTime();
         if (time <= consumeTime) {
             final CheckResult result = new CheckResult();
-            result.setFailed("Consumed an item too fast.");
-            result.parameter("delta", time);
-            result.parameter("min", consumeTime);
-            return checkViolation(player, result).cancel();
+            result.setFailed("Consumed an item too fast.")
+                    .withParameter("delta", time)
+                    .withParameter("min", consumeTime);
+            return checkViolation(player, result);
         }
         return false;
     }

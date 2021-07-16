@@ -12,12 +12,12 @@ import me.vrekt.arc.listener.packet.NukkitPacketListener;
  */
 public final class MovePlayerPacketListener extends NukkitPacketListener {
 
-    public MovePlayerPacketListener(NukkitPacketHandler handler) {
-        super(handler);
+    public MovePlayerPacketListener(CheckType check, NukkitPacketHandler handler) {
+        super(check, handler);
     }
 
     @Override
-    public void onPacketReceiving(DataPacketReceiveEvent event) {
+    protected void onPacketReceiving0(DataPacketReceiveEvent event) {
         final Player player = event.getPlayer();
         if (!handler.isExempt(CheckType.MORE_PACKETS, player)) {
             if (MovingData.get(player).incrementMovePlayerPacketsAndCheckCancel()) {

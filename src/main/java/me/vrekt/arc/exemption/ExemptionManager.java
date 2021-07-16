@@ -160,7 +160,8 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @return {@code true}
      */
     private boolean isFlying(Player player) {
-        return player.getGamemode() == 1 || player.getGamemode() == 3;
+        return player.getGamemode() == 1
+                || player.getGamemode() == 3;
     }
 
     /**

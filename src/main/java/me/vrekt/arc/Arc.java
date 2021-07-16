@@ -7,6 +7,7 @@ import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.check.CheckManager;
 import me.vrekt.arc.command.ArcCommand;
 import me.vrekt.arc.configuration.ArcConfiguration;
+import me.vrekt.arc.data.Data;
 import me.vrekt.arc.exemption.ExemptionManager;
 import me.vrekt.arc.listener.connection.PlayerConnectionListener;
 import me.vrekt.arc.listener.moving.MovingEventListener;
@@ -23,7 +24,7 @@ public final class Arc extends PluginBase {
     /**
      * IPL version
      */
-    private static final String IPL_VERSION = "1.2";
+    private static final String IPL_VERSION = "1.3";
 
     /**
      * The instance of this class
@@ -60,6 +61,8 @@ public final class Arc extends PluginBase {
         if (arc != null) throw new UnsupportedOperationException();
         arc = this;
 
+        getLogger().info(TextFormat.RED + "**THIS IS AN EXPERIMENTAL VERSION OF ARC**");
+        getLogger().info(TextFormat.RED + "**PLEASE REPORT ANY ISSUES TO GITHUB**");
         getLogger().info(TextFormat.DARK_GREEN + "Initializing Arc " + IPL_VERSION);
         getLogger().info(TextFormat.DARK_GREEN + "Reading main configuration...");
 
@@ -87,7 +90,20 @@ public final class Arc extends PluginBase {
 
     @Override
     public void onDisable() {
+        getLogger().info("Saving file configuration...");
+        saveConfig();
 
+        getLogger().info("Closing resources...");
+        exemptionManager.close();
+        violationManager.close();
+        checkManager.close();
+        punishmentManager.close();
+
+        getLogger().info("Removing player data...");
+        getServer().getOnlinePlayers().values().forEach(Data::removeAll);
+        arc = null;
+
+        getLogger().info("Goodbye.");
     }
 
     /**
@@ -109,57 +125,58 @@ public final class Arc extends PluginBase {
         getServer().getOnlinePlayers()
                 .values()
                 .forEach(player -> {
-                    Arc.arc().violations().onPlayerJoin(player);
-                    Arc.arc().exemptions().onPlayerJoin(player);
+                    violationManager.onPlayerJoin(player);
+                    exemptionManager.onPlayerJoin(player);
                 });
     }
 
+
     /**
-     * @return this instance.
+     * @return the internal plugin
      */
-    public static Arc arc() {
-        return Arc.arc;
+    public static Plugin getPlugin() {
+        return arc;
     }
 
     /**
-     * @return this plugin
+     * @return arc
      */
-    public static Plugin plugin() {
-        return Arc.arc;
+    public static Arc getInstance() {
+        return arc;
     }
 
     /**
-     * @return the arc configuration
+     * @return the configuration
      */
-    public ArcConfiguration configuration() {
+    public ArcConfiguration getArcConfiguration() {
         return arcConfiguration;
     }
 
     /**
      * @return the violation manager
      */
-    public ViolationManager violations() {
+    public ViolationManager getViolationManager() {
         return violationManager;
     }
 
     /**
-     * @return the exemptions manager
+     * @return the exemption manager
      */
-    public ExemptionManager exemptions() {
+    public ExemptionManager getExemptionManager() {
         return exemptionManager;
-    }
-
-    /**
-     * @return the check manager
-     */
-    public CheckManager checks() {
-        return checkManager;
     }
 
     /**
      * @return the punishment manager
      */
-    public PunishmentManager punishment() {
+    public PunishmentManager getPunishmentManager() {
         return punishmentManager;
+    }
+
+    /**
+     * @return the check manager
+     */
+    public CheckManager getCheckManager() {
+        return checkManager;
     }
 }

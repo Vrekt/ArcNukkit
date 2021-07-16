@@ -15,6 +15,7 @@ public final class MathUtil {
      * @return the vertical distance
      */
     public static double vertical(Location from, Location to) {
+        if (from == null || to == null) return 0.0;
         final double dy = to.getY() - from.getY();
         return Math.sqrt(dy * dy);
     }
@@ -27,6 +28,8 @@ public final class MathUtil {
      * @return the distance
      */
     public static double distance(Location from, Location to) {
+        if (from == null || to == null) return 0.0;
+
         final double dx = to.getX() - from.getX();
         final double dy = to.getY() - from.getY();
         final double dz = to.getZ() - from.getZ();
@@ -41,6 +44,8 @@ public final class MathUtil {
      * @return distance
      */
     public static double horizontal(Location from, Location to) {
+        if (from == null || to == null) return 0.0;
+
         final double dx = to.getX() - from.getX();
         final double dz = to.getZ() - from.getZ();
         return Math.sqrt(dx * dx + dz * dz);
@@ -62,5 +67,17 @@ public final class MathUtil {
         if (angle < -180.0F) angle += 360.0F;
         return angle;
     }
+
+    /**
+     * NumberConversions floor from Bukkit.
+     *
+     * @param num the number
+     * @return the floor, carpet preferably.
+     */
+    public static int floor(double num) {
+        final int floor = (int) num;
+        return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
+    }
+
 
 }

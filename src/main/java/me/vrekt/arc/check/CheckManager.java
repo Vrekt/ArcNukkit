@@ -2,14 +2,13 @@ package me.vrekt.arc.check;
 
 import me.vrekt.arc.check.moving.Flight;
 import me.vrekt.arc.check.moving.MorePackets;
+import me.vrekt.arc.check.moving.Speed;
 import me.vrekt.arc.check.player.FastUse;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.configuration.Configurable;
 
 import java.io.Closeable;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A check manager
@@ -17,9 +16,9 @@ import java.util.Set;
 public final class CheckManager extends Configurable implements Closeable {
 
     /**
-     * All the checks
+     * Map of all checks.
      */
-    private final Set<Check> checks = new HashSet<>();
+    private final Map<CheckType, Check> checks = new HashMap<>();
 
     /**
      * Populate the check map.
@@ -28,6 +27,7 @@ public final class CheckManager extends Configurable implements Closeable {
         add(new FastUse());
         add(new MorePackets());
         add(new Flight());
+        add(new Speed());
     }
 
     /**
@@ -36,38 +36,39 @@ public final class CheckManager extends Configurable implements Closeable {
      * @param check the check
      */
     private void add(Check check) {
-        checks.add(check);
+        checks.put(check.type(), check);
     }
 
     @Override
     public void reload(ArcConfiguration configuration) {
-        checks.forEach(check -> check.reload(configuration));
+        checks.values().forEach(check -> check.reload(configuration));
     }
 
     /**
      * Get a check
      *
-     * @param checkType the type
+     * @param check the check
+     * @param <T>   the type
      * @return the check
      */
-    public Check getCheck(CheckType checkType) {
-        return checks
-                .stream()
-                .filter(check -> check.type() == checkType)
-                .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Could not find check " + checkType.getName()));
+    @SuppressWarnings("unchecked")
+    public <T extends Check> T getCheck(CheckType check) {
+        return (T) checks.get(check);
     }
 
     /**
-     * @return all checks
+     * Check if a check is enabled
+     *
+     * @param check the check
+     * @return {@code true} if so
      */
-    public Set<Check> getAllChecks() {
-        return checks;
+    public boolean isCheckEnabled(CheckType check) {
+        return checks.get(check).enabled();
     }
 
     @Override
     public void close() {
-        checks.forEach(Check::unload);
+        checks.values().forEach(Check::unload);
         checks.clear();
     }
 }

@@ -15,9 +15,14 @@ public enum CheckType {
     MORE_PACKETS("MorePackets", CheckCategory.MOVING),
 
     /**
-     * Checks if the player is flying
+     * Checks if the player is flying.
      */
-    FLIGHT("Flight", CheckCategory.MOVING);
+    FLIGHT("Flight", CheckCategory.MOVING),
+
+    /**
+     * Checks if the player is moving too fast.
+     */
+    SPEED("Speed", CheckCategory.MOVING);
 
     /**
      * The name

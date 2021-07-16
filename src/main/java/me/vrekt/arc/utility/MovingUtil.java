@@ -3,11 +3,10 @@ package me.vrekt.arc.utility;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.Location;
+import cn.nukkit.math.BlockFace;
+import me.vrekt.arc.compatibility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
-import me.vrekt.arc.utility.block.Blocks;
 import me.vrekt.arc.utility.math.MathUtil;
-
-import java.util.function.Predicate;
 
 /**
  * Moving utility for calculating various things related to movement.
@@ -23,11 +22,11 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean onGround(Location location) {
-        final Block selfBlock = location.subtract(0, 0.5, 0).getLevelBlock();
+        final Block block = location.subtract(0, 0.5, 0).getLevelBlock();
         location.add(0, 0.5, 0);
-        if (Blocks.isSolid(selfBlock)) return true;
 
-        return checkBlocksAround(location, 0.3, -0.1, 0.3, Blocks::isSolid);
+        return BlockAccess.isConsideredGround(block) ||
+                BlockAccess.hasSolidGroundAt(location, location.getLevel(), 0.3, -0.1, 0.3);
     }
 
     /**
@@ -37,18 +36,17 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean hasClimbable(Location location) {
-        final Block selfBlock = location.getLevelBlock();
-        if (Blocks.isClimbable(selfBlock)) return true;
-        return checkBlocksAround(location, 0.1, -0.06, 0.1, Blocks::isClimbable);
+        return BlockAccess.isClimbable(location.getLevelBlock()) ||
+                BlockAccess.hasClimbableAt(location, location.getLevel(), 0.1, -0.06, 0.1);
     }
 
     /**
      * @return if we are in or on liquid.
      */
     public static boolean isInOrOnLiquid(Location location) {
-        if (Blocks.isLiquid(location.getLevelBlock())) return true;
-        final boolean liquidRelative = Blocks.isLiquid(location.getLevelBlock().down());
-        return liquidRelative || checkBlocksAround(location, 0.3, -0.1, 0.3, Blocks::isLiquid);
+        return BlockAccess.isLiquid(location.getLevelBlock()) ||
+                BlockAccess.isLiquid(location.getLevelBlock().getSide(BlockFace.DOWN)) ||
+                BlockAccess.hasLiquidAt(location, location.getLevel(), 0.3, -0.1, 0.3);
     }
 
     /**
@@ -56,96 +54,11 @@ public final class MovingUtil {
      * @return {@code true} if the location is on ice
      */
     public static boolean isOnIce(Location location) {
-        if (Blocks.isIce(location.getLevelBlock())) return true;
-        final boolean iceRelative = Blocks.isIce(location.getLevelBlock().down());
-        return iceRelative || checkBlocksAround(location, 0.1, -0.01, 0.1, Blocks::isIce);
+        return BlockAccess.isIce(location.getLevelBlock()) ||
+                BlockAccess.isIce(location.getLevelBlock().getSide(BlockFace.DOWN)) ||
+                BlockAccess.hasIceAt(location, location.getLevel(), 0.1, -0.01, 0.1);
     }
 
-    /**
-     * Check if we are on ice with trapdoors.
-     *
-     * @param location the location
-     * @return {@code true} if so
-     * TODO
-     */
-    public static boolean isOnIceTrapdoor(Location location) {
-        return true;
-    }
-
-    /**
-     * Check if the location has a block.
-     *
-     * @param location  the location
-     * @param xModifier the X modifier
-     * @param yModifier the Y modifier
-     * @param zModifier the Z modifier
-     * @param predicate the predicate to test
-     * @return {@code true} if so
-     */
-    public static boolean hasBlock(Location location, double xModifier, double yModifier, double zModifier, Predicate<Block> predicate) {
-        final Block self = location.getLevelBlock();
-        if (predicate.test(self)) return true;
-        final Block under = location.getLevelBlock().down();
-        if (predicate.test(under)) return true;
-        return checkBlocksAround(location, xModifier, yModifier, zModifier, predicate);
-    }
-
-    /**
-     * Check blocks around a location
-     *
-     * @param location  the location
-     * @param xModifier the xModifier
-     * @param yModifier the yModifier
-     * @param zModifier the zModifier
-     * @param predicate the predicate to test against
-     * @return {@code true} if the predicate is successful.
-     */
-    public static boolean checkBlocksAround(Location location, double xModifier, double yModifier, double zModifier, Predicate<Block> predicate) {
-        final double originalX = location.getX();
-        final double originalY = location.getY();
-        final double originalZ = location.getZ();
-
-        if (predicate.test(getBlockFromModifier(location, xModifier, yModifier, -zModifier, originalX, originalY, originalZ)))
-            return true;
-        if (predicate.test(getBlockFromModifier(location, -xModifier, yModifier, zModifier, originalX, originalY, originalZ)))
-            return true;
-        if (predicate.test(getBlockFromModifier(location, -xModifier, yModifier, -zModifier, originalX, originalY, originalZ)))
-            return true;
-        return predicate.test(getBlockFromModifier(location, xModifier, yModifier, zModifier, originalX, originalY, originalZ));
-    }
-
-    /**
-     * Get a block from a modifier
-     *
-     * @param location  the location
-     * @param xModifier the xModifier
-     * @param yModifier the yModifier
-     * @param zModifier the zModifier
-     * @param originalX the original X
-     * @param originalY the original Y
-     * @param originalZ the original Z
-     * @return the block
-     */
-    public static Block getBlockFromModifier(Location location, double xModifier, double yModifier, double zModifier, double originalX, double originalY, double originalZ) {
-        location.add(xModifier, yModifier, zModifier);
-        final Block block = location.getLevelBlock();
-        reset(location, originalX, originalY, originalZ);
-        return block;
-    }
-
-    /**
-     * Reset the location
-     *
-     * @param location  the location
-     * @param originalX the original X
-     * @param originalY the original Y
-     * @param originalZ the original Z
-     */
-    public static void reset(Location location, double originalX, double originalY, double originalZ) {
-        location.x = originalX;
-        location.y = originalY;
-        location.z = originalZ;
-    }
 
     /**
      * Calculate player movement
@@ -173,8 +86,17 @@ public final class MovingUtil {
 
         // calculate ground stuff.
         if (onGround) {
+            // set initial safe location if null.
+            if (data.getSafeLocation() == null) {
+                data.setSafeLocation(cloneTo);
+            }
+
+            // Set ground location with the cloned location.
             data.ground(cloneTo);
-            data.incrementOnGroundTime();
+            // Here, reset the ladder location once we touch the ground.
+            data.setLadderLocation(null);
+
+            // TODO: Work on slime-block compatibility.
 
             final boolean isOnIce = MovingUtil.isOnIce(cloneTo);
             final boolean wasOnIce = MovingUtil.isOnIce(cloneFrom);
@@ -191,6 +113,7 @@ public final class MovingUtil {
 
         } else {
             data.onGroundTime(0);
+            if (data.getSafeLocation() == null) data.setSafeLocation(from);
         }
 
         // calculate sprinting and sneaking times
@@ -240,7 +163,6 @@ public final class MovingUtil {
         final boolean inLiquid = MovingUtil.isInOrOnLiquid(cloneTo);
         data.inLiquid(inLiquid);
         data.lastMovingUpdate(now);
-
     }
 
 }

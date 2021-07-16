@@ -1,6 +1,6 @@
 name: Arc
 main: me.vrekt.arc.Arc
-version: 1.2
+version: 1.3
 description: An anticheat for Nukkit.
 author: Vrekt
 api: ["1.0.0"]
@@ -33,12 +33,11 @@ permissions:
           arc.bypass.moving.morepackets:
             description: Allows the player to bypass the MorePackets check.
           arc.bypass.moving.flight:
-            description: Allows the plaeyr to bypass the Flight check.
+            description: Allows the player to bypass the Flight check.
+          arc.bypass.moving.speed:
+            description: Allows the player to bypass the Speed check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
-    children:
-      arc.violations.debug:
-        description: Allows the player to view extra debug information with violations.
   arc.administrator:
     description: Allows the player permission to manage Arc.
     default: false

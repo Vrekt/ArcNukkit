@@ -57,7 +57,7 @@ public final class ViolationManager extends Configurable implements Closeable {
      */
     public void initialize(ArcConfiguration configuration) {
         this.configuration = configuration;
-        this.punishmentManager = Arc.arc().punishment();
+        this.punishmentManager = Arc.getInstance().getPunishmentManager();
 
         historyCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)

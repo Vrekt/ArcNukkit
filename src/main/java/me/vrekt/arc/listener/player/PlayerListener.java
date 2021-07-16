@@ -21,7 +21,7 @@ public final class PlayerListener implements Listener {
     private final FastUse fastUse;
 
     public PlayerListener() {
-        fastUse = (FastUse) Arc.arc().checks().getCheck(CheckType.FAST_USE);
+        fastUse = (FastUse) Arc.getInstance().getCheckManager().getCheck(CheckType.FAST_USE);
     }
 
     /**

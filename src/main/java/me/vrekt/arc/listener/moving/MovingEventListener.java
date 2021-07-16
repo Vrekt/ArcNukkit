@@ -9,6 +9,7 @@ import cn.nukkit.level.Location;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.moving.Flight;
+import me.vrekt.arc.check.moving.Speed;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.utility.MovingUtil;
 
@@ -22,8 +23,14 @@ public final class MovingEventListener implements Listener {
      */
     private final Flight flight;
 
+    /**
+     * The speed check
+     */
+    private final Speed speed;
+
     public MovingEventListener() {
-        flight = (Flight) Arc.arc().checks().getCheck(CheckType.FLIGHT);
+        flight = Arc.getInstance().getCheckManager().getCheck(CheckType.FLIGHT);
+        speed = Arc.getInstance().getCheckManager().getCheck(CheckType.SPEED);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -41,7 +48,6 @@ public final class MovingEventListener implements Listener {
             // run checks
             runChecks(player, data);
         }
-
     }
 
     /**

@@ -42,8 +42,10 @@ public final class MovingData {
      * From movement
      * To movement
      * the ground location
+     * A safe location (hopefully)
+     * The ladder location
      */
-    private Location from, to, ground;
+    private Location from, to, ground, safe, ladderLocation;
 
     /**
      * Arc ground and client ground
@@ -147,6 +149,11 @@ public final class MovingData {
      * If the move player packet should be cancelled.
      */
     private boolean cancelMovePlayerPacket;
+
+    /**
+     * If we had a climbable object
+     */
+    private boolean hadClimbable;
 
     public Location from() {
         return from;
@@ -556,5 +563,29 @@ public final class MovingData {
 
     public void cancelMovePlayerPacket(boolean cancelMovePlayerPacket) {
         this.cancelMovePlayerPacket = cancelMovePlayerPacket;
+    }
+
+    public boolean hadClimbable() {
+        return hadClimbable;
+    }
+
+    public void hadClimbable(boolean hadClimbable) {
+        this.hadClimbable = hadClimbable;
+    }
+
+    public Location getSafeLocation() {
+        return safe;
+    }
+
+    public void setSafeLocation(Location safeLocation) {
+        this.safe = safeLocation;
+    }
+
+    public Location getLadderLocation() {
+        return ladderLocation;
+    }
+
+    public void setLadderLocation(Location ladderLocation) {
+        this.ladderLocation = ladderLocation;
     }
 }

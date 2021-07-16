@@ -2,10 +2,10 @@ package me.vrekt.arc.check;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.level.Location;
 import cn.nukkit.scheduler.TaskHandler;
 import me.vrekt.arc.Arc;
-import me.vrekt.arc.check.result.CancelType;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.configuration.Configurable;
@@ -24,12 +24,12 @@ public abstract class Check extends Configurable {
     /**
      * Exemptions
      */
-    private static final ExemptionManager EXEMPTION_MANAGER = Arc.arc().exemptions();
+    private static final ExemptionManager EXEMPTION_MANAGER = Arc.getInstance().getExemptionManager();
 
     /**
      * Violations
      */
-    private static final ViolationManager VIOLATION_MANAGER = Arc.arc().violations();
+    private static final ViolationManager VIOLATION_MANAGER = Arc.getInstance().getViolationManager();
 
     /**
      * The check type
@@ -189,26 +189,52 @@ public abstract class Check extends Configurable {
      *
      * @param result the result
      */
-    protected ViolationResult checkViolation(Player player, CheckResult result) {
+    protected ViolationResult checkViolationWithResult(Player player, CheckResult result) {
         if (result.failed()) return VIOLATION_MANAGER.violation(player, this, result);
         return ViolationResult.EMPTY;
     }
 
     /**
-     * Process the check result.
+     * Process the provided {@code result}
      *
      * @param player the player
      * @param result the result
-     * @param cancel the cancel location
-     * @param type   the type of cancel
+     * @return {@code true} if the check should cancel.
      */
-    protected ViolationResult checkViolation(Player player, CheckResult result, Location cancel, CancelType type) {
+    protected boolean checkViolation(Player player, CheckResult result) {
+        return checkViolationWithResult(player, result).cancel();
+    }
+
+    /**
+     * Handle a check violation and reset the result after.
+     *
+     * @param player   the player
+     * @param result   the result
+     * @param cancelTo the cancel To
+     * @return the result
+     */
+    protected boolean handleCheckViolationAndReset(Player player, CheckResult result, Location cancelTo) {
         if (result.failed()) {
             final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
-            if (vr.cancel()) result.cancelTo(cancel, type);
-            return vr;
+            if (vr.cancel()) {
+                player.teleport(cancelTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            }
+            result.reset();
+            return vr.cancel();
         }
-        return ViolationResult.EMPTY;
+
+        result.reset();
+        return false;
+    }
+
+    /**
+     * Set back the player
+     *
+     * @param player the player
+     * @param where  where to
+     */
+    protected void setbackPlayer(Player player, Location where) {
+        player.teleport(where, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
 
     /**
@@ -239,7 +265,7 @@ public abstract class Check extends Configurable {
      * @param every    timer
      */
     protected void schedule(Runnable runnable, int every) {
-        task = Server.getInstance().getScheduler().scheduleRepeatingTask(Arc.plugin(), runnable, every);
+        task = Server.getInstance().getScheduler().scheduleRepeatingTask(Arc.getPlugin(), runnable, every);
     }
 
     /**

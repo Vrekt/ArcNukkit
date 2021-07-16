@@ -28,7 +28,7 @@ public final class CheckConfigurationBuilder {
     public CheckConfigurationBuilder(CheckType check) {
         this.check = check;
 
-        final Config configuration = Arc.arc().getConfig();
+        final Config configuration = Arc.getPlugin().getConfig();
         final String name = check.getName();
 
         // creates the section if it doesn't exist.

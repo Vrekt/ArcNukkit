@@ -72,7 +72,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
     private void read(ArcConfiguration configuration) {
         this.banConfiguration = configuration.banConfiguration();
         this.kickConfiguration = configuration.kickConfiguration();
-        enableEventApi = Arc.arc().configuration().enableEventApi();
+        enableEventApi = Arc.getInstance().getArcConfiguration().enableEventApi();
     }
 
     /**
@@ -136,7 +136,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 .time(banConfiguration.globalBanDelay())
                 .value();
         Server.getInstance().broadcast(violation, Permissions.ARC_VIOLATIONS);
-        Server.getInstance().getScheduler().scheduleDelayedTask(Arc.plugin(), () -> ban(player, check, date, length), banConfiguration.globalBanDelay() * 20);
+        Server.getInstance().getScheduler().scheduleDelayedTask(Arc.getPlugin(), () -> ban(player, check, date, length), banConfiguration.globalBanDelay() * 20);
     }
 
     /**
@@ -151,7 +151,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
         if (!hasPendingBan(player.getName())) return;
         final BanListType type = banConfiguration.globalBanType();
         if (type == BanListType.IP && player.getAddress() == null) {
-            Arc.arc().getLogger().warning("Failed to ban player " + player.getName());
+            Arc.getPlugin().getLogger().warning("Failed to ban player " + player.getName());
             pendingPlayerBans.remove(player);
             return;
         }
@@ -208,7 +208,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 .time(kickConfiguration.globalKickDelay())
                 .value();
         Server.getInstance().broadcast(violationsMessage, Permissions.ARC_VIOLATIONS);
-        Server.getInstance().getScheduler().scheduleDelayedTask(Arc.plugin(), () -> {
+        Server.getInstance().getScheduler().scheduleDelayedTask(Arc.getPlugin(), () -> {
             final String message = kickConfiguration.globalKickMessage()
                     .check(check, null)
                     .value();

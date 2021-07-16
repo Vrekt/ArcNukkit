@@ -1,7 +1,7 @@
 package me.vrekt.arc.check.result;
 
-import cn.nukkit.level.Location;
 import cn.nukkit.utils.TextFormat;
+import me.vrekt.arc.Arc;
 
 /**
  * Represents a check result.
@@ -31,20 +31,26 @@ public final class CheckResult {
     private StringBuilder informationBuilder;
 
     /**
-     * The cancel location
+     * If we have failed at all.
      */
-    private Location cancel;
-
-    /**
-     * The cancel type
-     */
-    private CancelType cancelType;
+    private boolean failedBefore;
 
     /**
      * Empty
      */
     public CheckResult() {
 
+    }
+
+    /**
+     * Create a result from another
+     *
+     * @param other the other
+     */
+    public CheckResult(CheckResult other) {
+        this.result = other.result;
+        this.failedBefore = other.failedBefore;
+        this.informationBuilder = other.informationBuilder;
     }
 
     /**
@@ -69,8 +75,26 @@ public final class CheckResult {
      * @param information the initial information
      */
     public CheckResult setFailed(String information) {
+        if (informationBuilder != null && informationBuilder.length() != 0) {
+            Arc.getPlugin().getLogger().warning("A check is not resetting the check result, information: \n" + information);
+        }
+
         setFailed();
         info(information);
+        return this;
+    }
+
+    /**
+     * Attach parameter debug information to this result.
+     *
+     * @param parameter the parameter
+     * @param value     the value
+     * @return this
+     */
+    public CheckResult withParameter(String parameter, Object value) {
+        if (informationBuilder == null) informationBuilder = new StringBuilder();
+        informationBuilder.append("\n").append(TextFormat.GRAY);
+        informationBuilder.append(parameter).append("=").append(value.toString());
         return this;
     }
 
@@ -80,6 +104,7 @@ public final class CheckResult {
     public CheckResult setFailed() {
         this.result = Result.FAILED;
         this.informationBuilder = new StringBuilder();
+        this.failedBefore = true;
         return this;
     }
 
@@ -94,32 +119,17 @@ public final class CheckResult {
     }
 
     /**
-     * Add a parameter
-     *
-     * @param parameter the parameter
-     * @param value     the value
-     */
-    public void parameter(String parameter, Object value) {
-        if (informationBuilder == null) informationBuilder = new StringBuilder();
-        informationBuilder.append(" ").append(TextFormat.GRAY);
-        informationBuilder.append(parameter).append("=").append(value.toString());
-    }
-
-    /**
-     * Set where to cancel to
-     *
-     * @param location the location
-     */
-    public void cancelTo(Location location, CancelType type) {
-        this.cancel = location;
-        this.cancelType = type;
-    }
-
-    /**
      * @return if the player has failed
      */
     public boolean failed() {
         return result == Result.FAILED;
+    }
+
+    /**
+     * @return if the player has failed before.
+     */
+    public boolean hasFailedBefore() {
+        return failedBefore;
     }
 
     /**
@@ -130,28 +140,12 @@ public final class CheckResult {
     }
 
     /**
-     * @return the cancel location
-     */
-    public Location cancel() {
-        return cancel;
-    }
-
-    /**
-     * @return the cancel type
-     */
-    public CancelType cancelType() {
-        return cancelType;
-    }
-
-    /**
      * Reset this result
      */
     public void reset() {
         if (result == Result.FAILED) {
-            cancel = null;
             result = Result.PASSED;
             informationBuilder.setLength(0);
         }
     }
-
 }

@@ -80,7 +80,7 @@ public abstract class ArcBaseCommand {
     protected boolean checkBasePermissions(CommandSender sender) {
         if (!sender.hasPermission(Permissions.ARC_COMMANDS_BASE)
                 || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL)) {
-            sender.sendMessage(Arc.arc().configuration().commandNoPermissionMessage());
+            sender.sendMessage(Arc.getInstance().getArcConfiguration().commandNoPermissionMessage());
             return false;
         }
         return true;

@@ -64,7 +64,7 @@ public final class CheckConfiguration extends Configurable {
 
     @Override
     public void reload(ArcConfiguration configuration) {
-        this.section = Arc.arc().getConfig().getSection(check.getName());
+        this.section = Arc.getPlugin().getConfig().getSection(check.getName());
         read(null);
     }
 

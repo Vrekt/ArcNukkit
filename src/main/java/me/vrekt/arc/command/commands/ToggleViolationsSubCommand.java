@@ -35,7 +35,7 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
      * @return {@code true} if violations are on.
      */
     private boolean toggleState(Player player) {
-        return Arc.arc().violations().toggleViolationsViewer(player);
+        return Arc.getInstance().getViolationManager().toggleViolationsViewer(player);
     }
 
 }

@@ -7,7 +7,6 @@ import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.data.moving.MovingData;
-import me.vrekt.arc.violation.result.ViolationResult;
 
 /**
  * Checks if the player is sending too many movement related packets.
@@ -60,9 +59,7 @@ public final class MorePackets extends Check {
         final CheckResult result = new CheckResult();
         if (moveCount > maxMovesPerSecond) {
             populateResult(result, "Too many move packets per second", moveCount, maxMovesPerSecond);
-            final ViolationResult vr = checkViolation(player, result);
-            data.cancelMovePlayerPacket(vr.cancel());
-
+            data.cancelMovePlayerPacket(checkViolation(player, result));
             kickPlayerIfThresholdReached(player, moveCount);
         } else {
             data.cancelMovePlayerPacket(false);
@@ -80,9 +77,9 @@ public final class MorePackets extends Check {
      * @param max         the max
      */
     private void populateResult(CheckResult result, String information, int count, int max) {
-        result.setFailed(information);
-        result.parameter("count", count);
-        result.parameter("max", max);
+        result.setFailed(information)
+                .withParameter("count", count)
+                .withParameter("max", max);
     }
 
     /**
@@ -92,8 +89,9 @@ public final class MorePackets extends Check {
      * @param count  the count
      */
     private void kickPlayerIfThresholdReached(Player player, int count) {
-        if (kickIfThresholdReached && count >= packetKickThreshold && !Arc.arc().punishment().hasPendingKick(player)) {
-            Arc.arc().punishment().kickPlayer(player, this);
+        if (kickIfThresholdReached && count >= packetKickThreshold
+                && Arc.getInstance().getPunishmentManager().hasPendingKick(player)) {
+            Arc.getInstance().getPunishmentManager().kickPlayer(player, this);
         }
     }
 

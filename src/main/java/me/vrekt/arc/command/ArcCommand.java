@@ -29,7 +29,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         addSubCommand("debug", new DebugSubCommand());
 
         // initialize help message.
-        final String prefix = Arc.arc().configuration().prefix();
+        final String prefix = Arc.getInstance().getArcConfiguration().prefix();
         helpLine(Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS, prefix + TextFormat.DARK_AQUA + " /arc violations - " + TextFormat.GRAY + "Toggle violations on or off.");
         helpLine(Permissions.ARC_COMMANDS_RELOAD_CONFIG, prefix + TextFormat.DARK_AQUA + " /arc reload - " + TextFormat.GRAY + "Reloads the configuration.");
         helpLine(Permissions.ARC_COMMANDS_CANCEL_BAN, prefix + TextFormat.DARK_AQUA + " /arc cancelban <player> - " + TextFormat.GRAY + "Cancel a pending player ban.");
