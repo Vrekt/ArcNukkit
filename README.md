@@ -10,7 +10,7 @@ The goal of Arc is to be highly performant, configurable and easy to work with. 
 
 # Features
 
-#### Extensive configuration
+### Extensive configuration
 
 Arc allows you to customize checks, violations, messages, banning, kicking, and a few advanced features within Arc. You can also customize check parameters allowing you to tune the check to your players needs.
 
@@ -22,13 +22,13 @@ With this change, there is more headroom for lag and thus a smoother experience 
 
 **All check configurations are already tested and are optimized, so in most cases you shouldn't need to change much.**
 
-#### Performant
+### Performant
 
 Arc is built with performance in mind with every check and feature, and optimizations are constantly being added.
 
 In the future, there will be tick/lag watch features and Arc will take into account the server TPS and adjust accordingly.
 
-#### Permissions
+### Permissions
 
 Arc includes a very extensive permission set and system. Arc has permissions for every command, check category and check. This allows you to fully disable certain categories for players, or just disable one check.
 
@@ -36,13 +36,13 @@ For example, giving the player the permission `arc.bypass.moving` will allow the
 
 But assigning `arc.bypass.moving.flight` will allow them to bypass **ONLY** the flight check.
 
-#### Commands
+### Commands
 
 Another goal of Arc is to provide powerful administration tools. These features are still work-in-progress but right now there are a few.
 
 At the moment Arc allows you to cancel bans scheduled, enable or disable violation messages, enable or disable debugging and the ability to reload the configuration anytime via a command.
 
-#### Other
+### Other
 
 Arc is able to keep player violation data when they logout for a set period of time. This prevents players from re-logging to restate their state within the Anticheat. This timeout value is also configurable. 
 
