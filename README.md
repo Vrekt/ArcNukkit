@@ -1,10 +1,12 @@
-# ArcNukkit
+# Arc
 
-**An experimental anticheat for Nukkit.**
+### What is it?
 
-*This version is a fork of my Bukkit/Spigot version of Arc.*
+Arc is an experimental anticheat for Nukkit. It is based off my Bukkit version, which you can find [here](https://github.com/Vrekt/Arc)
 
-*Most of the base is the same as the Bukkit one, meaning it has a-lot of the same features!*
+The goal of Arc is to be highly performant, configurable and easy to work with.
+
+Checks are designed to be more leniant allowing smooth gameplay, but not allowing anything abnormal. (This of course can be changed through configuration)
 
 # Features
 - Extensive configuration and permission system
