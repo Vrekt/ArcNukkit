@@ -4,7 +4,7 @@ Arc is an experimental anticheat for Nukkit. It is a "fork" of my Bukkit version
 
 Regardless, The goal of Arc is to be highly performant, configurable and easy to work with. Checks are designed for the smoothest gameplay, while still being very effective. Every check is very customizable and features many vaules within the configuration allowing you to tune exactly how it works within your server.
 
-# Features
+## Features
 
 #### Configurable
 - Customize checks
@@ -33,7 +33,7 @@ Arc is built with performance in mind with every check and feature, and optimiza
 
 The base of Arc is very stable and easy to work with. This allows new features or checks to be implemented easily, or for anybody else to add something!
 
-# Permissions Overview
+## Permissions 
 Arc has a very extensive permissions system. You can choose to bypass all checks, a category all together or a singular check.
 
 *Command access*
@@ -56,7 +56,7 @@ Arc has a very extensive permissions system. You can choose to bypass all checks
 *View player violations as they come in*
 - `arc.violations` Allows you to view violations.
 
-# Checks
+## Checks
 
 Please note not all checks are finished, and not all checks fully block that certain cheat, **YET**
 
@@ -74,11 +74,12 @@ Please note not all checks are finished, and not all checks fully block that cer
 - Prevents the player from using timer cheats and regeneration.
 - Prevents the player from 'blinking'
 
-# Configuration
+## Configuration
 
 You can view each configuration value and what they mean/do in the wiki [here](https://github.com/Vrekt/ArcNukkit/wiki)
 
-# In-depth
+## In-depth 
+
 ### Extensive configuration
 
 Arc allows you to customize checks, violations, messages, banning, kicking, and a few advanced features within Arc. You can also customize check parameters allowing you to tune the check to your players needs.
