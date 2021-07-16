@@ -1,52 +1,37 @@
 # Arc
 
-### What is it?
+Arc is an experimental anticheat for Nukkit. It is a "fork" of my Bukkit version, which you can find on my page. Arc is still in the very early stages of developement and as such alot of checks are missing, incomplete or not fully functional yet.
 
-**Arc is an experimental anticheat for Nukkit. It is based off my Bukkit version, which you can find [here](https://github.com/Vrekt/Arc)**
-
-**Arc is still in the very early stages and most checks are incomplete and not fully functional yet.**
-
-The goal of Arc is to be highly performant, configurable and easy to work with. Checks are designed for the smoothest gameplay, while still being very effective. Every check is very customizable and features many vaules within the configuration allowing you to tune exactly how it works within your server. 
+Regardless, The goal of Arc is to be highly performant, configurable and easy to work with. Checks are designed for the smoothest gameplay, while still being very effective. Every check is very customizable and features many vaules within the configuration allowing you to tune exactly how it works within your server.
 
 # Features
 
-### Extensive configuration
+#### Configurable
+- Customize checks
+- Customize violations
+- Customize messages
+- Customize punishment
+- And more!
 
-Arc allows you to customize checks, violations, messages, banning, kicking, and a few advanced features within Arc. You can also customize check parameters allowing you to tune the check to your players needs.
+#### Performant
 
-For example, in the `MorePackets` check you can change how many packets are allowed per second. This is useful for laggy players or a laggy server.
+Arc is built with performance in mind with every check and feature, and optimizations are constantly being added. In the future, there will be tick/lag watch features and Arc will take into account the server TPS and adjust accordingly.
 
-`max-moves-per-second: 25 -> max-moves-per-second: 30`
+#### Permissions
+- Permissions for each command
+- Permissions for each check
+- Permissions for check categories
+- Permissions for administrative actions
 
-With this change, there is more headroom for lag and thus a smoother experience while still being safe.
+#### Commands
+- Toggle violations on or off.
+- Toggle debug messages on or off.
+- Cancel a ban that was scheduled by Arc
+- Configuration reloading for easy modification during up-time.
 
-**All check configurations are already tested and are optimized, so in most cases you shouldn't need to change much.**
+#### Misc
 
-### Performant
-
-Arc is built with performance in mind with every check and feature, and optimizations are constantly being added.
-
-In the future, there will be tick/lag watch features and Arc will take into account the server TPS and adjust accordingly.
-
-### Permissions
-
-Arc includes a very extensive permission set and system. Arc has permissions for every command, check category and check. This allows you to fully disable certain categories for players, or just disable one check.
-
-For example, giving the player the permission `arc.bypass.moving` will allow them to bypass **ALL** moving checks. 
-
-But assigning `arc.bypass.moving.flight` will allow them to bypass **ONLY** the flight check.
-
-### Commands
-
-Another goal of Arc is to provide powerful administration tools. These features are still work-in-progress but right now there are a few.
-
-At the moment Arc allows you to cancel bans scheduled, enable or disable violation messages, enable or disable debugging and the ability to reload the configuration anytime via a command.
-
-### Other
-
-Arc is able to keep player violation data when they logout for a set period of time. This prevents players from re-logging to restate their state within the Anticheat. This timeout value is also configurable. 
-
-The base of Arc is very strong and easy to work with. This allows anybody to easily fork or implement and feature or check they want.
+The base of Arc is very stable and easy to work with. This allows new features or checks to be implemented easily, or for anybody else to add something!
 
 # Permissions Overview
 Arc has a very extensive permissions system. You can choose to bypass all checks, a category all together or a singular check.
@@ -92,3 +77,42 @@ Please note not all checks are finished, and not all checks fully block that cer
 # Configuration
 
 You can view each configuration value and what they mean/do in the wiki [here](https://github.com/Vrekt/ArcNukkit/wiki)
+
+# In-depth
+### Extensive configuration
+
+Arc allows you to customize checks, violations, messages, banning, kicking, and a few advanced features within Arc. You can also customize check parameters allowing you to tune the check to your players needs.
+
+For example, in the `MorePackets` check you can change how many packets are allowed per second. This is useful for laggy players or a laggy server.
+
+`max-moves-per-second: 25 -> max-moves-per-second: 30`
+
+With this change, there is more headroom for lag and thus a smoother experience while still being safe.
+
+**All check configurations are already tested and are optimized, so in most cases you shouldn't need to change much.**
+
+### Performant
+
+Arc is built with performance in mind with every check and feature, and optimizations are constantly being added.
+
+In the future, there will be tick/lag watch features and Arc will take into account the server TPS and adjust accordingly.
+
+### Permissions
+
+Arc includes a very extensive permission set and system. Arc has permissions for every command, check category and check. This allows you to fully disable certain categories for players, or just disable one check.
+
+For example, giving the player the permission `arc.bypass.moving` will allow them to bypass **ALL** moving checks. 
+
+But assigning `arc.bypass.moving.flight` will allow them to bypass **ONLY** the flight check.
+
+### Commands
+
+Another goal of Arc is to provide powerful administration tools. These features are still work-in-progress but right now there are a few.
+
+At the moment Arc allows you to cancel bans scheduled, enable or disable violation messages, enable or disable debugging and the ability to reload the configuration anytime via a command.
+
+### Other
+
+Arc is able to keep player violation data when they logout for a set period of time. This prevents players from re-logging to restate their state within the Anticheat. This timeout value is also configurable. 
+
+The base of Arc is very strong and easy to work with. This allows anybody to easily fork or implement and feature or check they want.
