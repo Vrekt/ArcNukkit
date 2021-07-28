@@ -64,6 +64,7 @@ Please note not all checks are finished, and not all checks fully block that cer
 - Prevents the player from jumping too high.
 - Prevents the player from climbing vines or ladders too fast.
 - Prevents the player from jumping/ascending for too long. (AirJump, Spider, etc)
+- Prevents the player from clipping vertically through blocks
 - work-in-progress
 
 ###### FastUse
