@@ -1,6 +1,6 @@
 # Arc
 
-Arc is an experimental anticheat for Nukkit. It is a "fork" of my Bukkit version, which you can find on my page. Arc is still in the very early stages of developement and as such alot of checks are missing, incomplete or not fully functional yet.
+Arc is an experimental anticheat for Nukkit. It is a "fork" of my Bukkit version, which you can find on my page. Arc is still in the very early stages of development and as such alot of checks are missing, incomplete or not fully functional yet.
 
 Regardless, The goal of Arc is to be highly performant, configurable and easy to work with. Checks are designed for the smoothest gameplay, while still being very effective. Every check is very customizable and features many vaules within the configuration allowing you to tune exactly how it works within your server.
 
