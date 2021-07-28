@@ -58,7 +58,10 @@ public final class MorePackets extends Check {
         final int moveCount = data.movePlayerPackets();
         final CheckResult result = new CheckResult();
         if (moveCount > maxMovesPerSecond) {
-            populateResult(result, "Too many move packets per second", moveCount, maxMovesPerSecond);
+            result.setFailed("Too many movement packets per second")
+                    .withParameter("count", moveCount)
+                    .withParameter("max", maxMovesPerSecond);
+
             data.cancelMovePlayerPacket(checkViolation(player, result));
             kickPlayerIfThresholdReached(player, moveCount);
         } else {
@@ -66,20 +69,6 @@ public final class MorePackets extends Check {
         }
 
         data.movePlayerPackets(0);
-    }
-
-    /**
-     * Populate the check result with information
-     *
-     * @param result      the result
-     * @param information the information
-     * @param count       the count
-     * @param max         the max
-     */
-    private void populateResult(CheckResult result, String information, int count, int max) {
-        result.setFailed(information)
-                .withParameter("count", count)
-                .withParameter("max", max);
     }
 
     /**

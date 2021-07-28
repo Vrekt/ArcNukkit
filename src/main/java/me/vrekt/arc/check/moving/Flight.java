@@ -27,7 +27,7 @@ public final class Flight extends Check {
      * <p>
      * The distance (from the ground) required to start checking ascending stuff.
      * The distance (from the ground) (horizontal) that is capped, if the hDist > capped, no check is executed.
-     *
+     * <p>
      * Ground distance threshold is lenient here to account for bedrock movement.
      */
     private double maxJumpDistance, maxClimbSpeedUp, maxClimbSpeedDown, climbingCooldown, groundDistanceThreshold, groundDistanceHorizontalCap;
@@ -80,6 +80,9 @@ public final class Flight extends Check {
      */
     public void check(Player player, MovingData data) {
         if (exempt(player)) return;
+
+        // TODO: Elytra
+        if (player.isGliding()) return;
 
         final CheckResult result = new CheckResult();
 
@@ -235,11 +238,11 @@ public final class Flight extends Check {
     private boolean checkIfMovedThroughSolidBlock(Player player, CheckResult result, Location safe, Location from, Location to, double vertical) {
         if (vertical >= verticalClipMinimum) {
             // safe
-            final double min1 = Math.min(safe.getY(), to.getY()) - 1;
+            final double min1 = Math.min(safe.getY(), to.getY());
             final double max1 = Math.max(safe.getY(), to.getY()) + 1;
 
             // from
-            final double min2 = Math.min(from.getY(), to.getY()) - 1;
+            final double min2 = Math.min(from.getY(), to.getY());
             final double max2 = Math.max(from.getY(), to.getY()) + 1;
 
             if (hasSolidBlockBetween(min1, max1, player.getLevel(), safe)) {

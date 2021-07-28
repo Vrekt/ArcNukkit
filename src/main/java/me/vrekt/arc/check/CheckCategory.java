@@ -20,6 +20,11 @@ public enum CheckCategory {
     /**
      * Checks combat
      */
-    COMBAT
+    COMBAT,
+
+    /**
+     * Checks block related things
+     */
+    BLOCK
 
 }

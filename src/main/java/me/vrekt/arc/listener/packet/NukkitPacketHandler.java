@@ -23,10 +23,10 @@ public final class NukkitPacketHandler implements Listener {
      * This way we don't have to call containsKey literally every packet sent by players.
      */
     private final InventoryTransactionPacketListener inventoryTransactionPacketListener
-            = new InventoryTransactionPacketListener(CheckType.FAST_USE);
+            = new InventoryTransactionPacketListener();
 
     private final MovePlayerPacketListener movePlayerPacketListener
-            = new MovePlayerPacketListener(CheckType.MORE_PACKETS, this);
+            = new MovePlayerPacketListener(this);
 
     /**
      * The exemption manager.
@@ -59,7 +59,7 @@ public final class NukkitPacketHandler implements Listener {
     public void onPacketReceiving(DataPacketReceiveEvent event) {
 
         switch (event.getPacket().pid()) {
-            case ProtocolInfo.MOVE_PLAYER_PACKET:
+            case ProtocolInfo.BLOCK_EVENT_PACKET:
                 movePlayerPacketListener.onPacketReceiving(event);
                 break;
             case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:

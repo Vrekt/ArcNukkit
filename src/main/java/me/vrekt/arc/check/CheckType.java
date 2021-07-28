@@ -22,7 +22,12 @@ public enum CheckType {
     /**
      * Checks if the player is moving too fast.
      */
-    SPEED("Speed", CheckCategory.MOVING);
+    SPEED("Speed", CheckCategory.MOVING),
+
+    /**
+     * Checks if the player is breaking an impossible amount of blocks
+     */
+    NUKER("Nuker", CheckCategory.BLOCK);
 
     /**
      * The name

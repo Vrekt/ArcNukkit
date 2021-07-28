@@ -12,8 +12,8 @@ import me.vrekt.arc.listener.packet.NukkitPacketListener;
  */
 public final class MovePlayerPacketListener extends NukkitPacketListener {
 
-    public MovePlayerPacketListener(CheckType check, NukkitPacketHandler handler) {
-        super(check, handler);
+    public MovePlayerPacketListener(NukkitPacketHandler handler) {
+        super(handler);
     }
 
     @Override

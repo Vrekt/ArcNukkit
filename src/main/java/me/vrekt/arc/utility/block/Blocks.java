@@ -13,7 +13,7 @@ public final class Blocks {
     /**
      * Plugin
      */
-    private static final Plugin PLUGIN = Arc.plugin();
+    private static final Plugin PLUGIN = Arc.getPlugin();
 
     /**
      * Check if the block is a fence.
