@@ -49,7 +49,8 @@ public final class InventoryTransactionPacketListener extends NukkitPacketListen
                     }
                 }
 
-                if (useItemData.actionType == InventoryTransactionPacket.USE_ITEM_ACTION_BREAK_BLOCK) {
+                if (useItemData.actionType == InventoryTransactionPacket.USE_ITEM_ACTION_BREAK_BLOCK
+                        && nuker.isPacketCheck()) {
                     // player sent break block packet.
                     final boolean cancel = nuker.check(event.getPlayer());
                     event.setCancelled(cancel);

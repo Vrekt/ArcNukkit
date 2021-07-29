@@ -9,6 +9,8 @@ import me.vrekt.arc.command.ArcCommand;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.data.Data;
 import me.vrekt.arc.exemption.ExemptionManager;
+import me.vrekt.arc.listener.block.BlockListener;
+import me.vrekt.arc.listener.combat.CombatListener;
 import me.vrekt.arc.listener.connection.PlayerConnectionListener;
 import me.vrekt.arc.listener.moving.MovingEventListener;
 import me.vrekt.arc.listener.packet.NukkitPacketHandler;
@@ -24,7 +26,7 @@ public final class Arc extends PluginBase {
     /**
      * IPL version
      */
-    private static final String IPL_VERSION = "1.4";
+    private static final String IPL_VERSION = "1.5";
 
     /**
      * The instance of this class
@@ -80,6 +82,8 @@ public final class Arc extends PluginBase {
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new NukkitPacketHandler(exemptionManager), this);
         getServer().getPluginManager().registerEvents(new MovingEventListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockListener(), this);
+        getServer().getPluginManager().registerEvents(new CombatListener(), this);
 
         verifyCommand();
         getLogger().info(TextFormat.DARK_GREEN + "Saving configuration...");

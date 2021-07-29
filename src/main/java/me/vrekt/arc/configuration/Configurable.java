@@ -5,7 +5,7 @@ import cn.nukkit.utils.Config;
 /**
  * Basic class for configuration validation
  */
-public abstract class Configurable extends ConfigurableReader {
+public abstract class Configurable extends ConfigurationSettingReader {
 
     /**
      * Read the configuration

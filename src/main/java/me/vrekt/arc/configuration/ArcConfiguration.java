@@ -6,7 +6,7 @@ import me.vrekt.arc.Arc;
 import me.vrekt.arc.configuration.ban.BanConfiguration;
 import me.vrekt.arc.configuration.kick.KickConfiguration;
 import me.vrekt.arc.configuration.types.ConfigurationString;
-import me.vrekt.arc.configuration.values.ConfigurationValues;
+import me.vrekt.arc.configuration.values.ConfigurationSetting;
 
 /**
  * The arc configuration
@@ -53,11 +53,11 @@ public final class ArcConfiguration extends Configurable {
         kickConfiguration.read(configuration);
         banConfiguration.read(configuration);
 
-        violationNotifyMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationValues.VIOLATION_NOTIFY_MESSAGE)));
-        commandNoPermissionMessage = TextFormat.colorize('&', getString(configuration, ConfigurationValues.ARC_COMMAND_NO_PERMISSION_MESSAGE));
-        prefix = TextFormat.colorize('&', getString(configuration, ConfigurationValues.ARC_PREFIX));
-        violationDataTimeout = getInteger(configuration, ConfigurationValues.VIOLATION_DATA_TIMEOUT);
-        enableEventApi = getBoolean(configuration, ConfigurationValues.ENABLE_EVENT_API);
+        violationNotifyMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationSetting.VIOLATION_NOTIFY_MESSAGE)));
+        commandNoPermissionMessage = TextFormat.colorize('&', getString(configuration, ConfigurationSetting.ARC_COMMAND_NO_PERMISSION_MESSAGE));
+        prefix = TextFormat.colorize('&', getString(configuration, ConfigurationSetting.ARC_PREFIX));
+        violationDataTimeout = getInteger(configuration, ConfigurationSetting.VIOLATION_DATA_TIMEOUT);
+        enableEventApi = getBoolean(configuration, ConfigurationSetting.ENABLE_EVENT_API);
     }
 
     /**

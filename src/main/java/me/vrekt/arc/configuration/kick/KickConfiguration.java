@@ -5,7 +5,7 @@ import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.configuration.Configurable;
 import me.vrekt.arc.configuration.types.ConfigurationString;
-import me.vrekt.arc.configuration.values.ConfigurationValues;
+import me.vrekt.arc.configuration.values.ConfigurationSetting;
 
 /**
  * The kick configuration
@@ -29,9 +29,9 @@ public final class KickConfiguration extends Configurable {
 
     @Override
     public void read(Config configuration) {
-        this.globalKickMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationValues.GLOBAL_KICK_MESSAGE)));
-        this.globalViolationsKickMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationValues.GLOBAL_VIOLATIONS_KICK_MESSAGE)));
-        this.globalKickDelay = getInteger(configuration, ConfigurationValues.GLOBAL_KICK_DELAY);
+        this.globalKickMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationSetting.GLOBAL_KICK_MESSAGE)));
+        this.globalViolationsKickMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationSetting.GLOBAL_VIOLATIONS_KICK_MESSAGE)));
+        this.globalKickDelay = getInteger(configuration, ConfigurationSetting.GLOBAL_KICK_DELAY);
     }
 
     @Override

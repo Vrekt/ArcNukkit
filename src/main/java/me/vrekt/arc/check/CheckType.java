@@ -27,7 +27,12 @@ public enum CheckType {
     /**
      * Checks if the player is breaking an impossible amount of blocks
      */
-    NUKER("Nuker", CheckCategory.BLOCK);
+    NUKER("Nuker", CheckCategory.BLOCK),
+
+    /**
+     * Checks if the player is attacking entities from far away
+     */
+    REACH("Reach", CheckCategory.COMBAT);
 
     /**
      * The name

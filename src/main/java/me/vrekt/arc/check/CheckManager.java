@@ -1,5 +1,7 @@
 package me.vrekt.arc.check;
 
+import me.vrekt.arc.check.block.Nuker;
+import me.vrekt.arc.check.combat.Reach;
 import me.vrekt.arc.check.moving.Flight;
 import me.vrekt.arc.check.moving.MorePackets;
 import me.vrekt.arc.check.moving.Speed;
@@ -28,6 +30,8 @@ public final class CheckManager extends Configurable implements Closeable {
         add(new MorePackets());
         add(new Flight());
         add(new Speed());
+        add(new Nuker());
+        add(new Reach());
     }
 
     /**
