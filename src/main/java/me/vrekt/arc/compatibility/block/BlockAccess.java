@@ -176,6 +176,23 @@ public final class BlockAccess {
     }
 
     /**
+     * Check if the modified location has slimeblock
+     *
+     * @param origin the origin
+     * @param level  the level
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the result
+     */
+    public static boolean hasSlimeblockAt(Location origin, Level level, double x, double y, double z) {
+        if (hasSlimeblockAt0(origin, level, x, y, z)) return true;
+        if (hasSlimeblockAt0(origin, level, x, y, -z)) return true;
+        if (hasSlimeblockAt0(origin, level, -x, y, z)) return true;
+        return hasSlimeblockAt0(origin, level, -x, y, -z);
+    }
+
+    /**
      * Check if the provided origin and modified X, Y, Z coordinates have a vertical modifier
      *
      * @param origin    the origin
@@ -259,6 +276,22 @@ public final class BlockAccess {
         return level.getBlock(MathUtil.floor(origin.getX() + x),
                 MathUtil.floor(origin.getY() + y), MathUtil.floor(origin.getZ() + z))
                 instanceof BlockIce;
+    }
+
+    /**
+     * Check if the modified location has slime-block
+     *
+     * @param origin the origin
+     * @param level  the level
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the result
+     */
+    private static boolean hasSlimeblockAt0(Location origin, Level level, double x, double y, double z) {
+        return level.getBlock(MathUtil.floor(origin.getX() + x),
+                MathUtil.floor(origin.getY() + y), MathUtil.floor(origin.getZ() + z))
+                instanceof BlockSlime;
     }
 
     /**

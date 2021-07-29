@@ -1,7 +1,6 @@
 package me.vrekt.arc.check.moving;
 
 import cn.nukkit.Player;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
@@ -9,6 +8,7 @@ import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.compatibility.NukkitAccess;
 import me.vrekt.arc.compatibility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
+import me.vrekt.arc.utility.MovingAccess;
 import me.vrekt.arc.utility.math.MathUtil;
 
 /**
@@ -33,17 +33,17 @@ public final class Flight extends Check {
     private double maxJumpDistance, maxClimbSpeedUp, maxClimbSpeedDown, climbingCooldown, groundDistanceThreshold, groundDistanceHorizontalCap;
 
     /**
-     * The minimum distance required to move to check vclip.
-     * The minimum distance required to update the players safe location.
-     */
-    private double verticalClipMinimum, safeDistanceUpdateThreshold;
-
-    /**
      * The max ascend time
      * The amount to add to {@code maxAscendTime} when the player has jump boost.
      * Ascend cooldown work around.
+     * Max time allowed to b e hovering
      */
-    private int maxAscendTime, jumpBoostAscendAmplifier, ascendCooldown;
+    private int maxAscendTime, jumpBoostAscendAmplifier, ascendCooldown, maxInAirHoverTime;
+
+    /**
+     * The max difference allowed between a=(vertical speed - expected) then, (vertical speed - a)
+     */
+    private double slimeblockMaxScoreDiff;
 
     public Flight() {
         super(CheckType.FLIGHT);
@@ -57,17 +57,16 @@ public final class Flight extends Check {
                 .build();
 
         addConfigurationValue("max-jump-distance", 0.42);
-        addConfigurationValue("max-climbing-speed-up", 0.12);
-        addConfigurationValue("max-climbing-speed-down", 0.151);
-        addConfigurationValue("climbing-cooldown", 5);
+        addConfigurationValue("max-climbing-speed-up", 0.21);
+        addConfigurationValue("max-climbing-speed-down", 0.21);
+        addConfigurationValue("climbing-cooldown", 7);
         addConfigurationValue("max-ascend-time", 7);
         addConfigurationValue("ascend-cooldown", 3);
         addConfigurationValue("jump-boost-ascend-amplifier", 3);
         addConfigurationValue("ground-distance-threshold", 2.0);
         addConfigurationValue("ground-distance-horizontal-cap", 0.50);
-        addConfigurationValue("slime-block-distance-fallen-threshold", 0);
-        addConfigurationValue("vertical-clip-vertical-minimum", 0.99);
-        addConfigurationValue("safe-location-update-distance-threshold", 1.99);
+        addConfigurationValue("max-in-air-hover-time", 6);
+        addConfigurationValue("slimeblock-max-score-difference", 0.42);
 
         if (enabled()) load();
     }
@@ -90,13 +89,10 @@ public final class Flight extends Check {
         final Location from = data.from();
         final Location to = data.to();
         final Location ground = data.ground();
-        final Location safe = data.getSafeLocation();
-
-        final long now = System.currentTimeMillis();
         final double vertical = data.vertical();
 
         // initially, update any moving data we may need.
-        updateMovingData(data, safe, to, now);
+        updateMovingData(data);
 
         // check if the player is on skulls, slabs, stairs, fences, gates, beds, etc.
         final boolean hasVerticalModifier = BlockAccess.hasVerticalModifierAt(to, to.getLevel(), 0.3, -0.1, 0.3)
@@ -148,12 +144,19 @@ public final class Flight extends Check {
         if (data.ascending()) {
             // check ground distance.
             final double distance = MathUtil.vertical(ground, to);
+
+            final boolean hasSlimeblock = data.hasSlimeblock();
+            if (hasSlimeblock && vertical > 0.42 && distance > 3f) {
+                data.setHasSlimeBlockLaunch(true);
+            }
+
+
             if (distance >= groundDistanceThreshold) {
                 // high off ground (hopefully) check.
                 // make sure we are within the limits of the ground.
                 // we don't want a flag when the player is wildly jumping around.
                 final double hDist = MathUtil.horizontal(ground, to);
-                if (ascendingTime >= 5 && hDist < groundDistanceHorizontalCap) {
+                if (ascendingTime >= 5 && hDist < groundDistanceHorizontalCap && !data.hasSlimeBlockLaunch()) {
                     result.setFailed("Vertical distance from ground greater than allowed within limits.")
                             .withParameter("distance", distance)
                             .withParameter("threshold", groundDistanceThreshold)
@@ -167,6 +170,42 @@ public final class Flight extends Check {
             // ensure we didn't walk up a block that modifies your vertical
             final double maxJumpHeight = getJumpHeight(player);
 
+            if (hasSlimeblock) {
+                // player was launched, set state
+                final boolean launched = data.hasSlimeBlockLaunch();
+                if (launched) {
+                    // get rough estimate of player fall distance
+                    final double fallen = MathUtil.vertical(data.getFlightDescendingLocation() == null ? from
+                            : data.getFlightDescendingLocation(), from);
+                    if (data.getFlightDescendingLocation() != null) {
+                        // decrease the modifier if we fall from a significant height, +
+                        // to prevent one time abuse
+                        final double modifier = fallen > 15 ? 0.11D : 0.18d;
+                        final double rough = 0.4D + fallen * modifier;
+                        final double diff = Math.abs(vertical - rough);
+                        final double score = vertical - diff;
+                        if (score >= slimeblockMaxScoreDiff) {
+                            result.setFailed("Bounced too high from a slimeblock")
+                                    .withParameter("vertical", vertical)
+                                    .withParameter("rough", rough)
+                                    .withParameter("diff", diff)
+                                    .withParameter("score", score)
+                                    .withParameter("max", slimeblockMaxScoreDiff);
+                            handleCheckViolationAndReset(player, result, ground);
+                        }
+                    }
+
+                    // player is jumping really high with no velocity
+                    if (distance <= 1f && vertical > maxJumpHeight && fallen <= 1f) {
+                        result.setFailed("Vertical greater than max jump height on slimeblock")
+                                .withParameter("groundDistance", distance)
+                                .withParameter("vertical", vertical)
+                                .withParameter("max", maxJumpHeight);
+                        handleCheckViolationAndReset(player, result, ground);
+                    }
+                }
+            }
+
             // go back to where we were.
             // maybe ground later.
 
@@ -174,7 +213,8 @@ public final class Flight extends Check {
             // TODO: Bedrock movement is weird!
             // If vertical is greater than 1.44, ignore the cooldown.
             // Vertical is too high for the player so its sketchy.
-            if (vertical > maxJumpHeight && (vertical >= 1.44 || ascendingTime >= ascendCooldown)) {
+            if (vertical > maxJumpHeight && (vertical >= 1.44 || ascendingTime >= ascendCooldown)
+                    && !data.hasSlimeBlockLaunch()) {
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);
@@ -187,7 +227,7 @@ public final class Flight extends Check {
                     ? player.getEffect(NukkitAccess.JUMP_BOOST_EFFECT).getAmplifier() + jumpBoostAscendAmplifier
                     : 0;
 
-            if (ascendingTime > (maxAscendTime + modifier) && !data.hadClimbable()) {
+            if (ascendingTime > (maxAscendTime + modifier) && !data.hadClimbable() && !data.hasSlimeBlockLaunch()) {
                 result.setFailed("Ascending for too long")
                         .withParameter("vertical", vertical)
                         .withParameter("time", data.ascendingTime())
@@ -223,78 +263,69 @@ public final class Flight extends Check {
     }
 
     /**
-     * Check if the player moved vertically through a solid block.
+     * Check the player when they haven't moved in awhile.
      * <p>
-     * TODO: Does not work properly with Nukkit yet.
+     * As of right now this is mostly a hover check.
+     * <p>
+     * TODO: Might not need a temporary data set.
      *
-     * @param player   the player
-     * @param result   the result
-     * @param safe     the safe location
-     * @param from     the from
-     * @param to       the to
-     * @param vertical the vertical
-     * @return {@code true} if the player moved through a solid block.
+     * @param player the player
+     * @param data   the data
      */
-    private boolean checkIfMovedThroughSolidBlock(Player player, CheckResult result, Location safe, Location from, Location to, double vertical) {
-        if (vertical >= verticalClipMinimum) {
-            // safe
-            final double min1 = Math.min(safe.getY(), to.getY());
-            final double max1 = Math.max(safe.getY(), to.getY()) + 1;
+    public void checkNoMovement(Player player, MovingData data) {
+        if (exempt(player)) return;
+        // nukkit likes to include players before fully joining.
+        if (data.to() == null) return;
 
-            // from
-            final double min2 = Math.min(from.getY(), to.getY());
-            final double max2 = Math.max(from.getY(), to.getY()) + 1;
+        // don't wanna update the current player moving data set
+        // in-case it causes issues else-where, so for now use a temporary one
+        // to retrieve stuff we need right now
+        final MovingData temp = MovingData.retrieveTemporary();
+        MovingAccess.calculateMovement(temp, data.to(), player.getLocation());
 
-            if (hasSolidBlockBetween(min1, max1, player.getLevel(), safe)) {
-                result.setFailed("Attempted to move through a block")
-                        .withParameter("vertical", vertical)
-                        .withParameter("min", verticalClipMinimum)
-                        .withParameter("safe", true);
-                return handleCheckViolationAndReset(player, result, safe);
-            } else if (hasSolidBlockBetween(min2, max2, player.getLevel(), from)) {
-                result.setFailed("Attempted to move through a block")
-                        .withParameter("vertical", vertical)
-                        .withParameter("min", verticalClipMinimum)
-                        .withParameter("from", true);
-                return handleCheckViolationAndReset(player, result, from);
+        // update in-air time here since we're not moving or calculating movement.
+        int inAirTime = data.getInAirTime();
+        if (!temp.onGround()) {
+            data.setInAirTime(data.getInAirTime() + 1);
+            inAirTime++;
+        } else {
+            data.setInAirTime(0);
+        }
+
+        if (!temp.onGround() && temp.vertical() == 0.0 && !MovingAccess.isOnBoat(player)) {
+            // player is hovering
+            if (inAirTime >= maxInAirHoverTime) {
+                // flag player, hovering too long.
+                final CheckResult result = new CheckResult();
+                result.setFailed("Hovering off the ground for too long")
+                        .withParameter("inAirTime", inAirTime)
+                        .withParameter("max", maxInAirHoverTime);
+
+                handleCheckViolation(player, result, data.ground());
             }
         }
 
-        return false;
-    }
-
-    /**
-     * Check if there is a solid block between the coordinates.
-     *
-     * @param min    the min
-     * @param max    the max
-     * @param level  the level
-     * @param origin the origin
-     * @return the result
-     */
-    private boolean hasSolidBlockBetween(double min, double max, Level level, Location origin) {
-        for (double y = min; y <= max + 1; y++) {
-            if (BlockAccess.isConsideredGround(level.getBlock(
-                    MathUtil.floor(origin.getX()),
-                    MathUtil.floor(y),
-                    MathUtil.floor(origin.getZ())))) return true;
-        }
-        return false;
     }
 
     /**
      * Update moving data before checking flight.
-     * <p>
-     * TODO: WIP.
-     * <p>
      *
      * @param data the data
-     * @param safe the safe location
-     * @param to   the to location
-     * @param time the current time
      */
-    private void updateMovingData(MovingData data, Location safe, Location to, long time) {
-        data.climbTime(data.hasClimbable() ? data.climbTime() + 1 : 0);
+    private void updateMovingData(MovingData data) {
+        if (data.onGround()) {
+            if (!data.hasSlimeblock()
+                    && data.hasSlimeBlockLaunch()) {
+                data.setHasSlimeBlockLaunch(false);
+            }
+        } else {
+            if (data.descending()) {
+                data.setHasSlimeBlockLaunch(false);
+
+                // we just started descending, set.
+                if (data.descendingTime() == 1) data.setFlightDescendingLocation(data.from());
+            }
+        }
     }
 
     /**
@@ -329,7 +360,7 @@ public final class Flight extends Check {
         jumpBoostAscendAmplifier = configuration.getInt("jump-boost-ascend-amplifier");
         groundDistanceThreshold = configuration.getDouble("ground-distance-threshold");
         groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
-        verticalClipMinimum = configuration.getDouble("vertical-clip-vertical-minimum");
-        safeDistanceUpdateThreshold = configuration.getDouble("safe-location-update-distance-threshold");
+        maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
+        slimeblockMaxScoreDiff = configuration.getDouble("slimeblock-max-score-difference");
     }
 }

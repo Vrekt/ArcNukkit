@@ -39,6 +39,13 @@ public final class MovingData {
     }
 
     /**
+     * @return temporary moving data
+     */
+    public static MovingData retrieveTemporary() {
+        return new MovingData();
+    }
+
+    /**
      * From movement
      * To movement
      * the ground location
@@ -50,12 +57,7 @@ public final class MovingData {
     /**
      * Arc ground and client ground
      */
-    private boolean clientOnGround, wasClientOnGround, onGround, wasOnGround;
-
-    /**
-     * If the client position packet is on-ground.
-     */
-    private boolean clientPositionOnGround;
+    private boolean onGround, wasOnGround;
 
     /**
      * Ascending/Descending state
@@ -64,21 +66,10 @@ public final class MovingData {
      * If we are sneaking/sprinting
      * If we are on ice
      * If we are in liquid
-     * If we were in liquid
      */
-    private boolean ascending, descending, hasClimbable, climbing, onIce, inLiquid, wasInLiquid;
+    private boolean ascending, descending, hasClimbable, climbing, onIce, inLiquid;
 
     private final AtomicBoolean sneaking = new AtomicBoolean(), sprinting = new AtomicBoolean();
-
-    /**
-     * The various packet counts.
-     */
-    private int flyingPackets, positionPackets, positionLookPackets, lookPackets;
-
-    /**
-     * If any of the packets should be cancelled.
-     */
-    private boolean cancelFlying, cancelPosition, cancelLook;
 
     /**
      * The time we have been on ground
@@ -95,7 +86,7 @@ public final class MovingData {
      * The time in liquid
      * The time climbing
      */
-    private int sneakTime, sprintTime, onIceTime, offIceTime, invalidGround, liquidTime, climbTime;
+    private int sneakTime, sprintTime, onIceTime, offIceTime, climbTime;
 
     /**
      * The current and last vertical distance
@@ -104,41 +95,8 @@ public final class MovingData {
 
     /**
      * The last moving update.
-     * The last flying packet
      */
-    private long lastMovingUpdate, lastFlyingPacket;
-
-    /**
-     * The descending location for distance tracking.
-     * The valid falling location for distance checking.
-     */
-    private Location descendingLocation, validFallingLocation;
-
-    /**
-     * If the player has failed no-fall.
-     */
-    private boolean failedNoFall;
-
-    /**
-     * The water location for distance tracking.
-     */
-    private Location waterLocation;
-
-    /**
-     * The amount of no distance changes
-     */
-    private int noDistanceChanges;
-
-    /**
-     * The last water distance
-     */
-    private double lastWaterDistance;
-
-    /**
-     * The criticals no movement amount.
-     * The criticals similar movement amount.
-     */
-    private int noMovementAmount, similarMovementAmount;
+    private long lastMovingUpdate;
 
     /**
      * Total amount of move player packets
@@ -154,6 +112,21 @@ public final class MovingData {
      * If we had a climbable object
      */
     private boolean hadClimbable;
+
+    /**
+     * Flight descending start
+     */
+    private Location flightDescendingLocation;
+
+    /**
+     * IF the player was launched by a slimeblock.
+     */
+    private boolean hasSlimeBlockLaunch, hasSlimeblock;
+
+    /**
+     * Time in air
+     */
+    private int inAirTime;
 
     public Location from() {
         return from;
@@ -177,22 +150,6 @@ public final class MovingData {
 
     public void ground(Location ground) {
         this.ground = ground;
-    }
-
-    public boolean clientOnGround() {
-        return clientOnGround;
-    }
-
-    public void clientOnGround(boolean clientOnGround) {
-        this.clientOnGround = clientOnGround;
-    }
-
-    public boolean wasClientOnGround() {
-        return wasClientOnGround;
-    }
-
-    public void wasClientOnGround(boolean wasClientOnGround) {
-        this.wasClientOnGround = wasClientOnGround;
     }
 
     public boolean onGround() {
@@ -257,38 +214,6 @@ public final class MovingData {
 
     public void sprinting(boolean sprinting) {
         this.sprinting.set(sprinting);
-    }
-
-    public int flyingPackets() {
-        return flyingPackets;
-    }
-
-    public void flyingPackets(int flyingPackets) {
-        this.flyingPackets = flyingPackets;
-    }
-
-    public int positionPackets() {
-        return positionPackets;
-    }
-
-    public void positionPackets(int positionPackets) {
-        this.positionPackets = positionPackets;
-    }
-
-    public int positionLookPackets() {
-        return positionLookPackets;
-    }
-
-    public void positionLookPackets(int positionLookPackets) {
-        this.positionLookPackets = positionLookPackets;
-    }
-
-    public int lookPackets() {
-        return lookPackets;
-    }
-
-    public void lookPackets(int lookPackets) {
-        this.lookPackets = lookPackets;
     }
 
     public int onGroundTime() {
@@ -415,126 +340,6 @@ public final class MovingData {
         this.inLiquid = inLiquid;
     }
 
-    public long lastFlyingPacket() {
-        return lastFlyingPacket;
-    }
-
-    public void lastFlyingPacket(long lastFlyingPacket) {
-        this.lastFlyingPacket = lastFlyingPacket;
-    }
-
-    public int invalidGround() {
-        return invalidGround;
-    }
-
-    public void invalidGround(int invalidGround) {
-        this.invalidGround = MathUtil.clampInt(invalidGround, 0, 1000);
-    }
-
-    public boolean failedNoFall() {
-        return failedNoFall;
-    }
-
-    public void failedNoFall(boolean failedNoFall) {
-        this.failedNoFall = failedNoFall;
-    }
-
-    public Location descendingLocation() {
-        return descendingLocation;
-    }
-
-    public void descendingLocation(Location descendingLocation) {
-        this.descendingLocation = descendingLocation;
-    }
-
-    public Location validFallingLocation() {
-        return validFallingLocation;
-    }
-
-    public void validFallingLocation(Location validFallingLocation) {
-        this.validFallingLocation = validFallingLocation;
-    }
-
-    public boolean cancelFlying() {
-        return cancelFlying;
-    }
-
-    public void cancelFlying(boolean cancelFlying) {
-        this.cancelFlying = cancelFlying;
-    }
-
-    public boolean cancelPosition() {
-        return cancelPosition;
-    }
-
-    public void cancelPosition(boolean cancelPosition) {
-        this.cancelPosition = cancelPosition;
-    }
-
-    public boolean cancelLook() {
-        return cancelLook;
-    }
-
-    public void cancelLook(boolean cancelLook) {
-        this.cancelLook = cancelLook;
-    }
-
-    public int liquidTime() {
-        return liquidTime;
-    }
-
-    public void liquidTime(int liquidTime) {
-        this.liquidTime = MathUtil.clampInt(liquidTime, 0, 100);
-    }
-
-    public Location waterLocation() {
-        return waterLocation;
-    }
-
-    public void waterLocation(Location waterLocation) {
-        this.waterLocation = waterLocation;
-    }
-
-    public int noDistanceChanges() {
-        return noDistanceChanges;
-    }
-
-    public void noDistanceChanges(int noDistanceChanges) {
-        this.noDistanceChanges = MathUtil.clampInt(noDistanceChanges, 0, 100);
-    }
-
-    public double lastWaterDistance() {
-        return lastWaterDistance;
-    }
-
-    public void lastWaterDistance(double lastWaterDistance) {
-        this.lastWaterDistance = lastWaterDistance;
-    }
-
-    public boolean clientPositionOnGround() {
-        return clientPositionOnGround;
-    }
-
-    public void clientPositionOnGround(boolean clientPositionOnGround) {
-        this.clientPositionOnGround = clientPositionOnGround;
-    }
-
-    public int noMovementAmount() {
-        return noMovementAmount;
-    }
-
-    public void noMovementAmount(int noMovementAmount) {
-        this.noMovementAmount = MathUtil.clampInt(noMovementAmount, 0, 100);
-    }
-
-    public int similarMovementAmount() {
-        return similarMovementAmount;
-    }
-
-    public void similarMovementAmount(int similarMovementAmount) {
-        this.similarMovementAmount = MathUtil.clampInt(similarMovementAmount, 0, 100);
-    }
-
     public int climbTime() {
         return climbTime;
     }
@@ -581,11 +386,36 @@ public final class MovingData {
         this.safe = safeLocation;
     }
 
-    public Location getLadderLocation() {
-        return ladderLocation;
+    public boolean hasSlimeBlockLaunch() {
+        return hasSlimeBlockLaunch;
     }
 
-    public void setLadderLocation(Location ladderLocation) {
-        this.ladderLocation = ladderLocation;
+    public void setHasSlimeBlockLaunch(boolean hasSlimeBlockLaunch) {
+        this.hasSlimeBlockLaunch = hasSlimeBlockLaunch;
     }
+
+    public Location getFlightDescendingLocation() {
+        return flightDescendingLocation;
+    }
+
+    public void setFlightDescendingLocation(Location flightDescendingLocation) {
+        this.flightDescendingLocation = flightDescendingLocation;
+    }
+
+    public boolean hasSlimeblock() {
+        return hasSlimeblock;
+    }
+
+    public void setHasSlimeblock(boolean hasSlimeblock) {
+        this.hasSlimeblock = hasSlimeblock;
+    }
+
+    public int getInAirTime() {
+        return inAirTime;
+    }
+
+    public void setInAirTime(int inAirTime) {
+        this.inAirTime = MathUtil.clampInt(inAirTime, 0, 100);
+    }
+
 }

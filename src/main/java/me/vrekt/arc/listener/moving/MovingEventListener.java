@@ -11,7 +11,7 @@ import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.moving.Flight;
 import me.vrekt.arc.check.moving.Speed;
 import me.vrekt.arc.data.moving.MovingData;
-import me.vrekt.arc.utility.MovingUtil;
+import me.vrekt.arc.utility.MovingAccess;
 
 /**
  * Listens for player movement.
@@ -44,7 +44,7 @@ public final class MovingEventListener implements Listener {
         // check if we have moved.
         boolean hasMoved = from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ();
         if (hasMoved) {
-            MovingUtil.calculateMovement(data, from, to);
+            MovingAccess.calculateMovement(data, from, to);
             // run checks
             runChecks(player, data);
         }

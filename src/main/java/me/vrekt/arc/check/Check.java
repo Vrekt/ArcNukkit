@@ -216,7 +216,7 @@ public abstract class Check extends Configurable {
     protected boolean handleCheckViolationAndReset(Player player, CheckResult result, Location cancelTo) {
         if (result.failed()) {
             final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
-            if (vr.cancel()) {
+            if (vr.cancel() && cancelTo != null) {
                 player.teleport(cancelTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
             result.reset();
@@ -224,6 +224,26 @@ public abstract class Check extends Configurable {
         }
 
         result.reset();
+        return false;
+    }
+
+    /**
+     * Handle a check violation.
+     *
+     * @param player   the player
+     * @param result   the result
+     * @param cancelTo the cancel To
+     * @return the result
+     */
+    protected boolean handleCheckViolation(Player player, CheckResult result, Location cancelTo) {
+        if (result.failed()) {
+            final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
+            if (vr.cancel() && cancelTo != null) {
+                player.teleport(cancelTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            }
+            return vr.cancel();
+        }
+
         return false;
     }
 

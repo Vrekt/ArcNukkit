@@ -10,6 +10,8 @@ import cn.nukkit.event.player.PlayerQuitEvent;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.data.Data;
+import me.vrekt.arc.data.moving.MovingData;
+import me.vrekt.arc.utility.MovingAccess;
 
 /**
  * Listens for player disconnects/connects
@@ -22,6 +24,8 @@ public final class PlayerConnectionListener implements Listener {
         Arc.getInstance().getViolationManager().onPlayerJoin(player);
         Arc.getInstance().getExemptionManager().onPlayerJoin(player);
         doJoinExemptions(player);
+
+        MovingAccess.calculateMovement(MovingData.get(player), player.getLocation(), player.getLocation());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
