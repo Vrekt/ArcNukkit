@@ -59,7 +59,7 @@ public final class NukkitPacketHandler implements Listener {
     public void onPacketReceiving(DataPacketReceiveEvent event) {
 
         switch (event.getPacket().pid()) {
-            case ProtocolInfo.BLOCK_EVENT_PACKET:
+            case ProtocolInfo.MOVE_PLAYER_PACKET:
                 movePlayerPacketListener.onPacketReceiving(event);
                 break;
             case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:

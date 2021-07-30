@@ -36,6 +36,16 @@ permissions:
             description: Allows the player to bypass the Flight check.
           arc.bypass.moving.speed:
             description: Allows the player to bypass the Speed check.
+      arc.bypass.block:
+        description: Allows the player to bypass block related checks
+        children:
+          arc.bypass.block.nuker:
+            description: Allows the player to bypass the Nuker check.
+      arc.bypass.combat:
+        description: Allows the player to bypass combat related checks.
+        children:
+          arc.bypass.combat.reach:
+            description: Allows the player to bypass the reach check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
   arc.administrator:
