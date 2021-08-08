@@ -1,5 +1,6 @@
 package me.vrekt.arc.check;
 
+import me.vrekt.arc.check.block.FastBreak;
 import me.vrekt.arc.check.block.Nuker;
 import me.vrekt.arc.check.combat.Reach;
 import me.vrekt.arc.check.moving.Flight;
@@ -32,6 +33,7 @@ public final class CheckManager extends Configurable implements Closeable {
         add(new Speed());
         add(new Nuker());
         add(new Reach());
+        add(new FastBreak());
     }
 
     /**

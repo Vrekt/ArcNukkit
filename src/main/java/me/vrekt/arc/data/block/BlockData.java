@@ -1,9 +1,13 @@
 package me.vrekt.arc.data.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
+import cn.nukkit.item.Item;
 import me.vrekt.arc.data.Data;
+import me.vrekt.arc.utility.block.BlockAccess;
 import me.vrekt.arc.utility.math.MathUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +39,13 @@ public final class BlockData implements Data {
     }
 
     /**
+     * Map of blocks player has interacted with.
+     * <p>
+     * This map should be limited in size to only 100 entries.
+     */
+    private final Map<Long, Long> blocksInteractedWithByKey = new HashMap<>();
+
+    /**
      * Last break time in creative.
      */
     private long lastBreak;
@@ -49,6 +60,13 @@ public final class BlockData implements Data {
      * The amount of times delta was violated.
      */
     private int totalBroke, lastBreakDeltaCount;
+
+    /**
+     * Item in hand when start breaking.
+     * <p>
+     * TODO: Maybe not needed, but keep in-case.
+     */
+    private Item itemInHand;
 
     public long getLastBreak() {
         return lastBreak;
@@ -81,4 +99,26 @@ public final class BlockData implements Data {
     public void setLastBreakDeltaCount(int lastBreakDeltaCount) {
         this.lastBreakDeltaCount = MathUtil.clampInt(lastBreakDeltaCount, 0, 1000);
     }
+
+    public Item getItemInHand() {
+        return itemInHand;
+    }
+
+    public void setItemInHand(Item itemInHand) {
+        this.itemInHand = itemInHand;
+    }
+
+    public void addBlockInteractedWith(Block block) {
+        if (blocksInteractedWithByKey.size() >= 100) blocksInteractedWithByKey.clear();
+        blocksInteractedWithByKey.put(BlockAccess.getBlockKey(block), System.currentTimeMillis());
+    }
+
+    public long getBlockInteractedTime(Block block) {
+        return blocksInteractedWithByKey.get(BlockAccess.getBlockKey(block));
+    }
+
+    public boolean wasInteractedWith(Block block) {
+        return blocksInteractedWithByKey.containsKey(BlockAccess.getBlockKey(block));
+    }
+
 }

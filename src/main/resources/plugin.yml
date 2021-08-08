@@ -1,6 +1,6 @@
 name: Arc
 main: me.vrekt.arc.Arc
-version: 1.5
+version: 1.5.2
 description: An anticheat for Nukkit.
 author: Vrekt
 api: ["1.0.0"]
@@ -41,6 +41,8 @@ permissions:
         children:
           arc.bypass.block.nuker:
             description: Allows the player to bypass the Nuker check.
+          arc.bypass.block.fastbreak:
+            description: Allows the player to bypass the FastBreak check.
       arc.bypass.combat:
         description: Allows the player to bypass combat related checks.
         children:

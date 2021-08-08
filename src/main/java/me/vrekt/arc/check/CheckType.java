@@ -32,7 +32,12 @@ public enum CheckType {
     /**
      * Checks if the player is attacking entities from far away
      */
-    REACH("Reach", CheckCategory.COMBAT);
+    REACH("Reach", CheckCategory.COMBAT),
+
+    /**
+     * Checks if the player is breaking blocks too fast.
+     */
+    FAST_BREAK("FastBreak", CheckCategory.BLOCK);
 
     /**
      * The name
