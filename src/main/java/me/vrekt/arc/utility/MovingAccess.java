@@ -132,6 +132,8 @@ public final class MovingAccess {
             data.setInAirTime(0);
             data.ascendingTime(0);
             data.descendingTime(0);
+            data.setNoResetDescendTime(0);
+            data.setNoResetAscendTime(0);
         } else {
             data.setInAirTime(data.getInAirTime() + 1);
 

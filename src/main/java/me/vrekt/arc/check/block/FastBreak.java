@@ -44,6 +44,8 @@ public final class FastBreak extends Check {
      * @return the result
      */
     public boolean check(Player player, BlockData data, Block block) {
+        if (exempt(player) || player.getGamemode() == 1) return false;
+
         // the result.
         final CheckResult result = new CheckResult();
 

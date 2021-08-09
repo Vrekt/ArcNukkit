@@ -42,7 +42,8 @@ public final class BlockListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onInteract(PlayerInteractEvent event) {
-        if (event.getAction() == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
+        if (event.getAction() == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK
+                && event.getPlayer().getGamemode() != 1) {
             final Player player = event.getPlayer();
             final BlockData data = BlockData.get(player);
 

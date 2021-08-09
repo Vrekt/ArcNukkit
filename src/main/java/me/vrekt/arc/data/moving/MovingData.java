@@ -128,6 +128,14 @@ public final class MovingData {
      */
     private int inAirTime;
 
+    /**
+     * Player isn't moving down.
+     * <p>
+     * No reset times.
+     * <p>
+     */
+    private int noGlideTime, noResetAscendTime, noResetDescendTime;
+
     public Location from() {
         return from;
     }
@@ -416,6 +424,30 @@ public final class MovingData {
 
     public void setInAirTime(int inAirTime) {
         this.inAirTime = MathUtil.clampInt(inAirTime, 0, 100);
+    }
+
+    public int getNoGlideTime() {
+        return noGlideTime;
+    }
+
+    public void setNoGlideTime(int noGlideTime) {
+        this.noGlideTime = MathUtil.clampInt(noGlideTime, 0, 100);
+    }
+
+    public int getNoResetAscendTime() {
+        return noResetAscendTime;
+    }
+
+    public void setNoResetAscendTime(int noResetAscendTime) {
+        this.noResetAscendTime = MathUtil.clampInt(noResetAscendTime, 0, 1000);
+    }
+
+    public int getNoResetDescendTime() {
+        return noResetDescendTime;
+    }
+
+    public void setNoResetDescendTime(int noResetDescendTime) {
+        this.noResetDescendTime = MathUtil.clampInt(noResetDescendTime, 0, 1000);
     }
 
 }

@@ -38,12 +38,7 @@ public final class Flight extends Check {
      * Ascend cooldown work around.
      * Max time allowed to b e hovering
      */
-    private int maxAscendTime, jumpBoostAscendAmplifier, ascendCooldown, maxInAirHoverTime;
-
-    /**
-     * The max difference allowed between a=(vertical speed - expected) then, (vertical speed - a)
-     */
-    private double slimeblockMaxScoreDiff;
+    private int maxAscendTime, jumpBoostAscendAmplifier, ascendCooldown, maxInAirHoverTime, noGlideDifferenceMax;
 
     public Flight() {
         super(CheckType.FLIGHT);
@@ -66,7 +61,7 @@ public final class Flight extends Check {
         addConfigurationValue("ground-distance-threshold", 2.0);
         addConfigurationValue("ground-distance-horizontal-cap", 0.50);
         addConfigurationValue("max-in-air-hover-time", 6);
-        addConfigurationValue("slimeblock-max-score-difference", 0.42);
+        addConfigurationValue("no-glide-difference-max", 2);
 
         if (enabled()) load();
     }
@@ -109,13 +104,22 @@ public final class Flight extends Check {
                 && !data.hasClimbable();
 
         // check the vertical move of this player.
+        final double distanceToGround = MathUtil.vertical(ground, to);
         if (validVerticalMove) {
             // check vertical clip regardless of ascending or descending state.
             // return here since we don't want the rest of the check interfering with setback.
             //  final boolean failed = checkIfMovedThroughSolidBlock(player, result, safe, from, to, vertical);
             if (!hasVerticalModifier) {
-                checkVerticalMove(player, data, ground, from, to, vertical, data.ascendingTime(), result);
+                checkVerticalMove(player, data, ground, from, to, vertical, distanceToGround, data.ascendingTime(), result);
             }
+        }
+
+        // check gliding, descending movement.
+        if (player.getRiding() == null
+                && !data.inLiquid()
+                && !data.hasClimbable()
+                && !player.hasEffect(NukkitAccess.SLOW_FALLING_EFFECT)) {
+            checkGlide(player, data, ground, to, vertical, distanceToGround, result);
         }
 
         if (data.hasClimbable()) {
@@ -137,19 +141,16 @@ public final class Flight extends Check {
      * @param from          the from
      * @param to            movedTo
      * @param vertical      vertical
+     * @param distance      distance from ground
      * @param ascendingTime ascendingTime
      * @param result        result
      */
-    private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
+    private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to, double vertical, double distance, int ascendingTime, CheckResult result) {
         if (data.ascending()) {
-            // check ground distance.
-            final double distance = MathUtil.vertical(ground, to);
-
             final boolean hasSlimeblock = data.hasSlimeblock();
-            if (hasSlimeblock && vertical > 0.42 && distance > 3f) {
+            if (hasSlimeblock && vertical > 0.42 && distance > 1f) {
                 data.setHasSlimeBlockLaunch(true);
             }
-
 
             if (distance >= groundDistanceThreshold) {
                 // high off ground (hopefully) check.
@@ -166,45 +167,11 @@ public final class Flight extends Check {
                 }
             }
 
-            // TODO: check if we have launch from a slime-block.
+            // TODO: Maybe in the future, watch slime-block movement.
+            // TODO: But for now, movement is too weird, and haven't seen any cheats yet.
+
             // ensure we didn't walk up a block that modifies your vertical
             final double maxJumpHeight = getJumpHeight(player);
-
-            if (hasSlimeblock) {
-                // player was launched, set state
-                final boolean launched = data.hasSlimeBlockLaunch();
-                if (launched) {
-                    // get rough estimate of player fall distance
-                    final double fallen = MathUtil.vertical(data.getFlightDescendingLocation() == null ? from
-                            : data.getFlightDescendingLocation(), from);
-                    if (data.getFlightDescendingLocation() != null) {
-                        // decrease the modifier if we fall from a significant height, +
-                        // to prevent one time abuse
-                        final double modifier = fallen > 15 ? 0.11D : 0.18d;
-                        final double rough = 0.4D + fallen * modifier;
-                        final double diff = Math.abs(vertical - rough);
-                        final double score = vertical - diff;
-                        if (score >= slimeblockMaxScoreDiff) {
-                            result.setFailed("Bounced too high from a slimeblock")
-                                    .withParameter("vertical", vertical)
-                                    .withParameter("rough", rough)
-                                    .withParameter("diff", diff)
-                                    .withParameter("score", score)
-                                    .withParameter("max", slimeblockMaxScoreDiff);
-                            handleCheckViolationAndReset(player, result, ground);
-                        }
-                    }
-
-                    // player is jumping really high with no velocity
-                    if (distance <= 1f && vertical > maxJumpHeight && fallen <= 1f) {
-                        result.setFailed("Vertical greater than max jump height on slimeblock")
-                                .withParameter("groundDistance", distance)
-                                .withParameter("vertical", vertical)
-                                .withParameter("max", maxJumpHeight);
-                        handleCheckViolationAndReset(player, result, ground);
-                    }
-                }
-            }
 
             // go back to where we were.
             // maybe ground later.
@@ -233,6 +200,66 @@ public final class Flight extends Check {
                         .withParameter("time", data.ascendingTime())
                         .withParameter("max", (maxAscendTime + modifier));
                 handleCheckViolationAndReset(player, result, from);
+            }
+        }
+    }
+
+    /**
+     * Generally check player gliding and flight movements.
+     *
+     * @param player   the player
+     * @param data     their data
+     * @param ground   ground location
+     * @param to       to
+     * @param vertical vertical
+     * @param distance the distance to ground
+     * @param result   result
+     */
+    private void checkGlide(Player player, MovingData data, Location ground, Location to, double vertical, double distance, CheckResult result) {
+
+        // check no ground stuff
+        // TODO: Can be bypassed, needs to be improved, see comment below.
+        if (!data.onGround() && (data.getNoResetDescendTime() >= 5 || data.getNoResetAscendTime() >= 5)) {
+            final double horizontal = MathUtil.horizontal(ground, to);
+            if (horizontal > 3f && data.getInAirTime() >= 15) {
+                // player is far from ground, so we should expect to be a certain distance by this point.
+                // This can still be abused here, so in the future calculate what we should expect.
+                // TODO: Bypassable by falling a greater amount over time.
+                if (distance < 1f) {
+                    result.setFailed("Not gliding over-time (experimental)")
+                            .withParameter("horizontal", horizontal)
+                            .withParameter("min", 3f)
+                            .withParameter("air", data.getInAirTime())
+                            .withParameter("min", 15)
+                            .withParameter("distance", distance)
+                            .withParameter("min", 1f);
+                    handleCheckViolationAndReset(player, result, ground);
+                }
+            }
+        }
+
+        // first, basic glide check
+        // ensure player is actually moving down when off the ground here.
+        if (!data.onGround() && !data.ascending()) {
+            // calculate how we moved since last time.
+            final double delta = Math.abs(vertical - data.lastVertical());
+
+            // player hasn't moved, increase 'time'
+            if (vertical == 0.0 || delta == 0.0) {
+                data.setNoGlideTime(data.getNoGlideTime() + 1);
+            } else {
+                // decrease / reward
+                data.setNoGlideTime(data.getNoGlideTime() - 1);
+            }
+
+            if (data.getNoGlideTime() > noGlideDifferenceMax) {
+                result.setFailed("No vertical difference while off ground")
+                        .withParameter("vertical", vertical)
+                        .withParameter("last", data.lastVertical())
+                        .withParameter("delta", delta)
+                        .withParameter("time", data.getNoGlideTime())
+                        .withParameter("max", noGlideDifferenceMax);
+                handleCheckViolationAndReset(player, result, ground);
             }
         }
     }
@@ -361,6 +388,6 @@ public final class Flight extends Check {
         groundDistanceThreshold = configuration.getDouble("ground-distance-threshold");
         groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
         maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
-        slimeblockMaxScoreDiff = configuration.getDouble("slimeblock-max-score-difference");
+        noGlideDifferenceMax = configuration.getInt("no-glide-difference-max");
     }
 }

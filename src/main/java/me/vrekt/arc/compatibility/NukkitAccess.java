@@ -10,4 +10,9 @@ public final class NukkitAccess {
      */
     public static final int JUMP_BOOST_EFFECT = 8;
 
+    /**
+     * Slow falling effect.
+     */
+    public static final int SLOW_FALLING_EFFECT = 40;
+
 }
