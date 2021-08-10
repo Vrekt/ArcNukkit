@@ -132,6 +132,7 @@ public final class MovingAccess {
             data.setInAirTime(0);
             data.ascendingTime(0);
             data.descendingTime(0);
+
             data.setNoResetDescendTime(0);
             data.setNoResetAscendTime(0);
         } else {
@@ -176,12 +177,14 @@ public final class MovingAccess {
 
         if (ascending) {
             data.incrementAscendingTime();
+            data.setNoResetAscendTime(data.getNoResetAscendTime() + 1);
         } else {
             data.ascendingTime(0);
         }
 
         if (descending) {
             data.incrementDescendingTime();
+            data.setNoResetDescendTime(data.getNoResetDescendTime() + 1);
         } else {
             data.descendingTime(0);
         }

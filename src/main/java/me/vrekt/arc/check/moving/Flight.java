@@ -40,6 +40,23 @@ public final class Flight extends Check {
      */
     private int maxAscendTime, jumpBoostAscendAmplifier, ascendCooldown, maxInAirHoverTime, noGlideDifferenceMax;
 
+    /**
+     * No reset ascend checks if the player is ascending too high.
+     * Players previously could bypass regular ascend check by ascending slowly and descending every now and again.
+     * This check does not reset the players ascend time if they descend.
+     * <p>
+     * The distance needed away from ground to start checking a no reset ascend.
+     * The max amount of ascending moves allowed.
+     */
+    private double noResetAscendGroundDistanceThreshold, maxNoResetAscendMoves;
+
+    /**
+     * The minimum time needed to be descending to check glide.
+     * The minimum distance away from ground needed to check glide, 0.85 = player jump
+     * The max difference allowed between calculated fall velocity and actual fall velocity.
+     */
+    private double glideDescendTimeMin, glideDescendDistanceMin, glideMaxDifference;
+
     public Flight() {
         super(CheckType.FLIGHT);
         enabled(true)
@@ -62,6 +79,11 @@ public final class Flight extends Check {
         addConfigurationValue("ground-distance-horizontal-cap", 0.50);
         addConfigurationValue("max-in-air-hover-time", 6);
         addConfigurationValue("no-glide-difference-max", 2);
+        addConfigurationValue("no-reset-ascend-ground-distance-threshold", 1);
+        addConfigurationValue("max-no-reset-ascend-moves", 10);
+        addConfigurationValue("glide-descend-time-min", 5);
+        addConfigurationValue("glide-descend-distance-min", 1.6);
+        addConfigurationValue("glide-max-difference", 0.010);
 
         if (enabled()) load();
     }
@@ -150,6 +172,22 @@ public final class Flight extends Check {
             final boolean hasSlimeblock = data.hasSlimeblock();
             if (hasSlimeblock && vertical > 0.42 && distance > 1f) {
                 data.setHasSlimeBlockLaunch(true);
+            }
+
+            // tighter distance check, more moves allowed though, don't use ascend that resets.
+            if (distance >= noResetAscendGroundDistanceThreshold) {
+                // check ascending moves, no reset.
+                final int moves = data.getNoResetAscendTime();
+
+                if (moves >= maxNoResetAscendMoves
+                        && !data.hasSlimeBlockLaunch()) {
+                    // we have a few moves here to work with.
+                    result.setFailed("Ascending too long")
+                            .withParameter("distance", distance)
+                            .withParameter("moves", moves)
+                            .withParameter("max", maxNoResetAscendMoves);
+                    handleCheckViolationAndReset(player, result, ground);
+                }
             }
 
             if (distance >= groundDistanceThreshold) {
@@ -260,6 +298,36 @@ public final class Flight extends Check {
                         .withParameter("time", data.getNoGlideTime())
                         .withParameter("max", noGlideDifferenceMax);
                 handleCheckViolationAndReset(player, result, ground);
+            }
+
+            // next, calculate how we should be falling.
+            // ensure we have been falling though, and have at-least decent distance.
+            // Check horizontal distance as-well since its possible to glide pretty far
+            // before hitting the vertical distance required.
+            if (data.getNoResetDescendTime() >= glideDescendTimeMin
+                    && ((distance >= glideDescendDistanceMin)
+                    || MathUtil.horizontal(ground, to) >= glideDescendDistanceMin)) {
+
+                final int time = data.getInAirTime();
+
+                // meant to stop increasing the overall expected after a certain distance
+                // sort of like a reset.
+                final double mod = time <= 50 ? 0.000006 :
+                        MathUtil.vertical(data.getFlightDescendingLocation(), to) >= 50 ? 0.00000456
+                                : 0.000006;
+
+                final double expected = mod * Math.pow(data.getInAirTime(), 2) - 0.0011 * data.getInAirTime() + 0.077;
+                final double difference = expected - delta;
+
+                // TODO: Check for fast falling players.
+                if (difference >= glideMaxDifference) {
+                    result.setFailed("Gliding delta not expected")
+                            .withParameter("delta", delta)
+                            .withParameter("e", expected)
+                            .withParameter("diff", difference)
+                            .withParameter("max", glideMaxDifference);
+                    handleCheckViolationAndReset(player, result, ground);
+                }
             }
         }
     }
@@ -389,5 +457,10 @@ public final class Flight extends Check {
         groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
         maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
         noGlideDifferenceMax = configuration.getInt("no-glide-difference-max");
+        noResetAscendGroundDistanceThreshold = configuration.getDouble("no-reset-ascend-ground-distance-threshold");
+        maxNoResetAscendMoves = configuration.getDouble("max-no-reset-ascend-moves");
+        glideDescendTimeMin = configuration.getInt("glide-descend-time-min");
+        glideDescendDistanceMin = configuration.getDouble("glide-descend-distance-min");
+        glideMaxDifference = configuration.getDouble("glide-max-difference");
     }
 }
