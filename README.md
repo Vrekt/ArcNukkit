@@ -79,6 +79,9 @@ Please note not all checks are finished, and not all checks fully block that cer
 ###### Nuker
 - Prevents the player from breaking an impossible amount of blocks.
 
+###### FastBreak
+- Prevents the player from breaking blocks too fast.
+
 ## Configuration
 
 You can view each configuration value and what they mean/do in the wiki [here](https://github.com/Vrekt/ArcNukkit/wiki)
