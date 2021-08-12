@@ -1,6 +1,6 @@
 name: Arc
 main: me.vrekt.arc.Arc
-version: 1.6
+version: 1.6.1
 description: An anticheat for Nukkit.
 author: Vrekt
 api: ["1.0.0"]

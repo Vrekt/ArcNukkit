@@ -1,5 +1,7 @@
 package me.vrekt.arc.check;
 
+import me.vrekt.arc.permissions.Permissions;
+
 /**
  * Tells what type the check is
  */
@@ -41,8 +43,9 @@ public enum CheckType {
 
     /**
      * The name
+     * The permission to bypass.
      */
-    private final String name;
+    private final String name, bypassPermission;
 
     /**
      * The category
@@ -52,6 +55,8 @@ public enum CheckType {
     CheckType(String name, CheckCategory category) {
         this.name = name;
         this.category = category;
+
+        this.bypassPermission = Permissions.ARC_BYPASS + "." + category.name().toLowerCase() + "." + name.toLowerCase();
     }
 
     /**
@@ -62,9 +67,16 @@ public enum CheckType {
     }
 
     /**
+     * @return the bypass permission
+     */
+    public String getBypassPermission() {
+        return bypassPermission;
+    }
+
+    /**
      * @return the category
      */
-    public CheckCategory category() {
+    public CheckCategory getCategory() {
         return category;
     }
 

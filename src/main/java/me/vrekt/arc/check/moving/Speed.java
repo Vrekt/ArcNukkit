@@ -16,6 +16,11 @@ import me.vrekt.arc.utility.math.MathUtil;
  */
 public final class Speed extends Check {
 
+    /**
+     * Max distance player can move in one movement.
+     */
+    private double maxLargeDistanceMovement;
+
     public Speed() {
         super(CheckType.SPEED);
 
@@ -28,6 +33,8 @@ public final class Speed extends Check {
                 .banLevel(20)
                 .kick(false)
                 .build();
+
+        addConfigurationValue("max-large-distance-movement", 4);
 
         if (enabled()) load();
     }
@@ -42,7 +49,6 @@ public final class Speed extends Check {
         if (exempt(player)) return;
         startTiming(player);
 
-
         final Location from = data.from();
         final Location to = data.to();
 
@@ -51,10 +57,10 @@ public final class Speed extends Check {
         final CheckResult result = new CheckResult();
 
         // cancel large movements.
-        if (horizontal > 4) {
+        if (horizontal >= maxLargeDistanceMovement) {
             result.setFailed("Large movement")
                     .withParameter("h", horizontal)
-                    .withParameter("max", 4);
+                    .withParameter("max", maxLargeDistanceMovement);
             handleCheckViolationAndReset(player, result, from);
         }
 
@@ -85,6 +91,7 @@ public final class Speed extends Check {
 
     @Override
     public void load() {
+        maxLargeDistanceMovement = configuration.getDouble("max-large-distance-movement");
         CheckTimings.registerTiming(checkType);
     }
 }

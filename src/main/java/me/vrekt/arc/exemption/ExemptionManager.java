@@ -66,15 +66,13 @@ public final class ExemptionManager implements Configurable, Closeable {
      */
     public boolean isPlayerExempt(Player player, CheckType check) {
         final boolean exemptFromCheck = isPlayerExemptFromCheck(player, check);
+        if (exemptFromCheck) return true;
+
         final boolean exemptFlying = isFlying(player) && isExemptWhenFlying(check);
-        boolean exemptionsMapped = false;
+        if (exemptFlying) return true;
 
-        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
-        if (exemptions != null) {
-            exemptionsMapped = exemptions.isExempt(check);
-        }
-
-        return (exemptFromCheck || exemptFlying || exemptionsMapped);
+        final ExemptionHistory exemptions = this.exemptions.getOrDefault(player.getUniqueId(), ExemptionHistory.EMPTY);
+        return exemptions.isExempt(check);
     }
 
     /**
@@ -85,7 +83,7 @@ public final class ExemptionManager implements Configurable, Closeable {
      * @return {@code true} if so
      */
     public boolean isPlayerExemptFromCheck(Player player, CheckType check) {
-        return Permissions.canBypassChecks(player, check);
+        return Permissions.canBypassCheck(player, check);
     }
 
     /**

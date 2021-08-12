@@ -14,6 +14,11 @@ import java.util.Map;
 public final class ExemptionHistory {
 
     /**
+     * Empty
+     */
+    public static final ExemptionHistory EMPTY = new ExemptionHistory();
+
+    /**
      * Exemption data
      */
     private final Map<CheckType, Long> exemptions = new HashMap<>();
