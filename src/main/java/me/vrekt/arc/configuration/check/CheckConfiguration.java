@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * A check configuration format.
  */
-public final class CheckConfiguration extends Configurable {
+public final class CheckConfiguration implements Configurable {
 
     /**
      * The check for this configuration.
@@ -43,11 +43,11 @@ public final class CheckConfiguration extends Configurable {
     public CheckConfiguration(CheckType check, ConfigSection section) {
         this.check = check;
         this.section = section;
-        read(null);
+        readFromFile(null);
     }
 
     @Override
-    public void read(Config configuration) {
+    public void readFromFile(Config configuration) {
         // retrieve booleans
         enabled = section.getBoolean("enabled");
         cancel = section.getBoolean("cancel");
@@ -63,9 +63,9 @@ public final class CheckConfiguration extends Configurable {
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
+    public void reloadConfiguration(ArcConfiguration configuration) {
         this.section = Arc.getPlugin().getConfig().getSection(check.getName());
-        read(null);
+        readFromFile(null);
     }
 
     /**

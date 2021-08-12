@@ -15,25 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages player exemptions
  */
-public final class ExemptionManager extends Configurable implements Closeable {
+public final class ExemptionManager implements Configurable, Closeable {
 
     /**
-     * Exemptions by player
+     * ExemptionHistory by player
      */
-    private final Map<UUID, Exemptions> exemptions = new ConcurrentHashMap<>();
-
-    /**
-     * Initialize
-     *
-     * @param configuration the config
-     */
-    public void initialize(ArcConfiguration configuration) {
-        //
-    }
+    private final Map<UUID, ExemptionHistory> exemptions = new ConcurrentHashMap<>();
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        //
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        Configurable.super.reloadConfiguration(configuration);
     }
 
     /**
@@ -42,7 +33,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param player the player
      */
     public void onPlayerJoin(Player player) {
-        exemptions.put(player.getUniqueId(), new Exemptions());
+        exemptions.put(player.getUniqueId(), new ExemptionHistory());
         doJoinExemptions(player);
     }
 
@@ -61,7 +52,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param player the player
      */
     public void onPlayerLeave(Player player) {
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         this.exemptions.remove(player.getUniqueId());
         exemptions.clear();
     }
@@ -78,7 +69,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
         final boolean exemptFlying = isFlying(player) && isExemptWhenFlying(check);
         boolean exemptionsMapped = false;
 
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         if (exemptions != null) {
             exemptionsMapped = exemptions.isExempt(check);
         }
@@ -116,7 +107,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param duration the duration
      */
     public void addExemption(Player player, CheckType check, long duration) {
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         exemptions.addExemption(check, System.currentTimeMillis() + duration);
     }
 
@@ -127,7 +118,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param check  the check
      */
     public void addExemptionPermanently(Player player, CheckType... check) {
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         for (CheckType checkType : check) {
             exemptions.addExemptionPermanently(checkType);
         }
@@ -176,7 +167,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
 
     @Override
     public void close() {
-        exemptions.values().forEach(Exemptions::clear);
+        exemptions.values().forEach(ExemptionHistory::clear);
         exemptions.clear();
     }
 

@@ -15,4 +15,9 @@ public final class NukkitAccess {
      */
     public static final int SLOW_FALLING_EFFECT = 40;
 
+    /**
+     * Speed potion
+     */
+    public static final String MOVE_SPEED_POTION = "%potion.moveSpeed";
+
 }

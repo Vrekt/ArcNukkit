@@ -8,6 +8,7 @@ import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.compatibility.NukkitAccess;
 import me.vrekt.arc.compatibility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
+import me.vrekt.arc.timings.CheckTimings;
 import me.vrekt.arc.utility.MovingAccess;
 import me.vrekt.arc.utility.math.MathUtil;
 
@@ -101,6 +102,7 @@ public final class Flight extends Check {
         if (player.isGliding()) return;
 
         final CheckResult result = new CheckResult();
+        startTiming(player);
 
         // from, to, ground and safe location(s)
         final Location from = data.from();
@@ -152,6 +154,8 @@ public final class Flight extends Check {
 
         // update safe location if not failed and on ground.
         if (!result.hasFailedBefore() && data.onGround()) data.setSafeLocation(to);
+
+        stopTiming(player);
     }
 
     /**
@@ -462,5 +466,7 @@ public final class Flight extends Check {
         glideDescendTimeMin = configuration.getInt("glide-descend-time-min");
         glideDescendDistanceMin = configuration.getDouble("glide-descend-distance-min");
         glideMaxDifference = configuration.getDouble("glide-max-difference");
+
+        CheckTimings.registerTiming(checkType);
     }
 }

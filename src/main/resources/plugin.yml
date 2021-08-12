@@ -18,6 +18,10 @@ permissions:
     description: Allows the player to execute /arc
   arc.commands.all:
     description: Allows the player to use all Arc commands.
+  arc.commands.timings:
+    description: Allows the player to view timings information.
+  arc.commands.violationhistory:
+    description: Allows the player to view others violation history.
   arc.bypass:
     default: false
     description: Allows the player to bypass all Arc checks.

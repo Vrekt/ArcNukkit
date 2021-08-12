@@ -7,12 +7,16 @@ import me.vrekt.arc.Arc;
 import me.vrekt.arc.permissions.Permissions;
 
 /**
- * Allows viewing of debug information
+ * Allows the sender to enable or disable debug messages
  */
 public final class DebugSubCommand extends ArcSubCommand {
 
     public DebugSubCommand() {
         super(Permissions.ARC_COMMANDS_DEBUG);
+
+        setCommand("/arc debug");
+        setUsage("/arc debug");
+        setDescription("Allows you to toggle debug messaging.");
     }
 
     @Override

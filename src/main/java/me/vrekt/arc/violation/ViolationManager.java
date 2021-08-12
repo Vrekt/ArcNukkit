@@ -23,12 +23,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Manages violations
  */
-public final class ViolationManager extends Configurable implements Closeable {
+public final class ViolationManager implements Configurable, Closeable {
 
     /**
      * Violation history
      */
-    private final Map<UUID, Violations> history = new ConcurrentHashMap<>();
+    private final Map<UUID, ViolationHistory> history = new ConcurrentHashMap<>();
 
     /**
      * A list of players who can view violations/debug information
@@ -38,7 +38,7 @@ public final class ViolationManager extends Configurable implements Closeable {
     /**
      * Keeps track of when to expire history
      */
-    private Cache<UUID, Violations> historyCache;
+    private Cache<UUID, ViolationHistory> historyCache;
 
     /**
      * The arc configuration.
@@ -50,12 +50,8 @@ public final class ViolationManager extends Configurable implements Closeable {
      */
     private PunishmentManager punishmentManager;
 
-    /**
-     * Initialize
-     *
-     * @param configuration the configuration
-     */
-    public void initialize(ArcConfiguration configuration) {
+    @Override
+    public void loadConfiguration(ArcConfiguration configuration) {
         this.configuration = configuration;
         this.punishmentManager = Arc.getInstance().getPunishmentManager();
 
@@ -70,12 +66,12 @@ public final class ViolationManager extends Configurable implements Closeable {
      * @param player the player
      */
     public void onPlayerJoin(Player player) {
-        final Violations cached = historyCache.getIfPresent(player.getUniqueId());
+        final ViolationHistory cached = historyCache.getIfPresent(player.getUniqueId());
         if (cached != null) {
             historyCache.invalidate(player.getUniqueId());
             history.put(player.getUniqueId(), cached);
         } else {
-            history.put(player.getUniqueId(), new Violations());
+            history.put(player.getUniqueId(), new ViolationHistory());
         }
         if (Permissions.canViewViolations(player)) violationViewers.put(player, false);
     }
@@ -104,7 +100,7 @@ public final class ViolationManager extends Configurable implements Closeable {
      * @return the result
      */
     public ViolationResult violation(Player player, Check check, CheckResult result) {
-        final Violations violations = history.get(player.getUniqueId());
+        final ViolationHistory violations = history.get(player.getUniqueId());
         final int level = violations.incrementViolationLevel(check.type());
         // create a new result if we haven't cancelled.
         final ViolationResult violationResult = new ViolationResult();
@@ -202,12 +198,12 @@ public final class ViolationManager extends Configurable implements Closeable {
     /**
      * @return history
      */
-    public Map<UUID, Violations> getHistory() {
+    public Map<UUID, ViolationHistory> getHistory() {
         return history;
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
+    public void reloadConfiguration(ArcConfiguration configuration) {
         this.configuration = configuration;
 
         historyCache.invalidateAll();

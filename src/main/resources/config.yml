@@ -78,3 +78,6 @@ violation-data-timeout: 30
 
 # If the event API should be enabled.
 enable-event-api: true
+
+# If check timings should be enabled.
+enable-check-timings: true

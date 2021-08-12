@@ -4,6 +4,7 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.configuration.ArcConfiguration;
 import me.vrekt.arc.configuration.Configurable;
+import me.vrekt.arc.configuration.ConfigurationSettingReader;
 import me.vrekt.arc.configuration.types.BanLengthType;
 import me.vrekt.arc.configuration.types.BanListType;
 import me.vrekt.arc.configuration.types.ConfigurationString;
@@ -12,7 +13,7 @@ import me.vrekt.arc.configuration.values.ConfigurationSetting;
 /**
  * The ban configuration
  */
-public final class BanConfiguration extends Configurable {
+public final class BanConfiguration extends ConfigurationSettingReader implements Configurable {
 
     /**
      * The global ban message
@@ -55,7 +56,7 @@ public final class BanConfiguration extends Configurable {
     private ConfigurationString globalViolationsBanMessage;
 
     @Override
-    public void read(Config configuration) {
+    public void readFromFile(Config configuration) {
         globalBanMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationSetting.GLOBAL_BAN_MESSAGE)));
         globalBanDelay = getInteger(configuration, ConfigurationSetting.GLOBAL_BAN_DELAY);
         globalBanType = getBanListType(configuration, ConfigurationSetting.GLOBAL_BAN_TYPE);
@@ -67,8 +68,8 @@ public final class BanConfiguration extends Configurable {
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        read(configuration.fileConfiguration());
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        readFromFile(configuration.fileConfiguration());
     }
 
     /**

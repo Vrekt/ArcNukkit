@@ -57,9 +57,8 @@ public final class MovingEventListener implements Listener {
      * @param data   their data
      */
     private void runChecks(Player player, MovingData data) {
-        if (flight.enabled()) {
-            flight.check(player, data);
-        }
+        if (flight.enabled()) flight.check(player, data);
+        if (speed.enabled()) speed.check(player, data);
     }
 
 }

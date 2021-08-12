@@ -13,28 +13,29 @@ import me.vrekt.arc.configuration.check.CheckConfiguration;
 import me.vrekt.arc.configuration.check.CheckConfigurationBuilder;
 import me.vrekt.arc.exemption.ExemptionManager;
 import me.vrekt.arc.exemption.type.ExemptionType;
+import me.vrekt.arc.timings.CheckTimings;
 import me.vrekt.arc.violation.ViolationManager;
 import me.vrekt.arc.violation.result.ViolationResult;
 
 /**
  * Represents a check.
  */
-public abstract class Check extends Configurable {
+public abstract class Check implements Configurable {
 
     /**
-     * Exemptions
+     * ExemptionHistory
      */
     private static final ExemptionManager EXEMPTION_MANAGER = Arc.getInstance().getExemptionManager();
 
     /**
-     * Violations
+     * ViolationHistory
      */
     private static final ViolationManager VIOLATION_MANAGER = Arc.getInstance().getViolationManager();
 
     /**
      * The check type
      */
-    private final CheckType checkType;
+    protected final CheckType checkType;
 
     /**
      * The configuration builder;
@@ -248,16 +249,6 @@ public abstract class Check extends Configurable {
     }
 
     /**
-     * Set back the player
-     *
-     * @param player the player
-     * @param where  where to
-     */
-    protected void setbackPlayer(Player player, Location where) {
-        player.teleport(where, PlayerTeleportEvent.TeleportCause.PLUGIN);
-    }
-
-    /**
      * Check if the player is exempt
      *
      * @param player the player
@@ -298,12 +289,30 @@ public abstract class Check extends Configurable {
         }
     }
 
+    /**
+     * Start timing the player
+     *
+     * @param player the player
+     */
+    protected void startTiming(Player player) {
+        CheckTimings.startTiming(checkType, player.getUniqueId());
+    }
+
+    /**
+     * Stop timing the player
+     *
+     * @param player the player
+     */
+    protected void stopTiming(Player player) {
+        CheckTimings.stopTiming(checkType, player.getUniqueId());
+    }
+
     @Override
-    public void reload(ArcConfiguration configuration) {
+    public void reloadConfiguration(ArcConfiguration configuration) {
         if (permanentlyDisabled) return;
         unload();
 
-        this.configuration.reload(configuration);
+        this.configuration.reloadConfiguration(configuration);
         if (this.configuration.enabled()) {
             reloadConfig();
         }

@@ -50,6 +50,21 @@ public final class Permissions {
     public static final String ARC_COMMANDS_DEBUG = "arc.commands.debug";
 
     /**
+     * The permission for viewing timings information.
+     */
+    public static final String ARC_COMMANDS_TIMINGS = "arc.commands.timings";
+
+    /**
+     * The permission for viewing violation history
+     */
+    public static final String ARC_COMMANDS_VIOLATION_HISTORY = "arc.commands.violationhistory";
+
+    /**
+     * The permission to exempt from certain checks
+     */
+    public static final String ARC_COMMANDS_EXEMPT = "arc.commands.exempt";
+
+    /**
      * The permission to execute all arc commands
      */
     public static final String ARC_COMMANDS_ALL = "arc.commands.all";

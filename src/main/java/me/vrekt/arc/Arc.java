@@ -17,6 +17,7 @@ import me.vrekt.arc.listener.moving.task.MovingTaskListener;
 import me.vrekt.arc.listener.packet.NukkitPacketHandler;
 import me.vrekt.arc.listener.player.PlayerListener;
 import me.vrekt.arc.punishment.PunishmentManager;
+import me.vrekt.arc.timings.CheckTimings;
 import me.vrekt.arc.violation.ViolationManager;
 
 /**
@@ -27,7 +28,7 @@ public final class Arc extends PluginBase {
     /**
      * IPL version
      */
-    private static final String IPL_VERSION = "1.6-8921b-nukkit";
+    public static final String VERSION_STRING = "1.6.1-81221a-nukkit";
 
     /**
      * The instance of this class
@@ -66,28 +67,22 @@ public final class Arc extends PluginBase {
 
         getLogger().info(TextFormat.RED + "**THIS IS AN EXPERIMENTAL VERSION OF ARC**");
         getLogger().info(TextFormat.RED + "**PLEASE REPORT ANY ISSUES TO GITHUB**");
-        getLogger().info(TextFormat.DARK_GREEN + "Initializing Arc " + IPL_VERSION);
+        getLogger().info(TextFormat.DARK_GREEN + "Initializing Arc " + VERSION_STRING);
         getLogger().info(TextFormat.DARK_GREEN + "Reading main configuration...");
 
         saveDefaultConfig();
-        arcConfiguration.read(getConfig());
+        arcConfiguration.readFromFile(getConfig());
 
         getLogger().info(TextFormat.DARK_GREEN + "Registering checks and listeners...");
-        checkManager.initialize();
-        violationManager.initialize(arcConfiguration);
-        punishmentManager.initialize(arcConfiguration);
-        exemptionManager.initialize(arcConfiguration);
+        checkManager.initializeAllChecks();
+        violationManager.loadConfiguration(arcConfiguration);
+        punishmentManager.loadConfiguration(arcConfiguration);
+        exemptionManager.loadConfiguration(arcConfiguration);
         loadOnlinePlayers();
 
-        getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        getServer().getPluginManager().registerEvents(new NukkitPacketHandler(exemptionManager), this);
-        getServer().getPluginManager().registerEvents(new MovingEventListener(), this);
-        getServer().getPluginManager().registerEvents(new BlockListener(), this);
-        getServer().getPluginManager().registerEvents(new CombatListener(), this);
-        new MovingTaskListener();
-
+        registerListeners();
         verifyCommand();
+
         getLogger().info(TextFormat.DARK_GREEN + "Saving configuration...");
         saveConfig();
 
@@ -96,20 +91,34 @@ public final class Arc extends PluginBase {
 
     @Override
     public void onDisable() {
-        getLogger().info("Saving file configuration...");
+        getLogger().info(TextFormat.DARK_GREEN + "Saving file configuration...");
         saveConfig();
 
-        getLogger().info("Closing resources...");
+        getLogger().info(TextFormat.DARK_GREEN + "Closing resources...");
         exemptionManager.close();
         violationManager.close();
         checkManager.close();
         punishmentManager.close();
+        CheckTimings.shutdown();
 
-        getLogger().info("Removing player data...");
+        getLogger().info(TextFormat.DARK_GREEN + "Removing player data...");
         getServer().getOnlinePlayers().values().forEach(Data::removeAll);
         arc = null;
 
-        getLogger().info("Goodbye.");
+        getLogger().info(TextFormat.DARK_GREEN + "Goodbye.");
+    }
+
+    /**
+     * Register listeners.
+     */
+    private void registerListeners() {
+        getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new NukkitPacketHandler(exemptionManager), this);
+        getServer().getPluginManager().registerEvents(new MovingEventListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockListener(), this);
+        getServer().getPluginManager().registerEvents(new CombatListener(), this);
+        new MovingTaskListener();
     }
 
     /**
@@ -135,7 +144,6 @@ public final class Arc extends PluginBase {
                     exemptionManager.onPlayerJoin(player);
                 });
     }
-
 
     /**
      * @return the internal plugin

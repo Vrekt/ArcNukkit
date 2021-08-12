@@ -79,7 +79,7 @@ public final class ConfigurationString {
      * @return this
      */
     public ConfigurationString prefix() {
-        value = StringUtils.replace(value, Placeholders.PREFIX.placeholder(), Arc.getInstance().getArcConfiguration().prefix());
+        value = StringUtils.replace(value, Placeholders.PREFIX.placeholder(), Arc.getInstance().getArcConfiguration().getPrefix());
         return this;
     }
 

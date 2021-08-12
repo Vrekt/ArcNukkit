@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages kicking and banning of players.
  */
-public final class PunishmentManager extends Configurable implements Closeable {
+public final class PunishmentManager implements Configurable, Closeable {
 
     /**
      * A set of players who have pending bans.
@@ -50,26 +50,18 @@ public final class PunishmentManager extends Configurable implements Closeable {
      */
     private boolean enableEventApi;
 
-    /**
-     * Initialize
-     *
-     * @param configuration the arc config
-     */
-    public void initialize(ArcConfiguration configuration) {
-        read(configuration);
+    @Override
+    public void loadConfiguration(ArcConfiguration configuration) {
+        readFromArc(configuration);
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        read(configuration);
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        readFromArc(configuration);
     }
 
-    /**
-     * Read
-     *
-     * @param configuration the arc config
-     */
-    private void read(ArcConfiguration configuration) {
+    @Override
+    public void readFromArc(ArcConfiguration configuration) {
         this.banConfiguration = configuration.banConfiguration();
         this.kickConfiguration = configuration.kickConfiguration();
         enableEventApi = Arc.getInstance().getArcConfiguration().enableEventApi();

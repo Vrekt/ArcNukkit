@@ -12,17 +12,21 @@ public final class ReloadConfigSubCommand extends ArcSubCommand {
 
     public ReloadConfigSubCommand() {
         super(Permissions.ARC_COMMANDS_RELOAD_CONFIG);
+
+        setCommand("/arc reload");
+        setUsage("/arc reload");
+        setDescription("Allows you to view timings information.");
     }
 
     @Override
     public void execute(CommandSender sender, String[] arguments) {
-        sender.sendMessage(TextFormat.RED + "Reloading....");
+        sendMessage(sender, TextFormat.DARK_AQUA + "Reloading....");
         try {
-            Arc.getInstance().getArcConfiguration().reloadConfiguration();
-            sender.sendMessage(TextFormat.GREEN + "Configuration reloaded.");
+            Arc.getInstance().getArcConfiguration().reloadConfigurationAndComponents();
+            sendMessage(sender, TextFormat.DARK_AQUA + "Configuration reloaded.");
         } catch (Exception any) {
             any.printStackTrace();
-            sender.sendMessage(TextFormat.RED + "Any internal error occurred, it has been printed to console.");
+            sendErrorMessage(sender, "Any internal error occurred, it has been printed to console.");
         }
     }
 }

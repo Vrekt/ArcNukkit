@@ -5,14 +5,33 @@ import cn.nukkit.utils.Config;
 /**
  * Basic class for configuration validation
  */
-public abstract class Configurable extends ConfigurationSettingReader {
+public interface Configurable {
 
     /**
-     * Read the configuration
+     * /**
+     * Load initial configuration
      *
-     * @param configuration the configuration
+     * @param configuration the config
      */
-    public void read(Config configuration) {
+    default void loadConfiguration(ArcConfiguration configuration) {
+
+    }
+
+    /**
+     * Read from file configuration
+     *
+     * @param configuration the config
+     */
+    default void readFromFile(Config configuration) {
+
+    }
+
+    /**
+     * Read from arc configuration
+     *
+     * @param configuration configuration
+     */
+    default void readFromArc(ArcConfiguration configuration) {
 
     }
 
@@ -21,7 +40,7 @@ public abstract class Configurable extends ConfigurationSettingReader {
      *
      * @param configuration the configuration
      */
-    public void reload(ArcConfiguration configuration) {
+    default void reloadConfiguration(ArcConfiguration configuration) {
 
     }
 

@@ -11,7 +11,7 @@ import me.vrekt.arc.configuration.values.ConfigurationSetting;
 /**
  * The arc configuration
  */
-public final class ArcConfiguration extends Configurable {
+public final class ArcConfiguration extends ConfigurationSettingReader implements Configurable {
 
     /**
      * Handles ban configuration values
@@ -24,8 +24,9 @@ public final class ArcConfiguration extends Configurable {
 
     /**
      * If the event API should be enabled.
+     * If check timings should be enabled.
      */
-    private boolean enableEventApi;
+    private boolean enableEventApi, enableCheckTimings;
 
     /**
      * TPS helper limit
@@ -49,15 +50,16 @@ public final class ArcConfiguration extends Configurable {
     private String prefix;
 
     @Override
-    public void read(Config configuration) {
-        kickConfiguration.read(configuration);
-        banConfiguration.read(configuration);
+    public void readFromFile(Config configuration) {
+        kickConfiguration.readFromFile(configuration);
+        banConfiguration.readFromFile(configuration);
 
         violationNotifyMessage = new ConfigurationString(TextFormat.colorize('&', getString(configuration, ConfigurationSetting.VIOLATION_NOTIFY_MESSAGE)));
         commandNoPermissionMessage = TextFormat.colorize('&', getString(configuration, ConfigurationSetting.ARC_COMMAND_NO_PERMISSION_MESSAGE));
         prefix = TextFormat.colorize('&', getString(configuration, ConfigurationSetting.ARC_PREFIX));
         violationDataTimeout = getInteger(configuration, ConfigurationSetting.VIOLATION_DATA_TIMEOUT);
         enableEventApi = getBoolean(configuration, ConfigurationSetting.ENABLE_EVENT_API);
+        enableCheckTimings = getBoolean(configuration, ConfigurationSetting.ENABLE_CHECK_TIMINGS);
     }
 
     /**
@@ -98,14 +100,14 @@ public final class ArcConfiguration extends Configurable {
     /**
      * @return command no permission message
      */
-    public String commandNoPermissionMessage() {
+    public String getNoPermissionMessage() {
         return commandNoPermissionMessage;
     }
 
     /**
      * @return the prefix
      */
-    public String prefix() {
+    public String getPrefix() {
         return prefix;
     }
 
@@ -117,18 +119,23 @@ public final class ArcConfiguration extends Configurable {
     }
 
     /**
-     * Reload the configuration
+     * @return if check timings are enabled.
      */
-    public void reloadConfiguration() {
+    public boolean enableCheckTimings() {
+        return enableCheckTimings;
+    }
+
+    /**
+     * Reload the configuration and all configurable components.
+     */
+    public void reloadConfigurationAndComponents() {
         Arc.getPlugin().reloadConfig();
 
-        final Config configuration = Arc.getPlugin().getConfig();
-        read(configuration);
-
-        Arc.getInstance().getCheckManager().reload(this);
-        Arc.getInstance().getViolationManager().reload(this);
-        Arc.getInstance().getExemptionManager().reload(this);
-        Arc.getInstance().getPunishmentManager().reload(this);
+        this.readFromFile(Arc.getPlugin().getConfig());
+        Arc.getInstance().getCheckManager().reloadConfiguration(this);
+        Arc.getInstance().getViolationManager().reloadConfiguration(this);
+        Arc.getInstance().getExemptionManager().reloadConfiguration(this);
+        Arc.getInstance().getPunishmentManager().reloadConfiguration(this);
     }
 
 }

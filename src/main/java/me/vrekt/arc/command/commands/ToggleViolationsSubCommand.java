@@ -1,6 +1,5 @@
 package me.vrekt.arc.command.commands;
 
-
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.utils.TextFormat;
@@ -14,6 +13,10 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
 
     public ToggleViolationsSubCommand() {
         super(Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS);
+
+        setCommand("/arc violations");
+        setUsage("/arc violations");
+        setDescription("Allows you to toggle violation messages.");
     }
 
     @Override
@@ -25,7 +28,7 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
 
         final Player player = (Player) sender;
         final boolean state = toggleState(player);
-        player.sendMessage(TextFormat.GRAY + "Violations are now " + (state ? TextFormat.GREEN + "on." : TextFormat.RED + "off."));
+        sendMessage(player, TextFormat.DARK_AQUA + "Violations are now " + (state ? TextFormat.GREEN + "on." : TextFormat.RED + "off."));
     }
 
     /**

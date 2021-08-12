@@ -1,7 +1,7 @@
 package me.vrekt.arc.command;
 
+
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.command.commands.ArcSubCommand;
 import me.vrekt.arc.permissions.Permissions;
@@ -17,7 +17,7 @@ public abstract class ArcBaseCommand {
     /**
      * Map of sub-commands.
      */
-    private final Map<String, ArcSubCommand> subCommands = new HashMap<>();
+    protected final Map<String, ArcSubCommand> subCommands = new HashMap<>();
 
     /**
      * Map of help-lines
@@ -40,8 +40,8 @@ public abstract class ArcBaseCommand {
      * @param permission the permission
      * @param line       the line
      */
-    protected void helpLine(String permission, String line) {
-        helpLines.put(permission, line);
+    protected void addHelpLine(String permission, String line) {
+        helpLines.put(permission, Arc.getInstance().getArcConfiguration().getPrefix() + " " + line);
     }
 
     /**
@@ -66,7 +66,7 @@ public abstract class ArcBaseCommand {
         if (sender.hasPermission(Permissions.ARC_COMMANDS_ALL) || subCommand.hasPermission(sender)) {
             subCommand.execute(sender, arguments);
         } else {
-            sender.sendMessage(TextFormat.RED + "You do not have permission to do this.");
+            sender.sendMessage(Arc.getInstance().getArcConfiguration().getNoPermissionMessage());
         }
         return true;
     }
@@ -80,20 +80,10 @@ public abstract class ArcBaseCommand {
     protected boolean checkBasePermissions(CommandSender sender) {
         if (!sender.hasPermission(Permissions.ARC_COMMANDS_BASE)
                 || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL)) {
-            sender.sendMessage(Arc.getInstance().getArcConfiguration().commandNoPermissionMessage());
+            sender.sendMessage(Arc.getInstance().getArcConfiguration().getNoPermissionMessage());
             return false;
         }
         return true;
-    }
-
-    /**
-     * Check if the provided argument is help
-     *
-     * @param argument the argument
-     * @return {@code true} if so
-     */
-    protected boolean help(String argument) {
-        return argument.equalsIgnoreCase("help");
     }
 
     /**

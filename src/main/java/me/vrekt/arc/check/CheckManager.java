@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * A check manager
  */
-public final class CheckManager extends Configurable implements Closeable {
+public final class CheckManager implements Configurable, Closeable {
 
     /**
      * Map of all checks.
@@ -26,7 +26,7 @@ public final class CheckManager extends Configurable implements Closeable {
     /**
      * Populate the check map.
      */
-    public void initialize() {
+    public void initializeAllChecks() {
         add(new FastUse());
         add(new MorePackets());
         add(new Flight());
@@ -46,8 +46,8 @@ public final class CheckManager extends Configurable implements Closeable {
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        checks.values().forEach(check -> check.reload(configuration));
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        checks.values().forEach(check -> check.reloadConfiguration(configuration));
     }
 
     /**
@@ -60,16 +60,6 @@ public final class CheckManager extends Configurable implements Closeable {
     @SuppressWarnings("unchecked")
     public <T extends Check> T getCheck(CheckType check) {
         return (T) checks.get(check);
-    }
-
-    /**
-     * Check if a check is enabled
-     *
-     * @param check the check
-     * @return {@code true} if so
-     */
-    public boolean isCheckEnabled(CheckType check) {
-        return checks.get(check).enabled();
     }
 
     @Override
