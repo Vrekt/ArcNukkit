@@ -31,6 +31,7 @@ public final class PlayerConnectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerLeave(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
+        if (player == null) return;
 
         // Players will still invoke this event,
         // Even if they are banned.

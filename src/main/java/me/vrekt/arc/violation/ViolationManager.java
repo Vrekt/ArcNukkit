@@ -86,8 +86,13 @@ public final class ViolationManager extends Configurable implements Closeable {
      * @param player the player
      */
     public void onPlayerLeave(Player player) {
-        historyCache.put(player.getUniqueId(), history.get(player.getUniqueId()));
-        history.remove(player.getUniqueId());
+        // ensure player has history.
+        if (player == null) return;
+
+        if (history.get(player.getUniqueId()) != null) {
+            historyCache.put(player.getUniqueId(), history.get(player.getUniqueId()));
+            history.remove(player.getUniqueId());
+        }
         violationViewers.remove(player);
     }
 
@@ -192,6 +197,13 @@ public final class ViolationManager extends Configurable implements Closeable {
      */
     public int getViolationLevel(Player player, CheckType check) {
         return history.get(player.getUniqueId()).getViolationLevel(check);
+    }
+
+    /**
+     * @return history
+     */
+    public Map<UUID, Violations> getHistory() {
+        return history;
     }
 
     @Override
