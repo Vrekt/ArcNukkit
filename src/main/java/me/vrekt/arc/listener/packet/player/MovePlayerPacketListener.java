@@ -17,7 +17,7 @@ public final class MovePlayerPacketListener extends NukkitPacketListener {
     }
 
     @Override
-    protected void onPacketReceiving0(DataPacketReceiveEvent event) {
+    public void onPacketReceiving(DataPacketReceiveEvent event) {
         final Player player = event.getPlayer();
         if (!handler.isExempt(CheckType.MORE_PACKETS, player)) {
             if (MovingData.get(player).incrementMovePlayerPacketsAndCheckCancel()) {

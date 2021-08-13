@@ -5,10 +5,12 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerGameModeChangeEvent;
+import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.player.FastUse;
+import me.vrekt.arc.data.combat.CombatData;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.data.player.PlayerData;
 
@@ -40,6 +42,22 @@ public final class PlayerListener implements Listener {
 
         final boolean result = fastUse.check(player, data);
         event.setCancelled(result);
+    }
+
+    /**
+     * Handle interaction events
+     *
+     * @param event the event
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onInteract(PlayerInteractEvent event) {
+        if (event.getAction() == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
+            final CombatData data = CombatData.get(event.getPlayer());
+
+            // Workaround: more swing packets are sent when interacting with blocks.
+            data.setLastBlockInteract(System.currentTimeMillis());
+            data.setTotalBlockInteracts(data.getTotalBlockInteracts() + 1);
+        }
     }
 
     /**

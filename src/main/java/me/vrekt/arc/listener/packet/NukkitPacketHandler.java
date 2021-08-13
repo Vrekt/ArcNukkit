@@ -11,6 +11,7 @@ import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.exemption.ExemptionManager;
 import me.vrekt.arc.listener.packet.inventory.InventoryTransactionPacketListener;
 import me.vrekt.arc.listener.packet.player.MovePlayerPacketListener;
+import me.vrekt.arc.listener.packet.player.PlayerAnimatePacketListener;
 
 /**
  * Listens for packets.
@@ -27,6 +28,9 @@ public final class NukkitPacketHandler implements Listener {
 
     private final MovePlayerPacketListener movePlayerPacketListener
             = new MovePlayerPacketListener(this);
+
+    private final PlayerAnimatePacketListener playerAnimatePacketListener
+            = new PlayerAnimatePacketListener();
 
     /**
      * The exemption manager.
@@ -57,13 +61,15 @@ public final class NukkitPacketHandler implements Listener {
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPacketReceiving(DataPacketReceiveEvent event) {
-
         switch (event.getPacket().pid()) {
             case ProtocolInfo.MOVE_PLAYER_PACKET:
                 movePlayerPacketListener.onPacketReceiving(event);
                 break;
             case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:
                 inventoryTransactionPacketListener.onPacketReceiving(event);
+                break;
+            case ProtocolInfo.ANIMATE_PACKET:
+                playerAnimatePacketListener.onPacketReceiving(event);
                 break;
         }
 

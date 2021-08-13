@@ -54,7 +54,7 @@ public final class ExemptionManager implements Configurable, Closeable {
     public void onPlayerLeave(Player player) {
         final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         this.exemptions.remove(player.getUniqueId());
-        exemptions.clear();
+        if (exemptions != null) exemptions.clear();
     }
 
     /**

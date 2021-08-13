@@ -46,8 +46,8 @@ public final class Reach extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-survival-distance", 4.5);
-        addConfigurationValue("max-creative-distance", 6.5);
+        addConfigurationValue("max-survival-distance", 2.66);
+        addConfigurationValue("max-creative-distance", 6);
         addConfigurationValue("ignore-vertical-axis", true);
         addConfigurationValue("subtract-eye-height", true);
         addConfigurationValue("default-eye-height", 1.75);

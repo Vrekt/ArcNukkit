@@ -30,7 +30,6 @@ public final class CheckTimings {
 
     static {
         ENABLED = Arc.getInstance().getArcConfiguration().enableCheckTimings();
-        Arc.getInstance().getLogger().info("Check timings state: " + ENABLED);
     }
 
     /**

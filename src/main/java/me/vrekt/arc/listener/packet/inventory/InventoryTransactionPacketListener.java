@@ -30,7 +30,7 @@ public final class InventoryTransactionPacketListener extends NukkitPacketListen
     }
 
     @Override
-    protected void onPacketReceiving0(DataPacketReceiveEvent event) {
+    public void onPacketReceiving(DataPacketReceiveEvent event) {
         final InventoryTransactionPacket packet = (InventoryTransactionPacket) event.getPacket();
 
         if (packet.transactionType == InventoryTransactionPacket.TYPE_RELEASE_ITEM) {

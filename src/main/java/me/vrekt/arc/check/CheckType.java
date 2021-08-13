@@ -39,7 +39,22 @@ public enum CheckType {
     /**
      * Checks if the player is breaking blocks too fast.
      */
-    FAST_BREAK("FastBreak", CheckCategory.BLOCK);
+    FAST_BREAK("FastBreak", CheckCategory.BLOCK),
+
+    /**
+     * Checks if the player is moving through blocks
+     */
+    PHASE("Phase", CheckCategory.MOVING),
+
+    /**
+     * Checks if the player is using various combat cheats.
+     */
+    KILL_AURA("KillAura", CheckCategory.COMBAT),
+
+    /**
+     * Checks if the player is clicking too fast.
+     */
+    FAST_CLICK("FastClick", CheckCategory.COMBAT);
 
     /**
      * The name

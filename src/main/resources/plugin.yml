@@ -52,6 +52,10 @@ permissions:
         children:
           arc.bypass.combat.reach:
             description: Allows the player to bypass the reach check.
+          arc.bypass.combat.killaura:
+            description: Allows the player to bypass the KillAura check.
+          arc.bypass.combat.fastclick:
+            description: Allows the player to bypass the FastClick check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
   arc.administrator:

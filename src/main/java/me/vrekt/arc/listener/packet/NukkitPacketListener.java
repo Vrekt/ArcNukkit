@@ -25,10 +25,6 @@ public abstract class NukkitPacketListener {
      *
      * @param event the event
      */
-    public void onPacketReceiving(DataPacketReceiveEvent event) {
-        onPacketReceiving0(event);
-    }
-
-    protected abstract void onPacketReceiving0(DataPacketReceiveEvent event);
+    public abstract void onPacketReceiving(DataPacketReceiveEvent event);
 
 }
