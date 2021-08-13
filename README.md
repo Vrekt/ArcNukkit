@@ -90,10 +90,10 @@ Please note not all checks are finished, and not all checks fully block that cer
 ###### FastBreak
 - Prevents the player from breaking blocks too fast.
 
-##### FastClick
+###### FastClick
 - Prevents the player from clicking too fast.
 
-##### KillAura
+###### KillAura
 - Ensures the player is looking at the entity when attacking.
 
 ## Configuration
