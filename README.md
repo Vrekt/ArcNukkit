@@ -82,6 +82,12 @@ Please note not all checks are finished, and not all checks fully block that cer
 ###### FastBreak
 - Prevents the player from breaking blocks too fast.
 
+##### FastClick
+- Prevents the player from clicking too fast.
+
+##### KillAura
+- Ensures the player is looking at the entity when attacking.
+
 ## Configuration
 
 You can view each configuration value and what they mean/do in the wiki [here](https://github.com/Vrekt/ArcNukkit/wiki)
