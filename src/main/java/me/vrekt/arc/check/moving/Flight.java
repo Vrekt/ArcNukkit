@@ -143,7 +143,7 @@ public final class Flight extends Check {
                 && !data.inLiquid()
                 && !data.hasClimbable()
                 && !player.hasEffect(NukkitAccess.SLOW_FALLING_EFFECT)) {
-            checkGlide(player, data, ground, to, vertical, distanceToGround, result);
+            checkGlide(player, data, ground, from, to, vertical, distanceToGround, result);
         }
 
         if (data.hasClimbable()) {
@@ -252,12 +252,13 @@ public final class Flight extends Check {
      * @param player   the player
      * @param data     their data
      * @param ground   ground location
+     * @param from     the from
      * @param to       to
      * @param vertical vertical
      * @param distance the distance to ground
      * @param result   result
      */
-    private void checkGlide(Player player, MovingData data, Location ground, Location to, double vertical, double distance, CheckResult result) {
+    private void checkGlide(Player player, MovingData data, Location ground, Location from, Location to, double vertical, double distance, CheckResult result) {
 
         // check no ground stuff
         // TODO: Can be bypassed, needs to be improved, see comment below.
@@ -295,13 +296,17 @@ public final class Flight extends Check {
             }
 
             if (data.getNoGlideTime() > noGlideDifferenceMax) {
-                result.setFailed("No vertical difference while off ground")
-                        .withParameter("vertical", vertical)
-                        .withParameter("last", data.lastVertical())
-                        .withParameter("delta", delta)
-                        .withParameter("time", data.getNoGlideTime())
-                        .withParameter("max", noGlideDifferenceMax);
-                handleCheckViolationAndReset(player, result, ground);
+                // check off slab movements.
+                final boolean mod = BlockAccess.hasVerticalModifierAt(from, from.getLevel(), 0.3, -0.1, 0.3);
+                if (!mod) {
+                    result.setFailed("No vertical difference while off ground")
+                            .withParameter("vertical", vertical)
+                            .withParameter("last", data.lastVertical())
+                            .withParameter("delta", delta)
+                            .withParameter("time", data.getNoGlideTime())
+                            .withParameter("max", noGlideDifferenceMax);
+                    handleCheckViolationAndReset(player, result, ground);
+                }
             }
 
             // next, calculate how we should be falling.

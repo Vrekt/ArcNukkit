@@ -33,6 +33,8 @@ public final class PlayerAnimatePacketListener extends NukkitPacketListener {
         final AnimatePacket packet = (AnimatePacket) event.getPacket();
         if (packet.action == AnimatePacket.Action.SWING_ARM) {
             final Player player = event.getPlayer();
+            if (player.getGamemode() == 1) return;
+
             CheckTimings.startTiming(CheckType.FAST_CLICK, player.getUniqueId());
             final CombatData data = CombatData.get(player);
 
