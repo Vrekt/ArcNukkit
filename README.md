@@ -28,6 +28,12 @@ Arc is built with performance in mind with every check and feature, and optimiza
 - Toggle debug messages on or off.
 - Cancel a ban that was scheduled by Arc
 - Configuration reloading for easy modification during up-time.
+- Exempt players temporarily on the fly.
+- View check timings
+- View violation history
+- And more!
+
+https://github.com/Vrekt/ArcNukkit/wiki/Commands-overview
 
 #### Misc
 
@@ -43,6 +49,8 @@ Arc has a very extensive permissions system. You can choose to bypass all checks
 - `arc.commands.cancelban` Allows a player to cancel a pending ban.
 - `arc.commands.reloadconfig` Allows a player to reload the Arc configuration.
 - `arc.commands.debug` Allows a player to view debug information with each violation.
+- `arc.commands.timings` Allows a player to view check timings.
+- `arc.commands.violationhistory` Allows a player to view violation history of another player.
 
 *Bypass all checks*
 - `arc.bypass` Allows you to bypass all checks.
