@@ -5,12 +5,15 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerMoveEvent;
+import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.level.Location;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.moving.Flight;
+import me.vrekt.arc.check.moving.Phase;
 import me.vrekt.arc.check.moving.Speed;
 import me.vrekt.arc.data.moving.MovingData;
+import me.vrekt.arc.exemption.type.ExemptionType;
 import me.vrekt.arc.utility.MovingAccess;
 
 /**
@@ -53,6 +56,13 @@ public final class MovingEventListener implements Listener {
             MovingAccess.calculateMovement(data, from, to);
             // run checks
             runChecks(player, data);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onTeleport(PlayerTeleportEvent event) {
+        if (event.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
+            Arc.getInstance().getExemptionManager().addExemption(event.getPlayer(), ExemptionType.TELEPORT, 500);
         }
     }
 
