@@ -1,8 +1,6 @@
 package me.vrekt.arc.check.combat;
 
 import cn.nukkit.Player;
-import cn.nukkit.utils.TextFormat;
-import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
@@ -15,6 +13,8 @@ import me.vrekt.arc.timings.CheckTimings;
  * Adopted from ArcBukkit KillAura AttackSpeed check.
  * <p>
  * TODO: Very experimental
+ * <p>
+ * TODO: YSK: Various clients will flag this, even if it seems they are not modifying behavior.
  */
 public final class FastClick extends Check {
 
@@ -73,7 +73,6 @@ public final class FastClick extends Check {
         final long delta = now - data.getLastSwingTime();
         final long interactDelta = now - data.getLastBlockInteract();
         data.setLastSwingTime(System.currentTimeMillis());
-
         final CheckResult result = new CheckResult();
 
         if (delta <= minSwingDelta
@@ -134,8 +133,6 @@ public final class FastClick extends Check {
 
     @Override
     public void load() {
-        Arc.getInstance().getLogger().warning(TextFormat.YELLOW + "Warning: The FastClick is very experimental, you may run into some issues with PvP.");
-
         maxPacketsPerSecond = configuration.getInt("max-swing-packets-per-second");
         minSwingDelta = configuration.getInt("min-swing-delta");
         maxBlockSwingPackets = configuration.getInt("max-block-swing-packets");

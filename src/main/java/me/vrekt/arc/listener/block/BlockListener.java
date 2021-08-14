@@ -33,14 +33,24 @@ public final class BlockListener implements Listener {
         fastBreak = Arc.getInstance().getCheckManager().getCheck(CheckType.FAST_BREAK);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    /**
+     * Do not ignore a cancelled event here.
+     *
+     * @param event the event
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
     private void onBlockBreak(BlockBreakEvent event) {
         final Player player = event.getPlayer();
         if (!nuker.isPacketCheck()) event.setCancelled(nuker.check(player));
         event.setCancelled(fastBreak.check(player, BlockData.get(player), event.getBlock()));
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    /**
+     * Do not ignore a cancelled event here.
+     *
+     * @param event the event
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onInteract(PlayerInteractEvent event) {
         if (event.getAction() == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK
                 && event.getPlayer().getGamemode() != 1) {
