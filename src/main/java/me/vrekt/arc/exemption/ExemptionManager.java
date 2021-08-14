@@ -22,9 +22,14 @@ public final class ExemptionManager implements Configurable, Closeable {
      */
     private final Map<UUID, ExemptionHistory> exemptions = new ConcurrentHashMap<>();
 
+    /**
+     * If OP'd players can bypass.
+     */
+    private boolean canOpBypass;
+
     @Override
     public void reloadConfiguration(ArcConfiguration configuration) {
-        Configurable.super.reloadConfiguration(configuration);
+        canOpBypass = configuration.canOpBypass();
     }
 
     /**
@@ -65,6 +70,8 @@ public final class ExemptionManager implements Configurable, Closeable {
      * @return {@code true} if so
      */
     public boolean isPlayerExempt(Player player, CheckType check) {
+        if (canOpBypass && player.isOp()) return true;
+
         final boolean exemptFromCheck = isPlayerExemptFromCheck(player, check);
         if (exemptFromCheck) return true;
 
@@ -94,6 +101,7 @@ public final class ExemptionManager implements Configurable, Closeable {
      * @return {@code true} if so
      */
     public boolean isPlayerExempt(Player player, ExemptionType type) {
+        if (player == null || !player.isOnline()) return true;
         return exemptions.get(player.getUniqueId()).isExempt(type);
     }
 
@@ -130,6 +138,17 @@ public final class ExemptionManager implements Configurable, Closeable {
      */
     public void addExemption(Player player, ExemptionType type) {
         exemptions.get(player.getUniqueId()).addExemption(type);
+    }
+
+    /**
+     * Add an exemption type
+     *
+     * @param player   the player
+     * @param type     the type
+     * @param duration the duration
+     */
+    public void addExemption(Player player, ExemptionType type, long duration) {
+        exemptions.get(player.getUniqueId()).addExemption(type, System.currentTimeMillis() + duration);
     }
 
     /**

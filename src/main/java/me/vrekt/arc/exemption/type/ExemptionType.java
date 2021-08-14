@@ -8,6 +8,11 @@ public enum ExemptionType {
     /**
      * When a player dies.
      */
-    DEATH
+    DEATH,
+
+    /**
+     * When a player teleports.
+     */
+    TELEPORT
 
 }

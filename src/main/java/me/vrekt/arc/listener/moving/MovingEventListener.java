@@ -28,9 +28,15 @@ public final class MovingEventListener implements Listener {
      */
     private final Speed speed;
 
+    /**
+     * The phase check
+     */
+    private final Phase phase;
+
     public MovingEventListener() {
         flight = Arc.getInstance().getCheckManager().getCheck(CheckType.FLIGHT);
         speed = Arc.getInstance().getCheckManager().getCheck(CheckType.SPEED);
+        phase = Arc.getInstance().getCheckManager().getCheck(CheckType.PHASE);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -59,6 +65,7 @@ public final class MovingEventListener implements Listener {
     private void runChecks(Player player, MovingData data) {
         if (flight.enabled()) flight.check(player, data);
         if (speed.enabled()) speed.check(player, data);
+        if (phase.enabled()) phase.check(player, data);
     }
 
 }

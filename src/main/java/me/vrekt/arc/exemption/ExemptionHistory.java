@@ -3,9 +3,7 @@ package me.vrekt.arc.exemption;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.exemption.type.ExemptionType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +24,7 @@ public final class ExemptionHistory {
     /**
      * Set of exemption types
      */
-    private final List<ExemptionType> exemptionTypes = new ArrayList<>();
+    private final Map<ExemptionType, Long> exemptionTypes = new HashMap<>();
 
     /**
      * Add an exemption
@@ -53,7 +51,18 @@ public final class ExemptionHistory {
      * @param type the type
      */
     public void addExemption(ExemptionType type) {
-        exemptionTypes.add(type);
+        exemptionTypes.put(type, -1L);
+    }
+
+
+    /**
+     * Add an exemption type
+     *
+     * @param type     the type
+     * @param duration the duration
+     */
+    public void addExemption(ExemptionType type, long duration) {
+        exemptionTypes.put(type, duration);
     }
 
     /**
@@ -89,7 +98,14 @@ public final class ExemptionHistory {
      * @return {@code true} if so
      */
     public boolean isExempt(ExemptionType type) {
-        return exemptionTypes.contains(type);
+        final long time = exemptionTypes.getOrDefault(type, 0L);
+        if (time == 0) return false;
+        if (time == -1) return true;
+
+        final boolean result = (time - System.currentTimeMillis() <= 0);
+
+        if (result) exemptionTypes.remove(type);
+        return !result;
     }
 
     /**
