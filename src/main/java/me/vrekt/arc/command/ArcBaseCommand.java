@@ -63,7 +63,7 @@ public abstract class ArcBaseCommand {
      */
     protected boolean executeSubCommand(CommandSender sender, String command, String[] arguments) {
         final ArcSubCommand subCommand = subCommands.get(command);
-        if (sender.hasPermission(Permissions.ARC_COMMANDS_ALL) || subCommand.hasPermission(sender)) {
+        if (sender.hasPermission(Permissions.ARC_COMMANDS_ALL) || subCommand.hasPermission(sender) || sender.isOp()) {
             subCommand.execute(sender, arguments);
         } else {
             sender.sendMessage(Arc.getInstance().getArcConfiguration().getNoPermissionMessage());
@@ -79,7 +79,7 @@ public abstract class ArcBaseCommand {
      */
     protected boolean checkBasePermissions(CommandSender sender) {
         if (!sender.hasPermission(Permissions.ARC_COMMANDS_BASE)
-                || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL)) {
+                || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL) || !sender.isOp()) {
             sender.sendMessage(Arc.getInstance().getArcConfiguration().getNoPermissionMessage());
             return false;
         }
