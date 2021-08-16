@@ -43,6 +43,7 @@ public final class Phase extends Check {
      */
     public boolean check(Player player, MovingData data) {
         if (exempt(player)) return false;
+
         final Location from = data.from();
         final Location to = data.to();
         Location safe = data.getSafePhaseLocation();
@@ -55,7 +56,7 @@ public final class Phase extends Check {
         final long now = System.currentTimeMillis();
         final long timeSinceLastCollision = now - data.getLastCollisionEvent();
 
-        final AxisAlignedBB bb = player.boundingBox.grow(-0.2, 0.0, 0.2);
+        final AxisAlignedBB bb = player.boundingBox.grow(-0.3, 0.0, -0.3);
         final CheckResult result = new CheckResult();
 
         int minX = Math.min(from.getFloorX(), (int) bb.getMaxX());
@@ -116,17 +117,19 @@ public final class Phase extends Check {
             final boolean hasCollisionNormal = block.collidesWithBB(bb);
 
             if (model == null) {
-                final Block blockBelow = BlockAccess.getBlockAt(to, to.level, 0.0, -0.5, 0.0);
-                //  System.out.println(blockBelow.getName());
+                final Block blockBelow = BlockAccess.getBlockAt(to, to.level, 0.3, -0.2, 0.3);
+                System.out.println("Below is " + blockBelow);
 
                 final BlockModel maybe = BlockModel.getModel(blockBelow);
                 if (maybe != null) {
-                    //     return checkBlockModel(block, maybe, bb, safe, to);
+                    return checkBlockModel(block, maybe, bb, safe, to, result);
                 }
 
-                //    return hasCollisionNormal;
+                return hasCollisionNormal;
             } else {
-                return checkBlockModel(block, model, bb, safe, to, result);
+                if (hasCollisionNormal) {
+                    return checkBlockModel(block, model, bb, safe, to, result);
+                }
             }
         }
 
@@ -158,13 +161,14 @@ public final class Phase extends Check {
             int maxY = Math.max(safe.getFloorY(), to.getFloorY());
             int minZ = Math.min(safe.getFloorZ(), to.getFloorZ());
             int maxZ = Math.max(safe.getFloorZ(), to.getFloorZ());
+
             result.withParameter("areaCheck", "yes");
             // create a bounding box from that.
             final AxisAlignedBB area = new SimpleAxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
             // check if the block was inside.
             final boolean isIgnore = ignoreInAreaCheck(model);
             final boolean areaCollision = area.isVectorInside(new Vector3(block.x, block.y, block.z));
-            return areaCollision && !isPassable(model, block) && !isIgnore;
+            return false;
         }
     }
 

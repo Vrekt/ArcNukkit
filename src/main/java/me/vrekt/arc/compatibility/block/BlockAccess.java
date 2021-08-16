@@ -274,9 +274,9 @@ public final class BlockAccess {
      * @return the result
      */
     private static boolean hasIceAt0(Location origin, Level level, double x, double y, double z) {
-        return level.getBlock(MathUtil.floor(origin.getX() + x),
-                MathUtil.floor(origin.getY() + y), MathUtil.floor(origin.getZ() + z))
-                instanceof BlockIce;
+        final Block block = level.getBlock(MathUtil.floor(origin.getX() + x),
+                MathUtil.floor(origin.getY() + y), MathUtil.floor(origin.getZ() + z));
+        return block.getId() == BlockID.PACKED_ICE || block.getId() == BlockID.ICE;
     }
 
     /**

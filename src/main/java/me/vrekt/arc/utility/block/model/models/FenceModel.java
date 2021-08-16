@@ -21,6 +21,6 @@ public final class FenceModel extends BlockModel {
 
     @Override
     public AxisAlignedBB getBoundingBox(Block block) {
-        return block.getCollisionBoundingBox().grow(-0.2, 0.0, -0.2);
+        return block.getBoundingBox().grow(-0.2, 0.0, -0.2);
     }
 }

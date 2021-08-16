@@ -6,6 +6,10 @@ import me.vrekt.arc.check.CheckCategory;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.configuration.ArcConfiguration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Arc permissions
  */
@@ -100,6 +104,16 @@ public final class Permissions {
     public static boolean canBypassAllChecks(Player player) {
         if (player == null || !player.isOnline()) return true;
         return player.hasPermission(ARC_BYPASS) || (CONFIGURATION.canOpBypass() && player.isOp());
+    }
+
+    public static List<CheckType> getChecksCanBypass(Player player) {
+        if (canBypassAllChecks(player)) return Arrays.asList(CheckType.values());
+
+        final List<CheckType> checks = new ArrayList<>();
+        for (CheckType type : CheckType.values()) {
+            if (canBypassCheck(player, type)) checks.add(type);
+        }
+        return checks;
     }
 
     /**

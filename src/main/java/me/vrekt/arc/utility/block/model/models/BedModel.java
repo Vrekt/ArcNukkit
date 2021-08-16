@@ -21,6 +21,6 @@ public final class BedModel extends BlockModel {
 
     @Override
     public AxisAlignedBB getBoundingBox(Block block) {
-        return block.getCollisionBoundingBox().grow(-0.25, -0.2, -0.25);
+        return block.getCollisionBoundingBox().grow(-0.3, -0.25, -0.3);
     }
 }

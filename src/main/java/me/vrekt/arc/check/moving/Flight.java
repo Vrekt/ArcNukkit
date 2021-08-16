@@ -8,6 +8,7 @@ import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.compatibility.NukkitAccess;
 import me.vrekt.arc.compatibility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
+import me.vrekt.arc.exemption.type.ExemptionType;
 import me.vrekt.arc.timings.CheckTimings;
 import me.vrekt.arc.utility.MovingAccess;
 import me.vrekt.arc.utility.math.MathUtil;
@@ -96,7 +97,7 @@ public final class Flight extends Check {
      * @param data   their data
      */
     public void check(Player player, MovingData data) {
-        if (exempt(player)) return;
+        if (exempt(player) || exempt(player, ExemptionType.TELEPORT)) return;
 
         // TODO: Elytra
         if (player.isGliding()) return;
@@ -393,7 +394,7 @@ public final class Flight extends Check {
         // in-case it causes issues else-where, so for now use a temporary one
         // to retrieve stuff we need right now
         final MovingData temp = MovingData.retrieveTemporary();
-        MovingAccess.calculateMovement(temp, data.to(), player.getLocation());
+        MovingAccess.calculateMovement(player, temp, data.to(), player.getLocation());
 
         // update in-air time here since we're not moving or calculating movement.
         int inAirTime = data.getInAirTime();

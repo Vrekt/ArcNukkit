@@ -1,7 +1,6 @@
 package me.vrekt.arc.check.result;
 
 import cn.nukkit.utils.TextFormat;
-import me.vrekt.arc.Arc;
 
 /**
  * Represents a check result.
@@ -76,7 +75,7 @@ public final class CheckResult {
      */
     public CheckResult setFailed(String information) {
         if (informationBuilder != null && informationBuilder.length() != 0) {
-            Arc.getPlugin().getLogger().warning("A check is not resetting the check result, information: \n" + information);
+            // Arc.getPlugin().getLogger().warning("A check is not resetting the check result, information: \n" + information);
         }
 
         setFailed();
@@ -113,7 +112,7 @@ public final class CheckResult {
      * @param information the information
      */
     public void info(String information) {
-        if(informationBuilder == null) informationBuilder = new StringBuilder();
+        if (informationBuilder == null) informationBuilder = new StringBuilder();
         informationBuilder.append(TextFormat.RED).append(information);
         informationBuilder.append("\n");
     }

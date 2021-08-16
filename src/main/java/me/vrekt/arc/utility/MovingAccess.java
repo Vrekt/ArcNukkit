@@ -59,7 +59,7 @@ public final class MovingAccess {
     public static boolean isOnIce(Location location) {
         return BlockAccess.isIce(location.getLevelBlock()) ||
                 BlockAccess.isIce(location.getLevelBlock().getSide(BlockFace.DOWN)) ||
-                BlockAccess.hasIceAt(location, location.getLevel(), 0.1, -0.01, 0.1);
+                BlockAccess.hasIceAt(location, location.getLevel(), 0.3, -0.01, 0.3);
     }
 
     /**
@@ -82,9 +82,13 @@ public final class MovingAccess {
      * @param from from
      * @param to   to
      */
-    public static void calculateMovement(MovingData data, Location from, Location to) {
+    public static void calculateMovement(Player player, MovingData data, Location from, Location to) {
         final long now = System.currentTimeMillis();
+
         // prevent cloning multiple times to save performance
+        if (from == null) from = player.getLocation();
+        if (to == null) to = player.getLocation();
+
         final Location cloneFrom = from.clone();
         final Location cloneTo = to.clone();
 

@@ -3,9 +3,10 @@ package me.vrekt.arc.command.commands;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.utils.TextFormat;
+import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.permissions.Permissions;
-import me.vrekt.arc.utility.chat.ColoredChat;
+
+import java.util.List;
 
 /**
  * Allows you to view a summary about a player.
@@ -34,15 +35,13 @@ public final class ArcSummarySubCommand extends ArcSubCommand {
             return;
         }
 
-        ColoredChat.forRecipient(sender)
-                .setMainColor(TextFormat.DARK_AQUA)
-                .setParameterColor(TextFormat.GRAY)
-                .messagePrefix(TextFormat.STRIKETHROUGH + "------------------\n")
-                .messagePrefix("Viewing player summary for ")
-                .parameterPrefix(player.getName())
-                .messagePrefix(TextFormat.STRIKETHROUGH + "\n------------------\n")
-                .messagePrefix("Device: ")
-                .parameterPrefix(player.getLoginChainData().getDeviceOS() + "")
-                .send();
+        final int device = player.getLoginChainData().getDeviceOS();
+        final int gameMode = player.getGamemode();
+        final boolean op = player.isOp();
+
+        final List<CheckType> bypass = Permissions.getChecksCanBypass(player);
+        final String header = "";
+
+        sender.sendMessage(header);
     }
 }

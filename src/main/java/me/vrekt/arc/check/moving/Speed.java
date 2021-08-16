@@ -1,8 +1,10 @@
 package me.vrekt.arc.check.moving;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.BlockCobweb;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
@@ -19,54 +21,34 @@ import me.vrekt.arc.utility.math.MathUtil;
 public final class Speed extends Check {
 
     /**
-     * Max distance player can move in one movement.
+     * The base move speeds.
+     * Max initial jump boost given to the player.
+     */
+    private double baseMoveSpeedWalk, baseMoveSpeedSprint, maxInitialJumpBoost;
+
+    /**
+     * Max move speed in webs
      * <p>
-     * The max value of what can be considered a low jump.
-     * The min value of what can be considered a low jump
-     * Max speed allowed with low jumping.
+     * Low jump min + max with block above head.
+     * Max speed on ice + block above head.
+     * Min delta to flag when moving too similar.
      */
-    private double maxLargeDistanceMovement, lowJumpMax, lowJumpMin;
+    private double maxMoveSpeedWeb, blockLowJumpMin, blockLowJumpMax, blockIceMaxSpeed, blockIceDeltaMin;
 
     /**
-     * The max movement speed on stairs.
-     * The max speed descending slabs.
-     */
-    private double maxStairMovementSpeed, maxSlabMovementSpeed;
-
-    /**
-     * The max amount of times movement is allowed to be over the max.
-     * Time required to be descending on slabs to check.
-     */
-    private int stairMovementSpeedThreshold, slabMovementSpeedThreshold;
-
-    /**
-     * Max value allowed to be considered a violation when comparing (current speed - last speed)
-     */
-    private double maxStairMovementSpeedDelta, maxSlabMovementSpeedDelta;
-
-    /**
-     * Max amount of delta(s) allowed. ^^
-     * Max amount of batched movements allowed
-     */
-    private int maxStairMovementSpeedDeltaAmount, maxSlabMovementSpeedDeltaAmount, maxBatchedMovementCount;
-
-    /**
-     * Min time required to be on ground
+     * Max move speed on stairs
+     * In air min delta
      * <p>
-     * TODO: Is workaround
-     * Max number of fast movements allowed with normal checking.
+     * Various max speed(s)
      */
-    private int minOnGroundTime, minOffModifierTime, maxAllowedFastMovements;
+    private double maxMoveSpeedStairs, inAirMinDelta, maxInAirSpeed, maxInAirIceSpeed, maxInAirSlimeblockSpeed;
 
     /**
-     * Max time allowed to give player temp speed increase
+     * The minimum time required to be on ground.
+     * Max amount of times delta can be flagged when moving on ice + block above head
+     * Max delta amount
      */
-    private long lastTeleportTimeMax;
-
-    /**
-     * Last teleport time speed increase
-     */
-    private double lastTeleportTimeSpeedIncrease;
+    private int minimumOnGroundTime, blockIceDeltaAmountMax, inAirMaxDeltaAmount;
 
     public Speed() {
         super(CheckType.SPEED);
@@ -81,21 +63,22 @@ public final class Speed extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-large-distance-movement", 4);
-        addConfigurationValue("max-stair-movement-speed", 0.69);
-        addConfigurationValue("stair-movement-speed-threshold", 3);
-        addConfigurationValue("max-slab-movement-speed", 0.32);
-        addConfigurationValue("slab-movement-speed-threshold", 3);
-        addConfigurationValue("max-stair-movement-speed-delta", 0.03);
-        addConfigurationValue("max-stair-movement-speed-delta-amount", 3);
-        addConfigurationValue("max-slab-movement-speed-delta", 0.03);
-        addConfigurationValue("max-slab-movement-speed-delta-amount", 3);
-        addConfigurationValue("max-batched-movement-count", 3);
-        addConfigurationValue("min-on-ground-time", 5);
-        addConfigurationValue("min-off-modifier-time", 3);
-        addConfigurationValue("last-teleport-time-max", 1000);
-        addConfigurationValue("last-teleport-time-speed-increase", 1.0);
-        addConfigurationValue("max-allowed-fast-movements", 3);
+        addConfigurationValue("base-move-speed-sprint", 0.289);
+        addConfigurationValue("base-move-speed-walk", 0.289);
+        addConfigurationValue("minimum-on-ground-time", 10);
+        addConfigurationValue("max-initial-jump-boost", 0.5);
+        addConfigurationValue("max-move-speed-web", 0.099);
+        addConfigurationValue("block-low-jump-min", 0.07);
+        addConfigurationValue("block-low-jump-max", 0.2);
+        addConfigurationValue("block-ice-speed-max", 1.2);
+        addConfigurationValue("block-ice-delta-min", 0.02);
+        addConfigurationValue("block-ice-delta-amount-max", 5);
+        addConfigurationValue("max-move-speed-stairs", 0.6);
+        addConfigurationValue("in-air-min-delta", 0.02);
+        addConfigurationValue("in-air-max-delta-amount", 10);
+        addConfigurationValue("max-in-air-speed", 0.50);
+        addConfigurationValue("max-in-air-ice-speed", 0.56);
+        addConfigurationValue("max-in-air-slimeblock-speed", 0.45);
 
         if (enabled()) load();
     }
@@ -114,288 +97,204 @@ public final class Speed extends Check {
             data.setSafeSpeedLocation(data.from());
         }
 
-        final Location safe = data.getSafeSpeedLocation();
+        final Location setback = data.getSafeSpeedLocation();
         final Location from = data.from();
         final Location to = data.to();
 
-        data.setLastHorizontal(data.getHorizontal());
+        final CheckResult result = new CheckResult();
+
+        final double lastHorizontal = data.getHorizontal();
+        final double vertical = data.vertical();
         final double horizontal = MathUtil.horizontal(from, to);
         data.setHorizontal(horizontal);
 
-        final double vertical = data.vertical();
-        double base = getBaseMoveSpeed(player);
-        // TODO: Most likely can be abused.
-        if (System.currentTimeMillis() - data.getLastTeleport()
-                <= lastTeleportTimeMax) {
-            base += lastTeleportTimeSpeedIncrease;
+        final double base = getBaseMoveSpeed(player);
+        data.setLastHorizontal(lastHorizontal);
+
+        // Player is on-ground check normal speeds and stairs and stuff.
+        if (data.onGround() && data.onGroundTime() >= minimumOnGroundTime) {
+            runGroundChecks(player, data, result, from, to, setback, horizontal, base, vertical);
         }
 
-        final CheckResult result = new CheckResult();
-
-        // Start running checks.
-        // Only run the checks if we are already moving faster.
-        // But of-course this doesn't always mean cheating.
-        if (horizontal > base) {
-            if (data.onGround() && data.onGroundTime() > minOnGroundTime) {
-                // player is on-ground for long enough, run checks.
-                runOnGroundChecks(player, data, result, to, safe, horizontal, base, vertical);
-            } else {
-                if (data.ascending()) {
-                    data.setLastLiftOff(System.currentTimeMillis());
-                }
-                // player is not on-ground
-            }
-        }
-
-        // cancel large movements.
-        if (horizontal >= maxLargeDistanceMovement) {
-            result.setFailed("Large movement")
-                    .withParameter("h", horizontal)
-                    .withParameter("max", maxLargeDistanceMovement);
-            handleCheckViolationAndReset(player, result, safe);
-        }
-
-        // Update players 'safe' location here, only if they are on-ground and haven't failed before.
-        // This sets-back the player farther and is more effective at being annoying and stopping them.
-        if (!result.hasFailedBefore() && data.onGround() && MathUtil.horizontal(to, safe) >= 5) {
-            data.setSafeSpeedLocation(from);
+        // Player is not on ground, mostly fix b-hop type speeds.
+        if (!data.onGround()) {
+            runAirChecks(player, data, result, setback, horizontal);
         }
 
         stopTiming(player);
     }
 
     /**
-     * Run checks that check the speed of the player while they are on-ground
+     * First implementation of a basic in-air check.
+     * <p>
+     * This will cover most b-hop aspects, as-well as ignore ice and slimeblock modifiers.
+     * TODO
      *
      * @param player     the player
      * @param data       their data
      * @param result     the result
-     * @param to         the to
-     * @param safe       the safe location
+     * @param setback    their setback
      * @param horizontal the horizontal speed
-     * @param base       the base speed
-     * @param vertical   their vertical speed
      */
-    private void runOnGroundChecks(Player player, MovingData data, CheckResult result, Location to, Location safe, double horizontal, double base, double vertical) {
-        final boolean hasBlockAboveHead = BlockAccess.getBlockAt(to, to.level, 0.0, 2.1, 0.0).isSolid();
-        if (hasBlockAboveHead) {
-            handleBlockAbovePlayersHead(player, data, result, safe, horizontal, base, vertical);
-        } else {
-            if (!handleSlabAndStairMovement(player, data, result, to, safe, horizontal)) {
-                // player is not on slabs or stairs, normal check.
-                if (data.getOffModifierCooldown() >= minOffModifierTime) {
-                    handlePlayerOnGroundNoBoost(player, data, result, safe, horizontal, base, vertical);
-                }
-            }
-        }
-    }
+    private void runAirChecks(Player player, MovingData data, CheckResult result, Location setback, double horizontal) {
+        // check if the player is moving too similar over time
+        final double delta = Math.abs(data.getLastHorizontal() - horizontal);
+        if (delta <= inAirMinDelta) {
+            final int count = data.getInAirDeltaAmount() + 1;
+            data.setInAirDeltaAmount(count);
 
-    /**
-     * Player is on the ground, but has no boost.
-     *
-     * @param player     the player
-     * @param data       the data
-     * @param result     the result
-     * @param safe       the safe
-     * @param horizontal the horizontal
-     * @param base       the base
-     */
-    private void handlePlayerOnGroundNoBoost(Player player, MovingData data, CheckResult result, Location safe, double horizontal, double base, double vertical) {
-        // check if player movement was batched together.
-        final double mod = ((base * 2) - horizontal);
-        final boolean maybeBatched = mod > 0.0 && mod < 0.08;
-
-        if (maybeBatched) {
-            final int movementCount = data.getBatchedMovementCount() + 1;
-            data.setBatchedMovementCount(movementCount);
-            if (movementCount >= maxBatchedMovementCount) {
-                result.setFailed("Horizontal speed greater than base speed")
-                        .withParameter("batched", "yes")
-                        .withParameter("count", movementCount)
-                        .withParameter("max", maxBatchedMovementCount)
-                        .withParameter("h", horizontal)
-                        .withParameter("base", base);
-                handleCheckViolationAndReset(player, result, safe);
-            }
-        } else {
-            data.setBatchedMovementCount(0);
-            if (vertical > 0.0) {
-                data.setLastLiftOff(System.currentTimeMillis());
-                // player has lift-off
-                handlePlayerLiftOff(player, data, result, safe, horizontal, base, vertical);
-            } else {
-                // Workaround for boost after jumping
-                final boolean slowingDown = data.getLastHorizontal() > horizontal;
-                if (slowingDown) {
-                    final long lastLiftOffDelta = System.currentTimeMillis() - data.getLastLiftOff();
-                    if (lastLiftOffDelta <= 1000) {
-                        data.onGroundTime(2);
-                        return;
-                    }
-                }
-
-                if (horizontal > base) {
-                    final int count = data.getFastMovements() + 1;
-                    data.setFastMovements(count);
-
-                    if (count > maxAllowedFastMovements) {
-                        result.setFailed("Horizontal speed greater than base speed")
-                                .withParameter("batched", "no")
-                                .withParameter("h", horizontal)
-                                .withParameter("base", base)
-                                .withParameter("time", data.onGroundTime())
-                                .withParameter("count", count)
-                                .withParameter("max", maxAllowedFastMovements);
-                        handleCheckViolationAndReset(player, result, safe);
-                    }
-                } else {
-                    data.setFastMovements(0);
-                }
-            }
-        }
-
-    }
-
-    private void handlePlayerLiftOff(Player player, MovingData data, CheckResult result, Location safe, double horizontal, double base, double vertical) {
-
-    }
-
-    /**
-     * Handle when a player has a block above their head.
-     *
-     * @param player     the player
-     * @param data       their data
-     * @param result     the result
-     * @param safe       the safe location
-     * @param horizontal the horizontal speed
-     * @param base       the base speed
-     * @param vertical   their vertical speed
-     */
-    private void handleBlockAbovePlayersHead(Player player, MovingData data, CheckResult result, Location safe, double horizontal, double base, double vertical) {
-        if (vertical == 0.0 || vertical <= lowJumpMin) {
-            // player is not moving vertically at-all, which means no speed boost.
-            handlePlayerOnGroundNoBoost(player, data, result, safe, horizontal, base, vertical);
-        } else if (vertical < lowJumpMax) {
-            // reset batched movements
-            data.setBatchedMovementCount(0);
-            // player is moving vertically.
-        }
-    }
-
-    /**
-     * Handle player movement checking when they are on a slab or stair.
-     *
-     * @param player     the player
-     * @param data       their data
-     * @param result     the result
-     * @param to         the to
-     * @param safe       the safe setback
-     * @param horizontal the hDist
-     */
-    private boolean handleSlabAndStairMovement(Player player, MovingData data, CheckResult result, Location to, Location safe, double horizontal) {
-        final boolean hasSlab = BlockAccess.hasSlabAt(to, to.level, 0.3, -0.5, 0.3);
-        final boolean hasStair = BlockAccess.hasStairAt(to, to.level, 0.3, -0.5, 0.3);
-        if (!hasSlab && !hasStair) {
-            data.setOffModifierCooldown(data.getOffModifierCooldown() + 1);
-            return false;
-        } else {
-            data.setOffModifierCooldown(0);
-        }
-
-        final double last = data.getLastHorizontal();
-        if (hasStair) handleStairMovement(player, data, result, safe, horizontal, last);
-        if (hasSlab) handleSlabMovement(player, data, result, safe, horizontal, last);
-        return false;
-    }
-
-    /**
-     * Handle stair related movement.
-     * Check if players are moving too fast while going upstairs.
-     *
-     * @param player     the player
-     * @param data       their data
-     * @param result     the result
-     * @param safe       the safe setback
-     * @param horizontal the hDist
-     * @param last       the last hDist
-     */
-    private void handleStairMovement(Player player, MovingData data, CheckResult result, Location safe, double horizontal, double last) {
-        // Check if player has had a consistent move speed the whole time up the stairs.
-        final double delta = Math.abs(horizontal - last);
-        if (delta <= maxStairMovementSpeedDelta) {
-            final int deltaAmount = data.getStairMovementDeltaAmount() + 1;
-            data.setStairMovementDeltaAmount(deltaAmount);
-            if (deltaAmount > maxStairMovementSpeedDeltaAmount) {
-                result.setFailed("Movement too similar while moving on stairs.")
+            if (count > inAirMaxDeltaAmount) {
+                result.setFailed("Moving too similar in-air")
                         .withParameter("delta", delta)
-                        .withParameter("max", maxStairMovementSpeedDelta)
-                        .withParameter("amt", deltaAmount)
-                        .withParameter("max", maxStairMovementSpeedDeltaAmount);
-                handleCheckViolationAndReset(player, result, safe);
+                        .withParameter("min", inAirMinDelta)
+                        .withParameter("count", count)
+                        .withParameter("max", inAirMaxDeltaAmount);
+                handleCheckViolationAndReset(player, result, setback);
             }
         } else {
-            data.setStairMovementDeltaAmount(0);
+            data.setInAirDeltaAmount(0);
         }
 
-        // Otherwise, check if player has passed the hard limit set.
-        if (horizontal > maxStairMovementSpeed) {
-            final int count = data.getStairMovementOverThresholdCount() + 1;
-            data.setStairMovementOverThresholdCount(count);
-            if (count > stairMovementSpeedThreshold) {
-                result.setFailed("Moving too fast on stairs")
-                        .withParameter("h", horizontal)
-                        .withParameter("max", maxStairMovementSpeed)
-                        .withParameter("count", count)
-                        .withParameter("threshold", stairMovementSpeedThreshold);
-                handleCheckViolationAndReset(player, result, safe);
-            }
-        } else {
-            data.setStairMovementOverThresholdCount(0);
+        if (horizontal >= maxInAirSpeed) {
+            result.setFailed("Moving too fast in-air")
+                    .withParameter("h", horizontal)
+                    .withParameter("max", maxInAirSpeed);
+            handleCheckViolationAndReset(player, result, setback);
+        }
+
+        if (data.onIce() && horizontal >= maxInAirIceSpeed) {
+            result.setFailed("Moving too fast in-air on-ice")
+                    .withParameter("h", horizontal)
+                    .withParameter("max", maxInAirIceSpeed);
+            handleCheckViolationAndReset(player, result, setback);
+        }
+
+        if (data.hasSlimeblock() && horizontal >= maxInAirSlimeblockSpeed) {
+            result.setFailed("Moving too fast in-air on-slimeblock")
+                    .withParameter("h", horizontal)
+                    .withParameter("max", maxInAirSlimeblockSpeed);
+            handleCheckViolationAndReset(player, result, setback);
         }
     }
 
     /**
-     * Handle slab related movement.
-     * Check if players are moving too fast while going up slabs.
+     * Run checks while the player is on the ground
+     * TODO
      *
      * @param player     the player
      * @param data       their data
      * @param result     the result
-     * @param safe       the safe setback
-     * @param horizontal the hDist
-     * @param last       the last hDist
+     * @param from       the from
+     * @param to         the to
+     * @param setback    their setback
+     * @param horizontal the horizontal speed
+     * @param base       the base speed
+     * @param vertical   their vertical speed
      */
-    private void handleSlabMovement(Player player, MovingData data, CheckResult result, Location safe, double horizontal, double last) {
-        if (data.ascending()) {
-            final double delta = Math.abs(horizontal - last);
-            if (delta <= maxSlabMovementSpeedDelta) {
-                final int deltaAmount = data.getSlabMovementDeltaAmount() + 1;
-                data.setSlabMovementDeltaAmount(deltaAmount);
-                if (deltaAmount > maxSlabMovementSpeedDeltaAmount) {
-                    result.setFailed("Movement too similar while moving on slabs.")
-                            .withParameter("delta", delta)
-                            .withParameter("max", maxSlabMovementSpeedDelta)
-                            .withParameter("amt", deltaAmount)
-                            .withParameter("max", maxSlabMovementSpeedDeltaAmount);
-                    handleCheckViolationAndReset(player, result, safe);
-                }
-            } else {
-                data.setSlabMovementDeltaAmount(0);
-            }
+    private void runGroundChecks(Player player, MovingData data, CheckResult result, Location from, Location to, Location setback, double horizontal, double base, double vertical) {
+        final boolean hasModifier = BlockAccess.hasVerticalModifierAt(to, to.level, 0.3, -0.1, 0.3);
+        if (!hasModifier) {
+            data.setOffModifierTime(data.getOffModifierTime() + 1);
+        } else {
+            data.setOffModifierTime(0);
+        }
 
-            if (horizontal > maxSlabMovementSpeed) {
-                final int count = data.getSlabMovementOverThresholdCount() + 1;
-                data.setSlabMovementOverThresholdCount(count);
-                if (count > slabMovementSpeedThreshold) {
-                    result.setFailed("Moving too fast on slabs")
-                            .withParameter("h", horizontal)
-                            .withParameter("max", maxSlabMovementSpeed)
-                            .withParameter("count", count)
-                            .withParameter("threshold", slabMovementSpeedThreshold);
-                    handleCheckViolationAndReset(player, result, safe);
+        // player could be lifting off, which gives them a speed boost.
+        if (vertical >= 0.40) {
+            // player has lift-off phase
+            if (horizontal > maxInitialJumpBoost && data.offIceTime() >= 10 && data.getOffModifierTime() >= 10) {
+                result.setFailed("Moving too fast on initial lift-off")
+                        .withParameter("h", horizontal)
+                        .withParameter("max", maxInitialJumpBoost)
+                        .withParameter("offIceTime", data.offIceTime())
+                        .withParameter("modTime", data.getOffModifierTime());
+                handleCheckViolationAndReset(player, result, from);
+            }
+        } else {
+            // player has no significant lift off.
+            if (horizontal > base) {
+                // check low jump ice movement
+                if (data.onIce() && vertical > blockLowJumpMin && vertical < blockLowJumpMax) {
+                    checkLowJumpMovement(player, data, result, to, setback, horizontal);
+                } else {
+                    // check for stairs.
+                    if (BlockAccess.hasStairAt(to, to.level, 0.3, -0.1, 0.3) && vertical > 0.0) {
+                        // player has boost when jumping up stairs.
+                        if (horizontal > maxMoveSpeedStairs) {
+                            result.setFailed("Moving too fast on stairs")
+                                    .withParameter("h", horizontal)
+                                    .withParameter("max", maxMoveSpeedStairs);
+                            handleCheckViolationAndReset(player, result, from);
+                        }
+                    } else {
+                        // regular flag.
+                        // ensure player has had no ice recently.
+                        if (data.offIceTime() >= 10 && data.getOffModifierTime() >= 10) {
+                            player.sendMessage(TextFormat.YELLOW + "REGULAR FLAG");
+                            result.setFailed("Moving too fast")
+                                    .withParameter("h", horizontal)
+                                    .withParameter("max", base)
+                                    .withParameter("offIceTime", data.offIceTime())
+                                    .withParameter("offModTime", data.getOffModifierTime());
+                            handleCheckViolationAndReset(player, result, from);
+                        }
+                    }
                 }
             } else {
-                data.setSlabMovementOverThresholdCount(0);
+                // check for web-movement.
+                final boolean inWeb = to.getLevelBlock() instanceof BlockCobweb;
+                if (inWeb) {
+                    if (horizontal > maxMoveSpeedWeb) {
+                        result.setFailed("Moving too fast in cob-web")
+                                .withParameter("h", horizontal)
+                                .withParameter("max", maxMoveSpeedWeb);
+                        handleCheckViolationAndReset(player, result, from);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks low jump movement when a player has a block above their head.
+     * TODO
+     *
+     * @param player     the player
+     * @param data       their data
+     * @param result     the result
+     * @param to         the to
+     * @param setback    their setback
+     * @param horizontal the horizontal speed
+     */
+    private void checkLowJumpMovement(Player player, MovingData data, CheckResult result, Location to, Location setback, double horizontal) {
+        // check if player has block above head.
+        final boolean hasBlockAboveHead = BlockAccess.getBlockAt(to, to.level, 0.3, 2, 0.3).isSolid();
+        if (hasBlockAboveHead) {
+            // player would have a boost here.
+            final double delta = Math.abs(data.getLastHorizontal() - horizontal);
+            if (delta < blockIceDeltaMin) {
+                final int count = data.getBlockIceDeltaAmount() + 1;
+                data.setBlockIceDeltaAmount(count);
+
+                // this checks if the player is moving too similar.
+                if (count > blockIceDeltaAmountMax) {
+                    result.setFailed("Moving too similar on ice")
+                            .withParameter("delta", delta)
+                            .withParameter("min", blockIceDeltaMin)
+                            .withParameter("count", count)
+                            .withParameter("max", blockIceDeltaAmountMax);
+                    handleCheckViolationAndReset(player, result, setback);
+                }
+
+                if (horizontal > blockIceMaxSpeed) {
+                    result.setFailed("Moving too fast on ice")
+                            .withParameter("h", horizontal)
+                            .withParameter("max", blockIceMaxSpeed);
+                    handleCheckViolationAndReset(player, result, setback);
+                }
+
+            } else {
+                data.setBlockIceDeltaAmount(0);
             }
         }
     }
@@ -407,7 +306,7 @@ public final class Speed extends Check {
      * @return players move speed
      */
     private double getBaseMoveSpeed(Player player) {
-        double baseSpeed = 0.289;
+        double baseSpeed = player.isSprinting() ? baseMoveSpeedSprint : baseMoveSpeedWalk;
 
         for (Effect effect : player.getEffects().values()) {
             if (effect.getName().equalsIgnoreCase(NukkitAccess.MOVE_SPEED_POTION)) {
@@ -424,23 +323,22 @@ public final class Speed extends Check {
 
     @Override
     public void load() {
-        maxLargeDistanceMovement = configuration.getDouble("max-large-distance-movement");
-        lowJumpMax = configuration.getDouble("low-jump-max");
-        lowJumpMin = configuration.getDouble("low-jump-min");
-        maxStairMovementSpeed = configuration.getDouble("max-stair-movement-speed");
-        maxStairMovementSpeedDelta = configuration.getDouble("max-stair-movement-speed-delta");
-        maxStairMovementSpeedDeltaAmount = configuration.getInt("max-stair-movement-speed-delta-amount");
-        maxSlabMovementSpeed = configuration.getDouble("max-slab-movement-speed");
-        maxSlabMovementSpeedDelta = configuration.getDouble("max-slab-movement-speed-delta");
-        maxSlabMovementSpeedDeltaAmount = configuration.getInt("max-slab-movement-speed-delta-amount");
-        maxBatchedMovementCount = configuration.getInt("max-batched-movement-count");
-        minOnGroundTime = configuration.getInt("min-on-ground-time");
-        minOffModifierTime = configuration.getInt("min-off-modifier-time");
-        lastTeleportTimeMax = configuration.getLong("last-teleport-time-max");
-        lastTeleportTimeSpeedIncrease = configuration.getDouble("last-teleport-time-speed-increase");
-        maxAllowedFastMovements = configuration.getInt("max-allowed-fast-movements");
-        stairMovementSpeedThreshold = configuration.getInt("stair-movement-speed-threshold");
-        slabMovementSpeedThreshold = configuration.getInt("slab-movement-speed-threshold");
+        baseMoveSpeedSprint = configuration.getDouble("base-move-speed-sprint");
+        baseMoveSpeedWalk = configuration.getDouble("base-move-speed-walk");
+        minimumOnGroundTime = configuration.getInt("minimum-on-ground-time");
+        maxInitialJumpBoost = configuration.getDouble("max-initial-jump-boost");
+        maxMoveSpeedWeb = configuration.getDouble("max-move-speed-web");
+        blockLowJumpMin = configuration.getDouble("block-low-jump-min");
+        blockLowJumpMax = configuration.getDouble("block-low-jump-max");
+        blockIceDeltaAmountMax = configuration.getInt("block-ice-delta-amount-max");
+        blockIceDeltaMin = configuration.getDouble("block-ice-delta-min");
+        blockIceMaxSpeed = configuration.getDouble("block-ice-speed-max");
+        maxMoveSpeedStairs = configuration.getDouble("max-move-speed-stairs");
+        inAirMinDelta = configuration.getDouble("in-air-min-delta");
+        inAirMaxDeltaAmount = configuration.getInt("in-air-max-delta-amount");
+        maxInAirSpeed = configuration.getDouble("max-in-air-speed");
+        maxInAirIceSpeed = configuration.getDouble("max-in-air-ice-speed");
+        maxInAirSlimeblockSpeed = configuration.getDouble("max-in-air-slimeblock-speed");
 
         CheckTimings.registerTiming(checkType);
     }

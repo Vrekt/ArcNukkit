@@ -7,12 +7,14 @@ import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerGameModeChangeEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
+import cn.nukkit.event.player.PlayerTeleportEvent;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.player.FastUse;
 import me.vrekt.arc.data.combat.CombatData;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.data.player.PlayerData;
+import me.vrekt.arc.exemption.type.ExemptionType;
 
 /**
  * Listens for player related checks.
@@ -73,6 +75,13 @@ public final class PlayerListener implements Listener {
                 && player.getGamemode() == 1 || player.getGamemode() == 3) {
             final MovingData data = MovingData.get(player);
             data.setInAirTime(0);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onTeleport(PlayerTeleportEvent event) {
+        if (event.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
+            Arc.getInstance().getExemptionManager().addExemption(event.getPlayer(), ExemptionType.TELEPORT, 500);
         }
     }
 

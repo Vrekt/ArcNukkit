@@ -148,28 +148,10 @@ public final class MovingData {
     private long lastCollisionEvent;
 
     /**
-     * Batched movement count
-     * Amount of times failed low jump
-     * <p>
-     * Batched low jump movement count
-     * Time off slab cooldown.
+     * Amount of times delta was flagged.
+     * Time off a modifier.
      */
-    private int batchedMovementCount, lowJumpMovementCount, batchedLowJumpMovementCount, offModifierCooldown;
-
-    /**
-     * Amount of times stair/slab movement was over threshold.
-     */
-    private int stairMovementOverThresholdCount, slabMovementOverThresholdCount, notDescendingTime;
-
-    /**
-     * Amount of times delta was violated
-     */
-    private int stairMovementDeltaAmount, slabMovementDeltaAmount, fastMovements;
-
-    /**
-     * Last lift off and teleport times
-     */
-    private long lastLiftOff, lastTeleport;
+    private int blockIceDeltaAmount, offModifierTime, inAirDeltaAmount;
 
     public Location from() {
         return from;
@@ -501,62 +483,6 @@ public final class MovingData {
         this.lastCollisionEvent = lastCollisionEvent;
     }
 
-    public int getBatchedMovementCount() {
-        return batchedMovementCount;
-    }
-
-    public void setBatchedMovementCount(int batchedMovementCount) {
-        this.batchedMovementCount = MathUtil.clampInt(batchedMovementCount, 0, 100);
-    }
-
-    public int getLowJumpMovementCount() {
-        return lowJumpMovementCount;
-    }
-
-    public void setLowJumpMovementCount(int lowJumpMovementCount) {
-        this.lowJumpMovementCount = MathUtil.clampInt(lowJumpMovementCount, 0, 100);
-    }
-
-    public int getBatchedLowJumpMovementCount() {
-        return batchedLowJumpMovementCount;
-    }
-
-    public void setBatchedLowJumpMovementCount(int batchedLowJumpMovementCount) {
-        this.batchedLowJumpMovementCount = MathUtil.clampInt(batchedLowJumpMovementCount, 0, 1000);
-    }
-
-    public int getOffModifierCooldown() {
-        return offModifierCooldown;
-    }
-
-    public void setOffModifierCooldown(int offSlabCooldown) {
-        this.offModifierCooldown = MathUtil.clampInt(offSlabCooldown, 0, 1000);
-    }
-
-    public int getStairMovementOverThresholdCount() {
-        return stairMovementOverThresholdCount;
-    }
-
-    public void setStairMovementOverThresholdCount(int stairMovementOverThresholdCount) {
-        this.stairMovementOverThresholdCount = MathUtil.clampInt(stairMovementOverThresholdCount, 0, 1000);
-    }
-
-    public int getSlabMovementOverThresholdCount() {
-        return slabMovementOverThresholdCount;
-    }
-
-    public void setSlabMovementOverThresholdCount(int slabMovementOverThresholdCount) {
-        this.slabMovementOverThresholdCount = MathUtil.clampInt(slabMovementOverThresholdCount, 0, 1000);
-    }
-
-    public int getNotDescendingTime() {
-        return notDescendingTime;
-    }
-
-    public void setNotDescendingTime(int notDescendingTime) {
-        this.notDescendingTime = MathUtil.clampInt(notDescendingTime, 0, 1000);
-    }
-
     public double getHorizontal() {
         return horizontal;
     }
@@ -573,14 +499,6 @@ public final class MovingData {
         this.lastHorizontal = lastHorizontal;
     }
 
-    public int getStairMovementDeltaAmount() {
-        return stairMovementDeltaAmount;
-    }
-
-    public void setStairMovementDeltaAmount(int stairMovementDeltaAmount) {
-        this.stairMovementDeltaAmount = MathUtil.clampInt(stairMovementDeltaAmount, 0, 100);
-    }
-
     public Location getSafeSpeedLocation() {
         return safeSpeedLocation;
     }
@@ -589,35 +507,27 @@ public final class MovingData {
         this.safeSpeedLocation = safeSpeedLocation;
     }
 
-    public int getSlabMovementDeltaAmount() {
-        return slabMovementDeltaAmount;
+    public int getBlockIceDeltaAmount() {
+        return blockIceDeltaAmount;
     }
 
-    public void setSlabMovementDeltaAmount(int slabMovementDeltaAmount) {
-        this.slabMovementDeltaAmount = MathUtil.clampInt(slabMovementDeltaAmount, 0, 1000);
+    public void setBlockIceDeltaAmount(int blockIceDeltaAmount) {
+        this.blockIceDeltaAmount = MathUtil.clampInt(blockIceDeltaAmount, 0, 1000);
     }
 
-    public long getLastLiftOff() {
-        return lastLiftOff;
+    public int getOffModifierTime() {
+        return offModifierTime;
     }
 
-    public void setLastLiftOff(long lastLiftOff) {
-        this.lastLiftOff = lastLiftOff;
+    public void setOffModifierTime(int offModifierTime) {
+        this.offModifierTime = MathUtil.clampInt(offModifierTime, 0, 1000);
     }
 
-    public long getLastTeleport() {
-        return lastTeleport;
+    public int getInAirDeltaAmount() {
+        return inAirDeltaAmount;
     }
 
-    public void setLastTeleport(long lastTeleport) {
-        this.lastTeleport = lastTeleport;
-    }
-
-    public int getFastMovements() {
-        return fastMovements;
-    }
-
-    public void setFastMovements(int fastMovements) {
-        this.fastMovements = MathUtil.clampInt(fastMovements, 0, 1000);
+    public void setInAirDeltaAmount(int inAirDeltaAmount) {
+        this.inAirDeltaAmount = MathUtil.clampInt(inAirDeltaAmount, 0, 1000);
     }
 }

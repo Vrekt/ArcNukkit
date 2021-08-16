@@ -1,6 +1,6 @@
 name: Arc
 main: me.vrekt.arc.Arc
-version: 1.6.1
+version: 1.6.2
 description: An anticheat for Nukkit.
 author: Vrekt
 api: ["1.0.0"]
@@ -42,6 +42,8 @@ permissions:
             description: Allows the player to bypass the Flight check.
           arc.bypass.moving.speed:
             description: Allows the player to bypass the Speed check.
+          arc.bypass.moving.phase:
+            description: Allows the player to bypass the Phase check.
       arc.bypass.block:
         description: Allows the player to bypass block related checks
         children:

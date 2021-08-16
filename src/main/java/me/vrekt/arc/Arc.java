@@ -12,7 +12,6 @@ import me.vrekt.arc.exemption.ExemptionManager;
 import me.vrekt.arc.listener.block.BlockListener;
 import me.vrekt.arc.listener.combat.CombatListener;
 import me.vrekt.arc.listener.connection.PlayerConnectionListener;
-import me.vrekt.arc.listener.moving.MovingEventListener;
 import me.vrekt.arc.listener.moving.task.MovingTaskListener;
 import me.vrekt.arc.listener.packet.NukkitPacketHandler;
 import me.vrekt.arc.listener.player.PlayerListener;
@@ -28,7 +27,7 @@ public final class Arc extends PluginBase {
     /**
      * IPL version
      */
-    public static final String VERSION_STRING = "1.6.1-81521c-nukkit";
+    public static final String VERSION_STRING = "1.6.2-81621a-nukkit";
 
     /**
      * The instance of this class
@@ -114,8 +113,7 @@ public final class Arc extends PluginBase {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        getServer().getPluginManager().registerEvents(new NukkitPacketHandler(exemptionManager), this);
-        getServer().getPluginManager().registerEvents(new MovingEventListener(), this);
+        getServer().getPluginManager().registerEvents(new NukkitPacketHandler(), this);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(new CombatListener(), this);
         new MovingTaskListener();
