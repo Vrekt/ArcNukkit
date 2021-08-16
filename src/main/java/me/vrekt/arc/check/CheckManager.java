@@ -7,6 +7,7 @@ import me.vrekt.arc.check.combat.KillAura;
 import me.vrekt.arc.check.combat.Reach;
 import me.vrekt.arc.check.moving.Flight;
 import me.vrekt.arc.check.moving.MorePackets;
+import me.vrekt.arc.check.moving.Phase;
 import me.vrekt.arc.check.moving.Speed;
 import me.vrekt.arc.check.player.FastUse;
 import me.vrekt.arc.configuration.ArcConfiguration;
@@ -38,6 +39,7 @@ public final class CheckManager implements Configurable, Closeable {
         add(new FastBreak());
         add(new KillAura());
         add(new FastClick());
+        add(new Phase());
     }
 
     /**

@@ -101,6 +101,8 @@ public final class MovingAccess {
 
         // calculate ground stuff.
         if (onGround) {
+            data.incrementOnGroundTime();
+
             // set initial safe location if null.
             if (data.getSafeLocation() == null) {
                 data.setSafeLocation(cloneTo);

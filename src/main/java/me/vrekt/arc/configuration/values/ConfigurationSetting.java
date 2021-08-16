@@ -23,7 +23,10 @@ public enum ConfigurationSetting {
     ARC_PREFIX(new ConfigValue<>("arc-prefix", "&8[&cArc&8]")),
     VIOLATION_DATA_TIMEOUT(new ConfigValue<>("violation-data-timeout", 30)),
     ENABLE_EVENT_API(new ConfigValue<>("enable-event-api", true)),
-    ENABLE_CHECK_TIMINGS(new ConfigValue<>("enable-check-timings", true));
+    ENABLE_CHECK_TIMINGS(new ConfigValue<>("enable-check-timings", true)),
+    RESET_VIOLATION_DATA_AFTER(new ConfigValue<>("reset-violation-data-after", 10)),
+    OP_CAN_BYPASS(new ConfigValue<>("op-can-bypass", true)),
+    OP_CAN_VIEW_VIOLATIONS(new ConfigValue<>("op-can-view-violations", true));
 
     /**
      * The value

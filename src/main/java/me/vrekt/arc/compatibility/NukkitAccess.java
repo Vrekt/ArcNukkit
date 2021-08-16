@@ -17,6 +17,8 @@ public final class NukkitAccess {
 
     /**
      * Speed potion
+     * <p>
+     * Use names here, since effect IDs are inconsistent.
      */
     public static final String MOVE_SPEED_POTION = "%potion.moveSpeed";
 

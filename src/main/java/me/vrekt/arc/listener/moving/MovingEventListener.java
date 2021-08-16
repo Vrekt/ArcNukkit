@@ -62,6 +62,7 @@ public final class MovingEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onTeleport(PlayerTeleportEvent event) {
         if (event.getCause() != PlayerTeleportEvent.TeleportCause.UNKNOWN) {
+            MovingData.get(event.getPlayer()).setLastTeleport(System.currentTimeMillis());
             Arc.getInstance().getExemptionManager().addExemption(event.getPlayer(), ExemptionType.TELEPORT, 500);
         }
     }

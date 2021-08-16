@@ -25,14 +25,16 @@ public final class ArcConfiguration extends ConfigurationSettingReader implement
     /**
      * If the event API should be enabled.
      * If check timings should be enabled.
+     * If an OP can bypass or view violations.
      */
-    private boolean enableEventApi, enableCheckTimings;
+    private boolean enableEventApi, enableCheckTimings, opCanBypass, opCanViewViolations;
 
     /**
      * TPS helper limit
      * The time after leaving violation data times out
+     * The interval to reset violation data
      */
-    private int violationDataTimeout;
+    private int violationDataTimeout, resetViolationData;
 
     /**
      * Violation notify message
@@ -60,6 +62,9 @@ public final class ArcConfiguration extends ConfigurationSettingReader implement
         violationDataTimeout = getInteger(configuration, ConfigurationSetting.VIOLATION_DATA_TIMEOUT);
         enableEventApi = getBoolean(configuration, ConfigurationSetting.ENABLE_EVENT_API);
         enableCheckTimings = getBoolean(configuration, ConfigurationSetting.ENABLE_CHECK_TIMINGS);
+        resetViolationData = getInteger(configuration, ConfigurationSetting.RESET_VIOLATION_DATA_AFTER);
+        opCanBypass = getBoolean(configuration, ConfigurationSetting.OP_CAN_BYPASS);
+        opCanViewViolations = getBoolean(configuration, ConfigurationSetting.OP_CAN_VIEW_VIOLATIONS);
     }
 
     /**
@@ -123,6 +128,27 @@ public final class ArcConfiguration extends ConfigurationSettingReader implement
      */
     public boolean enableCheckTimings() {
         return enableCheckTimings;
+    }
+
+    /**
+     * @return the interval to reset violation data.
+     */
+    public int getResetViolationData() {
+        return resetViolationData;
+    }
+
+    /**
+     * @return {@code true} if OP'd players can bypass checks.
+     */
+    public boolean canOpBypass() {
+        return opCanBypass;
+    }
+
+    /**
+     * @return {@code true} if OP'd players can view violations.
+     */
+    public boolean canOpViewViolations() {
+        return opCanViewViolations;
     }
 
     /**

@@ -32,6 +32,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         addSubCommand("debug", new DebugSubCommand());
         addSubCommand("version", new ArcVersionSubCommand());
         addSubCommand("history", new ViolationHistorySubCommand());
+        addSubCommand("summary", new ArcSummarySubCommand());
     }
 
     /**

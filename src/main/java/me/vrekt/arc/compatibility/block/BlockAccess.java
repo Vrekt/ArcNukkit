@@ -62,6 +62,7 @@ public final class BlockAccess {
                 block instanceof BlockFenceGate ||
                 block instanceof BlockStairs ||
                 block instanceof BlockSlab ||
+                block instanceof BlockDoubleSlab ||
                 block instanceof BlockWall ||
                 block instanceof BlockSnow ||
                 block instanceof BlockSnowLayer ||
@@ -312,6 +313,86 @@ public final class BlockAccess {
      */
     public static boolean isLiquid(Block block) {
         return block instanceof BlockLiquid;
+    }
+
+    /**
+     * Get block at
+     *
+     * @param origin the origin
+     * @param level  the level
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the block
+     */
+    public static Block getBlockAt(Location origin, Level level, double x, double y, double z) {
+        return level.getBlock(MathUtil.floor(origin.getX() + x),
+                MathUtil.floor(origin.getY() + y), MathUtil.floor(origin.getZ() + z));
+    }
+
+    /**
+     * Check if there is a slab
+     *
+     * @param origin the origin
+     * @param level  the level
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the block
+     */
+    public static boolean hasSlabAt(Location origin, Level level, double x, double y, double z) {
+        if (hasSlabAt0(origin, level, x, y, z)) return true;
+        if (hasSlabAt0(origin, level, x, y, -z)) return true;
+        if (hasSlabAt0(origin, level, -x, y, z)) return true;
+        return hasSlabAt0(origin, level, -x, y, -z);
+    }
+
+    /**
+     * Check if there is a slab
+     *
+     * @param origin the origin
+     * @param level  the level
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the block
+     */
+    private static boolean hasSlabAt0(Location origin, Level level, double x, double y, double z) {
+        final Block block = level.getBlock(MathUtil.floor(origin.getX() + x),
+                MathUtil.floor(origin.getY() + y), MathUtil.floor(origin.getZ() + z));
+        return block instanceof BlockSlab || block instanceof BlockDoubleSlab;
+    }
+
+    /**
+     * Check if there is a stair
+     *
+     * @param origin the origin
+     * @param level  the level
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the block
+     */
+    public static boolean hasStairAt(Location origin, Level level, double x, double y, double z) {
+        if (hasStairAt0(origin, level, x, y, z)) return true;
+        if (hasStairAt0(origin, level, x, y, -z)) return true;
+        if (hasStairAt0(origin, level, -x, y, z)) return true;
+        return hasStairAt0(origin, level, -x, y, -z);
+    }
+
+    /**
+     * Check if there is a stair
+     *
+     * @param origin the origin
+     * @param level  the level
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the block
+     */
+    private static boolean hasStairAt0(Location origin, Level level, double x, double y, double z) {
+        return level.getBlock(MathUtil.floor(origin.getX() + x),
+                MathUtil.floor(origin.getY() + y), MathUtil.floor(origin.getZ() + z)) instanceof BlockStairs;
     }
 
 }

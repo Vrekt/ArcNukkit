@@ -224,6 +224,14 @@ public final class Flight extends Check {
             // Vertical is too high for the player so its sketchy.
             if (vertical > maxJumpHeight && (vertical >= 1.44 || ascendingTime >= ascendCooldown)
                     && !data.hasSlimeBlockLaunch()) {
+
+                // Check if player is ascending off stairs.
+                // TODO: Unsure if this works yet.
+                final boolean ascendingFromStairs = BlockAccess.hasStairAt(from, from.level, 0.3, -0.5, 0.3);
+                if (ascendingFromStairs) {
+                    return;
+                }
+
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);

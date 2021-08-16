@@ -179,7 +179,7 @@ public final class ExemptionManager implements Configurable, Closeable {
      * @return {@code true} if so
      */
     private boolean isExemptWhenFlying(CheckType check) {
-        return check == CheckType.FLIGHT;
+        return check == CheckType.FLIGHT || check == CheckType.SPEED || check == CheckType.PHASE;
     }
 
     @Override

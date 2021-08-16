@@ -1,8 +1,10 @@
 package me.vrekt.arc.permissions;
 
 import cn.nukkit.Player;
+import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckCategory;
 import me.vrekt.arc.check.CheckType;
+import me.vrekt.arc.configuration.ArcConfiguration;
 
 /**
  * Arc permissions
@@ -65,9 +67,19 @@ public final class Permissions {
     public static final String ARC_COMMANDS_EXEMPT = "arc.commands.exempt";
 
     /**
+     * The permission to view player summaries
+     */
+    public static final String ARC_COMMANDS_SUMMARY = "arc.commands.summary";
+
+    /**
      * The permission to execute all arc commands
      */
     public static final String ARC_COMMANDS_ALL = "arc.commands.all";
+
+    /**
+     * Config instance.
+     */
+    private static final ArcConfiguration CONFIGURATION = Arc.getInstance().getArcConfiguration();
 
     /**
      * Check if the player can view violations
@@ -76,7 +88,7 @@ public final class Permissions {
      * @return {@code true} if so.
      */
     public static boolean canViewViolations(Player player) {
-        return player.hasPermission(ARC_VIOLATIONS);
+        return player.hasPermission(ARC_VIOLATIONS) || (CONFIGURATION.canOpViewViolations() && player.isOp());
     }
 
     /**
@@ -87,7 +99,7 @@ public final class Permissions {
      */
     public static boolean canBypassAllChecks(Player player) {
         if (player == null || !player.isOnline()) return true;
-        return player.hasPermission(ARC_BYPASS);
+        return player.hasPermission(ARC_BYPASS) || (CONFIGURATION.canOpBypass() && player.isOp());
     }
 
     /**
@@ -99,7 +111,7 @@ public final class Permissions {
      */
     public static boolean canBypassCategory(Player player, CheckCategory category) {
         if (player == null || !player.isOnline() || canBypassAllChecks(player)) return true;
-        return player.hasPermission(category.getBypassPermission());
+        return player.hasPermission(category.getBypassPermission()) || (CONFIGURATION.canOpBypass() && player.isOp());
     }
 
     /**
@@ -112,6 +124,7 @@ public final class Permissions {
     public static boolean canBypassCheck(Player player, CheckType check) {
         if (player == null || !player.isOnline() || canBypassAllChecks(player)) return true;
         return player.hasPermission(check.getCategory().getBypassPermission())
-                || player.hasPermission(check.getBypassPermission());
+                || player.hasPermission(check.getBypassPermission())
+                || (CONFIGURATION.canOpBypass() && player.isOp());
     }
 }

@@ -103,7 +103,6 @@ public final class CheckResult {
      */
     public CheckResult setFailed() {
         this.result = Result.FAILED;
-        this.informationBuilder = new StringBuilder();
         this.failedBefore = true;
         return this;
     }
@@ -114,6 +113,7 @@ public final class CheckResult {
      * @param information the information
      */
     public void info(String information) {
+        if(informationBuilder == null) informationBuilder = new StringBuilder();
         informationBuilder.append(TextFormat.RED).append(information);
         informationBuilder.append("\n");
     }
