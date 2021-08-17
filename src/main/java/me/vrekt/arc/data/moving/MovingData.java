@@ -153,6 +153,21 @@ public final class MovingData {
      */
     private int blockIceDeltaAmount, offModifierTime, inAirDeltaAmount;
 
+    /**
+     * The water location for distance tracking.
+     */
+    private Location waterLocation;
+
+    /**
+     * The amount of no distance changes
+     * Time in liquid, time out of.
+     * Amount of times small movement counts in liquid
+     * Amount of times no vertical in water.
+     */
+    private int liquidTime, outOfLiquidTime, liquidSmallMovementCount, noVerticalCount;
+
+    private long lastSwimTime;
+
     public Location from() {
         return from;
     }
@@ -529,5 +544,53 @@ public final class MovingData {
 
     public void setInAirDeltaAmount(int inAirDeltaAmount) {
         this.inAirDeltaAmount = MathUtil.clampInt(inAirDeltaAmount, 0, 1000);
+    }
+
+    public int liquidTime() {
+        return liquidTime;
+    }
+
+    public void liquidTime(int liquidTime) {
+        this.liquidTime = MathUtil.clampInt(liquidTime, 0, 100);
+    }
+
+    public int getOutOfLiquidTime() {
+        return outOfLiquidTime;
+    }
+
+    public void setOutOfLiquidTime(int outOfLiquidTime) {
+        this.outOfLiquidTime = MathUtil.clampInt(outOfLiquidTime, 0, 100);
+    }
+
+    public Location waterLocation() {
+        return waterLocation;
+    }
+
+    public void waterLocation(Location waterLocation) {
+        this.waterLocation = waterLocation;
+    }
+
+    public int getLiquidSmallMovementCount() {
+        return liquidSmallMovementCount;
+    }
+
+    public void setLiquidSmallMovementCount(int liquidSmallMovementCount) {
+        this.liquidSmallMovementCount = MathUtil.clampInt(liquidSmallMovementCount, 0, 100);
+    }
+
+    public int getNoVerticalCount() {
+        return noVerticalCount;
+    }
+
+    public void setNoVerticalCount(int noVerticalCount) {
+        this.noVerticalCount = MathUtil.clampInt(noVerticalCount, 0, 100);
+    }
+
+    public long getLastSwimTime() {
+        return lastSwimTime;
+    }
+
+    public void setLastSwimTime(long lastSwimTime) {
+        this.lastSwimTime = lastSwimTime;
     }
 }

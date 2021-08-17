@@ -53,7 +53,8 @@ public final class ArcSummarySubCommand extends ArcSubCommand {
         final int playerDevice = player.getLoginChainData().getDeviceOS();
         final int playerPing = player.getPing();
 
-        final String playerDeviceId = playerDevice == 7 ? "Windows" : "Unknown";
+        // TODO: Mapping of devices.
+        final String playerDeviceId = playerDevice == 7 ? "Windows" : "Unknown Device";
         final String checksBypassed = bypass.isEmpty() ? " cannot bypass any checks."
                 : " can bypass " + ArrayUtils.toString(bypass);
         final String playerGameMode = player.getGamemode() == 0 ? "Survival"
@@ -62,7 +63,7 @@ public final class ArcSummarySubCommand extends ArcSubCommand {
                 : player.getGamemode() == 3 ? "Spectator"
                 : "Survival";
 
-        message.setMainColor(TextFormat.AQUA).setParameterColor(TextFormat.GOLD);
+        message.setMainColor(TextFormat.AQUA).setParameterColor(TextFormat.GRAY);
         message.messagePrefix("Viewing summary report for: ").parameter(player.getName()).newLine();
         message.parameterPrefix(player.getName()).message(" is playing on ").parameter(playerDeviceId).newLine();
         message.parameterPrefix(player.getName()).message(" is currently in ").parameter(playerGameMode).newLine();

@@ -111,13 +111,18 @@ public final class Speed extends Check {
         data.setLastHorizontal(lastHorizontal);
 
         // Player is on-ground check normal speeds and stairs and stuff.
-        if (data.onGround() && data.onGroundTime() >= minimumOnGroundTime) {
+        if (data.onGround() && data.onGroundTime() >= minimumOnGroundTime && !data.inLiquid()) {
             runGroundChecks(player, data, result, from, to, setback, horizontal, base, vertical);
         }
 
         // Player is not on ground, mostly fix b-hop type speeds.
-        if (!data.onGround()) {
+        if (!data.onGround() && !data.inLiquid()) {
             runAirChecks(player, data, result, setback, horizontal);
+        }
+
+        // Player is in liquid.
+        if (data.inLiquid()) {
+            runLiquidChecks(player, data, result, to, setback, horizontal);
         }
 
         stopTiming(player);
@@ -138,11 +143,12 @@ public final class Speed extends Check {
     private void runAirChecks(Player player, MovingData data, CheckResult result, Location setback, double horizontal) {
         // check if the player is moving too similar over time
         final double delta = Math.abs(data.getLastHorizontal() - horizontal);
-        if (delta <= inAirMinDelta) {
+        // TODO: Over compensating here, bypass.
+        if (delta <= inAirMinDelta && delta != 0.0) {
             // ignore cases where we are super far from ground.
             // TODO: This can cause bypasses.
             final double distance = MathUtil.distance(data.ground(), data.to());
-            if (distance <= 2.8) {
+            if (distance <= 2.8 && distance > 1.2) {
                 final int count = data.getInAirDeltaAmount() + 1;
                 data.setInAirDeltaAmount(count);
 
@@ -300,6 +306,21 @@ public final class Speed extends Check {
                 data.setBlockIceDeltaAmount(0);
             }
         }
+    }
+
+    /**
+     * Check movement in liquids.
+     * TODO
+     *
+     * @param player     the player
+     * @param data       their data
+     * @param result     the result
+     * @param to         the to
+     * @param setback    their setback
+     * @param horizontal the horizontal speed
+     */
+    private void runLiquidChecks(Player player, MovingData data, CheckResult result, Location to, Location setback, double horizontal) {
+        // TODO:
     }
 
     /**

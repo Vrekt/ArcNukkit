@@ -44,6 +44,8 @@ permissions:
             description: Allows the player to bypass the Speed check.
           arc.bypass.moving.phase:
             description: Allows the player to bypass the Phase check.
+          arc.bypass.moving.waterwalk:
+            description: Allows the player to bypass the WaterWalk check.
       arc.bypass.block:
         description: Allows the player to bypass block related checks
         children:

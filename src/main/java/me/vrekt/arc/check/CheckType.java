@@ -54,7 +54,12 @@ public enum CheckType {
     /**
      * Checks if the player is clicking too fast.
      */
-    FAST_CLICK("FastClick", CheckCategory.COMBAT);
+    FAST_CLICK("FastClick", CheckCategory.COMBAT),
+
+    /**
+     * Checks if the player is walking on water.
+     */
+    WATER_WALK("WaterWalk", CheckCategory.MOVING);
 
     /**
      * The name

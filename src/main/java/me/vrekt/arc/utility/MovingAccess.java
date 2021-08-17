@@ -25,8 +25,8 @@ public final class MovingAccess {
      * @return {@code true} if so
      */
     public static boolean onGround(Location location) {
-        final Block block = location.subtract(0, 0.5, 0).getLevelBlock();
-        location.add(0, 0.5, 0);
+        final Block block = location.subtract(0, 1, 0).getLevelBlock();
+        location.add(0, 1, 0);
 
         return BlockAccess.isConsideredGround(block) ||
                 BlockAccess.hasSolidGroundAt(location, location.getLevel(), 0.3, -0.1, 0.3);
