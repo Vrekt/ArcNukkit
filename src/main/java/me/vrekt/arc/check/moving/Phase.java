@@ -6,6 +6,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
@@ -13,6 +14,7 @@ import me.vrekt.arc.compatibility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.utility.block.model.BlockModel;
 import me.vrekt.arc.utility.block.model.models.*;
+import me.vrekt.arc.utility.block.ray.AxisRayTracing;
 
 /**
  * Checks if the player is moving through blocks.
@@ -56,45 +58,22 @@ public final class Phase extends Check {
         final long now = System.currentTimeMillis();
         final long timeSinceLastCollision = now - data.getLastCollisionEvent();
 
-        final AxisAlignedBB bb = player.boundingBox.grow(-0.3, 0.0, -0.3);
+        final AxisAlignedBB bb = player.boundingBox.grow(-0.25, 0.0, -0.25);
         final CheckResult result = new CheckResult();
 
-        int minX = Math.min(from.getFloorX(), (int) bb.getMaxX());
-        int maxX = Math.max(from.getFloorX(), (int) bb.getMaxX());
-        int minY = Math.min(from.getFloorY(), (int) bb.getMaxY());
-        int maxY = Math.max(from.getFloorY(), (int) bb.getMaxY());
-        int minZ = Math.min(from.getFloorZ(), (int) bb.getMaxZ());
-        int maxZ = Math.max(from.getFloorZ(), (int) bb.getMaxZ());
+        final AxisRayTracing rayTracing = new AxisRayTracing();
 
-        boolean hasAnyBlocks = false;
-        for (int z = minZ; z <= maxZ; ++z) {
-            for (int x = minX; x <= maxX; ++x) {
-                for (int y = minY; y <= maxY; ++y) {
-                    final Block block = player.getLevel().getBlock(x, y, z);
-                    if (block.getId() != 0) {
-                        hasAnyBlocks = checkBlockState(block, bb, safe, to, result);
+        rayTracing.set(safe, to, bb);
+        rayTracing.loop();
 
-                        if (hasAnyBlocks) {
-                            result.setFailed("Attempted to move through a solid block.")
-                                    .withParameter("blockId", block.getId());
-                            handleCheckViolationAndReset(player, result, safe);
-                            break;
-                        }
-                    }
-                }
+        if (rayTracing.collides()) {
+            data.setLastCollisionEvent(System.currentTimeMillis());
+            player.sendMessage(TextFormat.RED + "FLAG");
+            player.teleport(safe);
+        } else {
+            if (System.currentTimeMillis() - data.getLastCollisionEvent() >= 2000 && data.onGround()) {
+                data.setSafePhaseLocation(from);
             }
-        }
-
-        // Ensure player does not have possible blocks between safe locations.
-        // This prevents stuff like really fast speeds, (hopefully)
-        final boolean safeToUpdate = !hasAnyBlocks
-                && data.onGround()
-                && !hasAnyBlocksBetweenSafe(safe, data.to())
-                && timeSinceLastCollision >= 1500;
-
-        if (safeToUpdate) {
-            //   player.sendMessage("Updated");
-            data.setSafePhaseLocation(data.from());
         }
 
         return false;

@@ -250,7 +250,7 @@ public final class Flight extends Check {
                         .withParameter("vertical", vertical)
                         .withParameter("time", data.ascendingTime())
                         .withParameter("max", (maxAscendTime + modifier));
-                handleCheckViolationAndReset(player, result, from);
+                handleCheckViolationAndReset(player, result, ground);
             }
         }
     }

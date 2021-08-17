@@ -110,6 +110,16 @@ public final class ColoredChat {
     }
 
     /**
+     * Append a new line
+     *
+     * @return this
+     */
+    public ColoredChat newLine() {
+        builder.append("\n");
+        return this;
+    }
+
+    /**
      * Append a parameter
      *
      * @param parameter the parameter

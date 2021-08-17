@@ -47,7 +47,7 @@ public final class FastClick extends Check {
                 .build();
 
         addConfigurationValue("max-swing-packets-per-second", 12);
-        addConfigurationValue("max-block-swing-packets", 25);
+        addConfigurationValue("max-block-swing-packets", 30);
         addConfigurationValue("min-swing-delta", 50);
         addConfigurationValue("min-last-block-interact-required", 500);
         addConfigurationValue("cancel-attacks", true);
@@ -112,7 +112,7 @@ public final class FastClick extends Check {
                     && !result.failed()) {
                 result.setFailed("Too many block swings per second")
                         .withParameter("swings", data.getTotalBlockInteracts())
-                        .withParameter("max", maxPacketsPerSecond);
+                        .withParameter("max", maxBlockSwingPackets);
                 // we do not need to cancel attacks here.
             }
 

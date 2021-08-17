@@ -16,6 +16,39 @@ public final class ViolationHistory {
     private final Map<CheckType, Integer> violations = new HashMap<>();
 
     /**
+     * The time when this history was created
+     */
+    private long timeCreated;
+
+    public ViolationHistory() {
+        timeCreated = System.currentTimeMillis();
+    }
+
+    /**
+     * @return get the time created
+     */
+    public long getTimeCreated() {
+        return timeCreated;
+    }
+
+    /**
+     * Set the time created.
+     * Also used for reset.
+     *
+     * @param timeCreated the time created
+     */
+    public void setTimeCreated(long timeCreated) {
+        this.timeCreated = timeCreated;
+    }
+
+    /**
+     * Clear.
+     */
+    public void clear() {
+        violations.clear();
+    }
+
+    /**
      * Get the violation level for a check
      *
      * @param check the check

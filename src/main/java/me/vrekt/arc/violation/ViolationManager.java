@@ -1,6 +1,8 @@
 package me.vrekt.arc.violation;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
+import cn.nukkit.scheduler.TaskHandler;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import me.vrekt.arc.Arc;
@@ -50,6 +52,11 @@ public final class ViolationManager implements Configurable, Closeable {
      */
     private PunishmentManager punishmentManager;
 
+    /**
+     * Violation history handler.
+     */
+    private TaskHandler handler;
+
     @Override
     public void loadConfiguration(ArcConfiguration configuration) {
         this.configuration = configuration;
@@ -58,6 +65,22 @@ public final class ViolationManager implements Configurable, Closeable {
         historyCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)
                 .build();
+
+        // schedule wipe task
+        handler = Server.getInstance().getScheduler().scheduleRepeatingTask(Arc.getPlugin(), this::wipePlayerHistory, 20 * 60, true);
+    }
+
+    /**
+     * Wipe player history.
+     */
+    private void wipePlayerHistory() {
+        final long now = System.currentTimeMillis();
+        history.forEach((uuid, history) -> {
+            if (now - history.getTimeCreated() >= (configuration.violationDataTimeout() * 1000L)) {
+                history.clear();
+                history.setTimeCreated(now);
+            }
+        });
     }
 
     /**
@@ -210,6 +233,10 @@ public final class ViolationManager implements Configurable, Closeable {
         historyCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)
                 .build();
+
+        // cancel and re-schedule.
+        if (handler != null) handler.cancel();
+        handler = Server.getInstance().getScheduler().scheduleRepeatingTask(Arc.getPlugin(), this::wipePlayerHistory, 20 * 60, true);
     }
 
     @Override

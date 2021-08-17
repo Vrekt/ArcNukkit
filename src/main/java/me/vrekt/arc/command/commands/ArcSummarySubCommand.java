@@ -3,10 +3,16 @@ package me.vrekt.arc.command.commands;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.utils.TextFormat;
+import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.permissions.Permissions;
+import me.vrekt.arc.utility.chat.ColoredChat;
+import me.vrekt.arc.violation.ViolationHistory;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Allows you to view a summary about a player.
@@ -39,9 +45,42 @@ public final class ArcSummarySubCommand extends ArcSubCommand {
         final int gameMode = player.getGamemode();
         final boolean op = player.isOp();
 
-        final List<CheckType> bypass = Permissions.getChecksCanBypass(player);
-        final String header = "";
+        final List<String> bypass = Permissions.getChecksCanBypass(player)
+                .stream().map(CheckType::getName)
+                .collect(Collectors.toList());
+        final ColoredChat message = ColoredChat.forRecipient(sender);
 
-        sender.sendMessage(header);
+        final int playerDevice = player.getLoginChainData().getDeviceOS();
+        final int playerPing = player.getPing();
+
+        final String playerDeviceId = playerDevice == 7 ? "Windows" : "Unknown";
+        final String checksBypassed = bypass.isEmpty() ? " cannot bypass any checks."
+                : " can bypass " + ArrayUtils.toString(bypass);
+        final String playerGameMode = player.getGamemode() == 0 ? "Survival"
+                : player.getGamemode() == 1 ? "Creative"
+                : player.getGamemode() == 2 ? "Adventure"
+                : player.getGamemode() == 3 ? "Spectator"
+                : "Survival";
+
+        message.setMainColor(TextFormat.AQUA).setParameterColor(TextFormat.GOLD);
+        message.messagePrefix("Viewing summary report for: ").parameter(player.getName()).newLine();
+        message.parameterPrefix(player.getName()).message(" is playing on ").parameter(playerDeviceId).newLine();
+        message.parameterPrefix(player.getName()).message(" is currently in ").parameter(playerGameMode).newLine();
+        message.parameterPrefix(player.getName()).message(checksBypassed).newLine();
+        message.messagePrefix("The ping of ").parameter(player.getName()).message(" is ").parameter(playerPing + " ms.").newLine();
+
+        final ViolationHistory history = Arc.getInstance().getViolationManager().getHistory().get(player.getUniqueId());
+        if (history != null) {
+            history.getViolations().forEach((check, level) -> {
+                message.parameterPrefix(player.getName())
+                        .message(" failed ")
+                        .parameter(check.getName())
+                        .parameter(" " + level)
+                        .message(" times.")
+                        .newLine();
+            });
+        }
+
+        message.send();
     }
 }

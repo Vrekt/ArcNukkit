@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.block.BlockCobweb;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
@@ -74,9 +73,9 @@ public final class Speed extends Check {
         addConfigurationValue("block-ice-delta-min", 0.02);
         addConfigurationValue("block-ice-delta-amount-max", 5);
         addConfigurationValue("max-move-speed-stairs", 0.6);
-        addConfigurationValue("in-air-min-delta", 0.02);
+        addConfigurationValue("in-air-min-delta", 0.01);
         addConfigurationValue("in-air-max-delta-amount", 10);
-        addConfigurationValue("max-in-air-speed", 0.50);
+        addConfigurationValue("max-in-air-speed", 0.62);
         addConfigurationValue("max-in-air-ice-speed", 0.56);
         addConfigurationValue("max-in-air-slimeblock-speed", 0.45);
 
@@ -90,7 +89,7 @@ public final class Speed extends Check {
      * @param data   their data
      */
     public void check(Player player, MovingData data) {
-        if (exempt(player) || exempt(player, ExemptionType.TELEPORT)) return;
+        if (exempt(player) || exempt(player, ExemptionType.TELEPORT) || player.riding != null) return;
         startTiming(player);
 
         if (data.getSafeSpeedLocation() == null) {
@@ -140,16 +139,21 @@ public final class Speed extends Check {
         // check if the player is moving too similar over time
         final double delta = Math.abs(data.getLastHorizontal() - horizontal);
         if (delta <= inAirMinDelta) {
-            final int count = data.getInAirDeltaAmount() + 1;
-            data.setInAirDeltaAmount(count);
+            // ignore cases where we are super far from ground.
+            // TODO: This can cause bypasses.
+            final double distance = MathUtil.distance(data.ground(), data.to());
+            if (distance <= 2.8) {
+                final int count = data.getInAirDeltaAmount() + 1;
+                data.setInAirDeltaAmount(count);
 
-            if (count > inAirMaxDeltaAmount) {
-                result.setFailed("Moving too similar in-air")
-                        .withParameter("delta", delta)
-                        .withParameter("min", inAirMinDelta)
-                        .withParameter("count", count)
-                        .withParameter("max", inAirMaxDeltaAmount);
-                handleCheckViolationAndReset(player, result, setback);
+                if (count > inAirMaxDeltaAmount) {
+                    result.setFailed("Moving too similar in-air")
+                            .withParameter("delta", delta)
+                            .withParameter("min", inAirMinDelta)
+                            .withParameter("count", count)
+                            .withParameter("max", inAirMaxDeltaAmount);
+                    handleCheckViolationAndReset(player, result, setback);
+                }
             }
         } else {
             data.setInAirDeltaAmount(0);
@@ -230,7 +234,6 @@ public final class Speed extends Check {
                         // regular flag.
                         // ensure player has had no ice recently.
                         if (data.offIceTime() >= 10 && data.getOffModifierTime() >= 10) {
-                            player.sendMessage(TextFormat.YELLOW + "REGULAR FLAG");
                             result.setFailed("Moving too fast")
                                     .withParameter("h", horizontal)
                                     .withParameter("max", base)

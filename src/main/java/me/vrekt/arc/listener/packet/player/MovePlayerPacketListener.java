@@ -5,6 +5,7 @@ import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.level.Location;
 import cn.nukkit.network.protocol.MovePlayerPacket;
 import me.vrekt.arc.Arc;
+import me.vrekt.arc.check.CheckCategory;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.moving.Flight;
 import me.vrekt.arc.check.moving.Phase;
@@ -12,6 +13,7 @@ import me.vrekt.arc.check.moving.Speed;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.listener.packet.NukkitPacketHandler;
 import me.vrekt.arc.listener.packet.NukkitPacketListener;
+import me.vrekt.arc.permissions.Permissions;
 import me.vrekt.arc.utility.MovingAccess;
 
 /**
@@ -36,7 +38,6 @@ public final class MovePlayerPacketListener extends NukkitPacketListener {
 
     public MovePlayerPacketListener(NukkitPacketHandler handler) {
         super(handler);
-
         flight = Arc.getInstance().getCheckManager().getCheck(CheckType.FLIGHT);
         speed = Arc.getInstance().getCheckManager().getCheck(CheckType.SPEED);
         phase = Arc.getInstance().getCheckManager().getCheck(CheckType.PHASE);
@@ -45,6 +46,7 @@ public final class MovePlayerPacketListener extends NukkitPacketListener {
     @Override
     public void onPacketReceiving(DataPacketReceiveEvent event) {
         final Player player = event.getPlayer();
+        if (Permissions.canBypassCategory(player, CheckCategory.MOVING)) return;
 
         final MovingData data = MovingData.get(player);
         final MovePlayerPacket packet = (MovePlayerPacket) event.getPacket();
@@ -59,7 +61,7 @@ public final class MovePlayerPacketListener extends NukkitPacketListener {
                 MovingAccess.calculateMovement(player, data, from, to);
                 if (flight.enabled()) flight.check(player, data);
                 if (speed.enabled()) speed.check(player, data);
-                //   if (phase.enabled()) phase.check(player, data);
+                // if (phase.enabled()) phase.check(player, data);
             }
         }
 
