@@ -8,6 +8,7 @@ import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.permissions.Permissions;
 import me.vrekt.arc.utility.chat.ColoredChat;
+import me.vrekt.arc.utility.misc.DeviceType;
 import me.vrekt.arc.violation.ViolationHistory;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -50,7 +51,7 @@ public final class ArcSummarySubCommand extends ArcSubCommand {
         final int playerPing = player.getPing();
 
         // TODO: Mapping of devices.
-        final String playerDeviceId = playerDevice == 7 ? "Windows" : "Unknown Device";
+        final String playerDeviceId = DeviceType.getByCode(playerDevice).getPrettyName();
         final String checksBypassed = bypass.isEmpty() ? " cannot bypass any checks."
                 : " can bypass " + ArrayUtils.toString(bypass);
         final String playerGameMode = player.getGamemode() == 0 ? "Survival"
