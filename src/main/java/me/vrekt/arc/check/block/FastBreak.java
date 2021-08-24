@@ -7,6 +7,7 @@ import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.data.block.BlockData;
+import me.vrekt.arc.utility.block.BlockProperties;
 
 /**
  * Check if the player is breaking blocks too fast.
@@ -30,7 +31,9 @@ public final class FastBreak extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-break-delta", 100);
+        addConfigurationValueWithComment("max-break-delta", 100,
+                "The minimum time difference allowed (expectedTime - timeItActuallyTook) allowed, " +
+                        "\nThe default value (100) allows the player to break blocks 100ms faster.");
 
         if (enabled()) load();
     }
@@ -57,16 +60,14 @@ public final class FastBreak extends Check {
 
         // ensure we actually broke the correct block we have data for I guess?
         final long delta = System.currentTimeMillis() - data.getBlockInteractedTime(block);
+        data.removeBlockInteractedWith(block);
+
         final Item now = player.getInventory().getItemInHand();
         final Item compare = now.getId() == 0 ? data.getItemInHand() : now;
-
-        // retrieve the base time.
-        final double baseTime = block.getBreakTime(compare, player) * 1000;
-        if (baseTime == 0.0) return false; // return, no check needed.
-
+        double baseTime = BlockProperties.getBreakTime(player, block, compare) * 1000;
+        if (baseTime == 0.0) return false;
         // find difference.
         final long baseTimeDelta = (long) (baseTime - delta);
-
         // Difference too large, flag.
         if (baseTimeDelta >= maxBreakDelta) {
             result.setFailed("Broke a block too fast.")
@@ -75,7 +76,7 @@ public final class FastBreak extends Check {
                     .withParameter("breakDelta", delta)
                     .withParameter("limit", maxBreakDelta);
         }
-        return checkViolation(player, result);
+        return false;
     }
 
     @Override

@@ -46,13 +46,20 @@ public final class Reach extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-survival-distance", 2.66);
-        addConfigurationValue("max-creative-distance", 6);
-        addConfigurationValue("ignore-vertical-axis", true);
-        addConfigurationValue("subtract-eye-height", true);
-        addConfigurationValue("default-eye-height", 1.75);
-        addConfigurationValue("subtract-player-velocity", true);
-        addConfigurationValue("subtract-entity-velocity", true);
+        addConfigurationValueWithComment("max-survival-distance", 2.66,
+                "The max reach distance for players in survival.");
+        addConfigurationValueWithComment("max-creative-distance", 6,
+                "The max reach distance for players in creative.");
+        addConfigurationValueWithComment("ignore-vertical-axis", true,
+                "If the Y values of players and entities should be ignored.");
+        addConfigurationValueWithComment("subtract-eye-height", true,
+                "If the players and entities eye heights should be subtracted from the final result.");
+        addConfigurationValueWithComment("default-eye-height", 1.75,
+                "The default eye height.");
+        addConfigurationValueWithComment("subtract-player-velocity", true,
+                "If the knockback of players should be accounted for.");
+        addConfigurationValueWithComment("subtract-entity-velocity", true,
+                "If the knockback of entities should be accounted for.");
         if (enabled()) load();
     }
 

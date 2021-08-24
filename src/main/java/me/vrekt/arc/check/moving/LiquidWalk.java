@@ -7,12 +7,11 @@ import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.utility.MovingAccess;
-import me.vrekt.arc.utility.math.MathUtil;
 
 /**
- * Checks if the player is walking on water.
+ * Checks if the player is walking on liquids like lava and water.
  */
-public final class WaterWalk extends Check {
+public final class LiquidWalk extends Check {
 
     /**
      * The time in liquid required to start checking.
@@ -27,8 +26,14 @@ public final class WaterWalk extends Check {
      */
     private double minVerticalAscend, maxSetbackDistance;
 
-    public WaterWalk() {
-        super(CheckType.WATER_WALK);
+    /**
+     * The minimum time after swimming to start checking
+     * TODO: This can be abused.
+     */
+    private long minSwimTime;
+
+    public LiquidWalk() {
+        super(CheckType.LIQUID_WALK);
         enabled(true)
                 .cancel(true)
                 .cancelLevel(0)
@@ -38,11 +43,18 @@ public final class WaterWalk extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("time-in-liquid-required", 3);
-        addConfigurationValue("max-no-vertical-count", 5);
-        addConfigurationValue("min-vertical-ascend", 0.1);
-        addConfigurationValue("max-small-vertical-movement-count", 5);
-        addConfigurationValue("max-setback-distance", 2);
+        addConfigurationValueWithComment("time-in-liquid-required", 3,
+                "The time in liquid required before checking.");
+        addConfigurationValueWithComment("max-no-vertical-count", 5,
+                "The max amount of times a player cannot be vertically moving in liquid.");
+        addConfigurationValueWithComment("min-vertical-ascend", 0.1,
+                "The minimum vertical ascend speed possible.");
+        addConfigurationValueWithComment("max-small-vertical-movement-count", 5,
+                "The max amount of times a player can barely move.");
+        addConfigurationValueWithComment("max-setback-distance", 2,
+                "The max setback distance allowed.");
+        addConfigurationValueWithComment("min-swim-time", 1000,
+                "The minimum time required from the last time a player was swimming to check.");
 
         if (enabled()) load();
     }
@@ -56,12 +68,10 @@ public final class WaterWalk extends Check {
     public void check(Player player, MovingData data) {
         // TODO: Possible bypass with these flags set.
         if (exempt(player) || player.isGliding()) return;
-
-        // TODO: Possible bypass with these flags set.
         if (player.isSwimming()) {
             data.setLastSwimTime(System.currentTimeMillis());
             return;
-        } else if (System.currentTimeMillis() - data.getLastSwimTime() < 1000) return;
+        } else if (System.currentTimeMillis() - data.getLastSwimTime() <= minSwimTime) return;
 
         final Location to = data.to();
         final boolean liquid = data.inLiquid();
@@ -94,7 +104,7 @@ public final class WaterWalk extends Check {
                     data.setNoVerticalCount(count);
 
                     if (count > maxNoVerticalCount) {
-                        result.setFailed("No vertical movement in water.")
+                        result.setFailed("No vertical movement in liquid.")
                                 .withParameter("vertical", vertical)
                                 .withParameter("count", count)
                                 .withParameter("max", maxNoVerticalCount);
@@ -107,7 +117,7 @@ public final class WaterWalk extends Check {
                         data.setLiquidSmallMovementCount(count);
 
                         if (count > maxSmallMovementVerticalCount) {
-                            result.setFailed("Ascending too slowly in water")
+                            result.setFailed("Ascending too slowly in liquid.")
                                     .withParameter("v", vertical)
                                     .withParameter("min", minVerticalAscend)
                                     .withParameter("count", count)
@@ -119,7 +129,7 @@ public final class WaterWalk extends Check {
                 }
                 if (checkViolation(player, result)) {
                     if (data.ground() != null) {
-                        final double distance = MathUtil.distance(data.ground(), data.to());
+                        final double distance = data.getGroundDistance();
                         player.teleport(distance > maxSetbackDistance ? data.from() : data.ground());
                     } else {
                         player.teleport(data.from());
@@ -142,5 +152,6 @@ public final class WaterWalk extends Check {
         maxSmallMovementVerticalCount = configuration.getInt("max-small-vertical-movement-count");
         minVerticalAscend = configuration.getDouble("min-vertical-ascend");
         maxSetbackDistance = configuration.getDouble("max-setback-distance");
+        minSwimTime = configuration.getLong("min-swim-time");
     }
 }

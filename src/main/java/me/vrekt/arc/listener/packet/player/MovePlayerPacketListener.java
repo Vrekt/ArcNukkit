@@ -8,9 +8,9 @@ import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckCategory;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.moving.Flight;
+import me.vrekt.arc.check.moving.LiquidWalk;
 import me.vrekt.arc.check.moving.Phase;
 import me.vrekt.arc.check.moving.Speed;
-import me.vrekt.arc.check.moving.WaterWalk;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.listener.packet.NukkitPacketHandler;
 import me.vrekt.arc.listener.packet.NukkitPacketListener;
@@ -40,14 +40,14 @@ public final class MovePlayerPacketListener extends NukkitPacketListener {
     /**
      * The water walk check.
      */
-    private final WaterWalk waterWalk;
+    private final LiquidWalk liquidWalk;
 
     public MovePlayerPacketListener(NukkitPacketHandler handler) {
         super(handler);
         flight = Arc.getInstance().getCheckManager().getCheck(CheckType.FLIGHT);
         speed = Arc.getInstance().getCheckManager().getCheck(CheckType.SPEED);
         phase = Arc.getInstance().getCheckManager().getCheck(CheckType.PHASE);
-        waterWalk = Arc.getInstance().getCheckManager().getCheck(CheckType.WATER_WALK);
+        liquidWalk = Arc.getInstance().getCheckManager().getCheck(CheckType.LIQUID_WALK);
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class MovePlayerPacketListener extends NukkitPacketListener {
                 MovingAccess.calculateMovement(player, data, from, to);
                 if (flight.enabled()) flight.check(player, data);
                 if (speed.enabled()) speed.check(player, data);
-                if(waterWalk.enabled()) waterWalk.check(player, data);
+                if (liquidWalk.enabled()) liquidWalk.check(player, data);
                 // if (phase.enabled()) phase.check(player, data);
             }
         }

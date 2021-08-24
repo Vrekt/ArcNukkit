@@ -65,6 +65,8 @@ public abstract class Check implements Configurable {
     protected Check(CheckType checkType) {
         this.checkType = checkType;
         this.builder = new CheckConfigurationBuilder(checkType);
+
+        Arc.getInstance().getConfigurationDocumentationWriter().addConfigurationSection(checkType);
     }
 
     /**
@@ -186,6 +188,17 @@ public abstract class Check implements Configurable {
     }
 
     /**
+     * Add a configuration value, with a comment.
+     *
+     * @param valueName the valueName
+     * @param value     the value
+     * @param comment   the comment
+     */
+    protected void addConfigurationValueWithComment(String valueName, Object value, String comment) {
+        configuration.addConfigurationValueWithComment(valueName, value, comment);
+    }
+
+    /**
      * Process the check result.
      *
      * @param result the result
@@ -246,6 +259,16 @@ public abstract class Check implements Configurable {
         }
 
         return false;
+    }
+
+    /**
+     * Get the last violation time
+     *
+     * @param player the player
+     * @return the time
+     */
+    protected long getLastViolation(Player player) {
+        return VIOLATION_MANAGER.getLastViolation(player, checkType);
     }
 
     /**

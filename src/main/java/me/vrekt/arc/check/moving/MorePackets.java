@@ -39,9 +39,12 @@ public final class MorePackets extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-moves-per-second", 25);
-        addConfigurationValue("kick-if-threshold-reached", true);
-        addConfigurationValue("packet-kick-threshold", 50);
+        addConfigurationValueWithComment("max-moves-per-second", 25,
+                "The max amount of moving packets allowed per second.");
+        addConfigurationValueWithComment("kick-if-threshold-reached", true,
+                "Kick players if they reached the max packet-kick-threshold.");
+        addConfigurationValueWithComment("packet-kick-threshold", 50,
+                "The max amount of packets allowed until the player is kicked.");
 
         if (enabled()) load();
     }

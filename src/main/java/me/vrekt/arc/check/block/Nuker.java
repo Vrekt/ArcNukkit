@@ -59,16 +59,25 @@ public final class Nuker extends Check {
                 .kickLevel(500)
                 .build();
 
-        addConfigurationValue("packet-check", true);
-        addConfigurationValue("creative-only", true);
-        addConfigurationValue("max-breaks-per-second", 15);
-        addConfigurationValue("min-delta-between-breaks", 50);
-        addConfigurationValue("min-delta-between-breaks-threshold", 5);
+        addConfigurationValueWithComment("packet-check", true,
+                "If the check should use packets instead of events.");
+        addConfigurationValueWithComment("creative-only", true,
+                "If the check is only active when players are in creative.");
+        addConfigurationValueWithComment("max-breaks-per-second", 15,
+                "The max amount of block breaks allowed per second.");
+        addConfigurationValueWithComment("min-delta-between-breaks", 50,
+                "The minimum time allowed between (theLastBreakTime - currentTime)");
+        addConfigurationValueWithComment("min-delta-between-breaks-threshold", 5,
+                "The amount of times a player has to break a block too fast to actually flag.");
 
-        addConfigurationValue("check-packets", true);
-        addConfigurationValue("max-break-packets-per-second", 50);
-        addConfigurationValue("kick-if-threshold-reached", false);
-        addConfigurationValue("packet-kick-threshold", 100);
+        addConfigurationValueWithComment("check-packets", true,
+                "If packets should be checked.");
+        addConfigurationValueWithComment("max-break-packets-per-second", 50,
+                "The max amount of break packets allowed per second.");
+        addConfigurationValueWithComment("kick-if-threshold-reached", false,
+                "If the player should be kicked if they send too many break packets.");
+        addConfigurationValueWithComment("packet-kick-threshold", 100,
+                "The max amount of packets allowed before a player is kicked.");
 
         if (enabled()) load();
     }

@@ -43,6 +43,7 @@ public final class CheckConfiguration implements Configurable {
     public CheckConfiguration(CheckType check, ConfigSection section) {
         this.check = check;
         this.section = section;
+
         readFromFile(null);
     }
 
@@ -75,6 +76,19 @@ public final class CheckConfiguration implements Configurable {
      * @param value     the value
      */
     public void addConfigurationValue(String valueName, Object value) {
+        if (containsValue(valueName)) return;
+        section.set(valueName, value);
+    }
+
+    /**
+     * Add a configuration value, with a comment.
+     *
+     * @param valueName the valueName
+     * @param value     the value
+     * @param comment   the comment
+     */
+    public void addConfigurationValueWithComment(String valueName, Object value, String comment) {
+        Arc.getInstance().getConfigurationDocumentationWriter().addConfigurationValue(check, valueName, value, comment);
         if (containsValue(valueName)) return;
         section.set(valueName, value);
     }

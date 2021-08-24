@@ -2,7 +2,6 @@ package me.vrekt.arc.listener.packet.player;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.network.protocol.AnimatePacket;
 import me.vrekt.arc.Arc;
@@ -39,8 +38,19 @@ public final class PlayerAnimatePacketListener extends NukkitPacketListener {
             final CombatData data = CombatData.get(player);
 
             // Workaround: check if player is possibly interacting with a block.
-            final Block b = player.getTargetBlock(6);
-            final boolean hasBlock = (b != null && !(b instanceof BlockAir));
+            boolean hasBlock = false;
+
+            try {
+                for (Block block : player.getLineOfSight(6)) {
+                    if (block.getId() != 0) {
+                        hasBlock = true;
+                        break;
+                    }
+                }
+            } catch (Exception any) {
+                // Ignore exceptions here, since nukkit seems to do the same.
+            }
+
             final long now = System.currentTimeMillis();
             final long delta = now - data.getLastAttack();
 

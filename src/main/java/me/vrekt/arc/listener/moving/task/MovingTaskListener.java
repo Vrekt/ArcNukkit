@@ -30,7 +30,7 @@ public final class MovingTaskListener implements Runnable {
             // make sure we are in a safe world.
             final MovingData data = MovingData.get(player);
             if (now - data.lastMovingUpdate() >= 500) {
-                // player hasn't moved in awhile, check-in.
+                // player hasn't moved in a while, check-in.
                 checkIn(player, data);
             }
         }

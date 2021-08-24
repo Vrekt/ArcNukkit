@@ -33,8 +33,10 @@ public final class KillAura extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-yaw-difference", 50.0);
-        addConfigurationValue("max-pitch-difference", 50.0);
+        addConfigurationValueWithComment("max-yaw-difference", 50.0,
+                "The max difference allowed between where the player should be looking.");
+        addConfigurationValueWithComment("max-pitch-difference", 50.0,
+                "The max difference allowed between where the player should be looking.");
 
         if (enabled()) load();
     }

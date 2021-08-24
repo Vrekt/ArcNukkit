@@ -117,6 +117,10 @@ public final class BlockData implements Data {
         return blocksInteractedWithByKey.get(BlockAccess.getBlockKey(block));
     }
 
+    public void removeBlockInteractedWith(Block block) {
+        blocksInteractedWithByKey.remove(BlockAccess.getBlockKey(block));
+    }
+
     public boolean wasInteractedWith(Block block) {
         return blocksInteractedWithByKey.containsKey(BlockAccess.getBlockKey(block));
     }

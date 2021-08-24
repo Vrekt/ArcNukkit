@@ -37,7 +37,7 @@ public final class CheckManager implements Configurable, Closeable {
         add(new KillAura());
         add(new FastClick());
         add(new Phase());
-        add(new WaterWalk());
+        add(new LiquidWalk());
     }
 
     /**

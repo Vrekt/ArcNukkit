@@ -8,7 +8,6 @@ import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import me.vrekt.arc.Arc;
-import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.data.Data;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.utility.MovingAccess;
@@ -23,7 +22,6 @@ public final class PlayerConnectionListener implements Listener {
         final Player player = event.getPlayer();
         Arc.getInstance().getViolationManager().onPlayerJoin(player);
         Arc.getInstance().getExemptionManager().onPlayerJoin(player);
-        doJoinExemptions(player);
 
         MovingAccess.calculateMovement(player, MovingData.get(player), player.getLocation(), player.getLocation());
     }
@@ -43,15 +41,6 @@ public final class PlayerConnectionListener implements Listener {
         Arc.getInstance().getViolationManager().onPlayerLeave(player);
         Arc.getInstance().getExemptionManager().onPlayerLeave(player);
         Data.removeAll(player);
-    }
-
-    /**
-     * Exempt the player on-join for various checks.
-     *
-     * @param player the player
-     */
-    private void doJoinExemptions(Player player) {
-        Arc.getInstance().getExemptionManager().addExemption(player, CheckType.MORE_PACKETS, 1000);
     }
 
 }

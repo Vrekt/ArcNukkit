@@ -49,7 +49,8 @@ public final class ExemptionManager implements Configurable, Closeable {
      */
     private void doJoinExemptions(Player player) {
         // players will have an odd vertical upon joining, not sure why.
-        addExemption(player, CheckType.FLIGHT, 500);
+        addExemption(player, CheckType.FLIGHT, 1000);
+        addExemption(player, CheckType.MORE_PACKETS, 1000);
     }
 
     /**

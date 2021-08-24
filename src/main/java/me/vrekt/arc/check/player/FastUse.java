@@ -10,9 +10,6 @@ import me.vrekt.arc.data.player.PlayerData;
  * A FastUse check.
  * Checks if players are using or consuming items too fast.
  * <p>
- * TODO: Maybe bypass:
- * TODO: Player sends x2 INVENTORY_TRANSACTION
- * TODO: 1400 is generous
  */
 public final class FastUse extends Check {
 
@@ -32,7 +29,8 @@ public final class FastUse extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("consume-time-ms", 1400);
+        addConfigurationValueWithComment("consume-time-ms", 1400,
+                "The minimum time it takes to consume a food or potion item.");
         if (enabled()) load();
     }
 

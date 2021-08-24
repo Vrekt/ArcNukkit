@@ -94,6 +94,8 @@ public final class MovingData {
      */
     private double vertical, lastVertical, horizontal, lastHorizontal;
 
+    private double groundDistance, groundHorizontalDistance;
+
     /**
      * The last moving update.
      */
@@ -166,7 +168,20 @@ public final class MovingData {
      */
     private int liquidTime, outOfLiquidTime, liquidSmallMovementCount, noVerticalCount;
 
-    private long lastSwimTime;
+    private int noVerticalBoost;
+
+    /**
+     * Max ice speed reached with block above head
+     * Max low jump speed reached with block above head
+     */
+    private double maxIceSpeedReached, maxLowJumpSpeedReached;
+
+    /**
+     * The last time a player was swimming.
+     * Last time a low jump boost was given
+     * The last speed violation
+     */
+    private long lastSwimTime, lastLowJumpBoost, lastSpeedViolation;
 
     public Location from() {
         return from;
@@ -518,7 +533,7 @@ public final class MovingData {
         return safeSpeedLocation;
     }
 
-    public void setSafeSpeedLocation(Location safeSpeedLocation) {
+    public void setSpeedSetback(Location safeSpeedLocation) {
         this.safeSpeedLocation = safeSpeedLocation;
     }
 
@@ -593,4 +608,54 @@ public final class MovingData {
     public void setLastSwimTime(long lastSwimTime) {
         this.lastSwimTime = lastSwimTime;
     }
+
+    public double getGroundDistance() {
+        return groundDistance;
+    }
+
+    public void setGroundDistance(double groundDistance) {
+        this.groundDistance = groundDistance;
+    }
+
+    public double getGroundHorizontalDistance() {
+        return groundHorizontalDistance;
+    }
+
+    public void setGroundHorizontalDistance(double groundHorizontalDistance) {
+        this.groundHorizontalDistance = groundHorizontalDistance;
+    }
+
+    public int getNoVerticalBoost() {
+        return noVerticalBoost;
+    }
+
+    public void setNoVerticalBoost(int noVerticalBoost) {
+        this.noVerticalBoost = MathUtil.clampInt(noVerticalBoost, 0, 100);
+    }
+
+    public double getMaxIceSpeedReached() {
+        return maxIceSpeedReached;
+    }
+
+    public void setMaxIceSpeedReached(double maxIceSpeedReached) {
+        this.maxIceSpeedReached = maxIceSpeedReached;
+    }
+
+    public double getMaxLowJumpSpeedReached() {
+        return maxLowJumpSpeedReached;
+    }
+
+    public void setMaxLowJumpSpeedReached(double maxLowJumpSpeedReached) {
+        this.maxLowJumpSpeedReached = maxLowJumpSpeedReached;
+    }
+
+    public long getLastLowJumpBoost() {
+        return lastLowJumpBoost;
+    }
+
+    public void setLastLowJumpBoost(long lastLowJumpBoost) {
+        this.lastLowJumpBoost = lastLowJumpBoost;
+    }
+
+
 }

@@ -3,10 +3,12 @@ package me.vrekt.arc;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.check.CheckManager;
 import me.vrekt.arc.command.ArcCommand;
 import me.vrekt.arc.configuration.ArcConfiguration;
+import me.vrekt.arc.configuration.documentation.ConfigurationDocumentationWriter;
 import me.vrekt.arc.data.Data;
 import me.vrekt.arc.exemption.ExemptionManager;
 import me.vrekt.arc.listener.block.BlockListener;
@@ -27,7 +29,7 @@ public final class Arc extends PluginBase {
     /**
      * IPL version
      */
-    public static final String VERSION_STRING = "1.6.3-81721b-nukkit";
+    public static final String VERSION_STRING = "1.7-824a-nukkit";
 
     /**
      * The instance of this class
@@ -59,6 +61,12 @@ public final class Arc extends PluginBase {
      */
     private final PunishmentManager punishmentManager = new PunishmentManager();
 
+    /**
+     * The config doc/explanation writer.
+     */
+    private final ConfigurationDocumentationWriter configurationDocumentationWriter
+            = new ConfigurationDocumentationWriter();
+
     @Override
     public void onEnable() {
         if (arc != null) throw new UnsupportedOperationException();
@@ -84,6 +92,7 @@ public final class Arc extends PluginBase {
 
         getLogger().info(TextFormat.DARK_GREEN + "Saving configuration...");
         saveConfig();
+        writeConfigurationDocumentation();
 
         getLogger().info(TextFormat.DARK_GREEN + "Ready!");
     }
@@ -144,6 +153,21 @@ public final class Arc extends PluginBase {
     }
 
     /**
+     * Write config docs.
+     */
+    private void writeConfigurationDocumentation() {
+        getServer().getScheduler().scheduleAsyncTask(this, new AsyncTask() {
+            @Override
+            public void onRun() {
+                if (configurationDocumentationWriter.createDocumentationFile(Arc.this)) {
+                    configurationDocumentationWriter.write(Arc.this);
+                    configurationDocumentationWriter.cleanup();
+                }
+            }
+        });
+    }
+
+    /**
      * @return the internal plugin
      */
     public static Plugin getPlugin() {
@@ -190,5 +214,12 @@ public final class Arc extends PluginBase {
      */
     public CheckManager getCheckManager() {
         return checkManager;
+    }
+
+    /**
+     * @return the documentation writer.
+     */
+    public ConfigurationDocumentationWriter getConfigurationDocumentationWriter() {
+        return configurationDocumentationWriter;
     }
 }

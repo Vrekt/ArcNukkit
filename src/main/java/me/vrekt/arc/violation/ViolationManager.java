@@ -132,7 +132,7 @@ public final class ViolationManager implements Configurable, Closeable {
         if (check.configuration().shouldNotify(level)) {
             // add that we are going to notify.
             violationResult.addResult(ViolationResult.Result.NOTIFY);
-            // replace the place holders within the message
+            // replace the placeholders within the message
 
             final String violationMessage = configuration.violationNotifyMessage()
                     .player(player)
@@ -144,7 +144,6 @@ public final class ViolationManager implements Configurable, Closeable {
             final String violationMessageWithDebug = violationMessage + "\n(" + result.information() + ")";
 
             // build the text component and then send to all viewers.
-            // TODO: Unfortunately no hover event
             violationViewers.forEach((viewer, isDebug) -> viewer.sendMessage(isDebug ? violationMessageWithDebug : violationMessage));
         }
 
@@ -219,6 +218,17 @@ public final class ViolationManager implements Configurable, Closeable {
     }
 
     /**
+     * Get the last time the player violated the provided check
+     *
+     * @param player the player
+     * @param check  the check
+     * @return the time
+     */
+    public long getLastViolation(Player player, CheckType check) {
+        return history.get(player.getUniqueId()).getLastViolationTime(check);
+    }
+
+    /**
      * @return history
      */
     public Map<UUID, ViolationHistory> getHistory() {
@@ -243,6 +253,6 @@ public final class ViolationManager implements Configurable, Closeable {
     public void close() {
         history.clear();
         violationViewers.clear();
-        historyCache.invalidateAll();
+        if (historyCache != null) historyCache.invalidateAll();
     }
 }

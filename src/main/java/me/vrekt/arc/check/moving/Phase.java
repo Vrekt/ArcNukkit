@@ -10,7 +10,7 @@ import cn.nukkit.utils.TextFormat;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.result.CheckResult;
-import me.vrekt.arc.compatibility.block.BlockAccess;
+import me.vrekt.arc.utility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.utility.block.model.BlockModel;
 import me.vrekt.arc.utility.block.model.models.*;

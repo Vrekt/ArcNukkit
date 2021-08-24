@@ -1,6 +1,6 @@
 name: Arc
 main: me.vrekt.arc.Arc
-version: 1.6.3
+version: 1.7
 description: An anticheat for Nukkit.
 author: Vrekt
 api: ["1.0.0"]
@@ -45,7 +45,7 @@ permissions:
           arc.bypass.moving.phase:
             description: Allows the player to bypass the Phase check.
           arc.bypass.moving.waterwalk:
-            description: Allows the player to bypass the WaterWalk check.
+            description: Allows the player to bypass the LiquidWalk check.
       arc.bypass.block:
         description: Allows the player to bypass block related checks
         children:
@@ -64,9 +64,6 @@ permissions:
             description: Allows the player to bypass the FastClick check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
-  arc.administrator:
-    description: Allows the player permission to manage Arc.
-    default: false
 
 commands:
   arc:

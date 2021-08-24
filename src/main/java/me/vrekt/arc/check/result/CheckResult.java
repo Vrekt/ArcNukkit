@@ -98,6 +98,22 @@ public final class CheckResult {
     }
 
     /**
+     * Attach parameter information to this result
+     *
+     * @param parameters the set of parameters
+     * @return this
+     */
+    public CheckResult withParameters(Parameter... parameters) {
+        if (informationBuilder == null) informationBuilder = new StringBuilder();
+        for (Parameter parameter : parameters) {
+            informationBuilder.append("\n").append(TextFormat.GRAY);
+            informationBuilder.append(parameter.getPair());
+        }
+        return this;
+    }
+
+
+    /**
      * Set failed
      */
     public CheckResult setFailed() {

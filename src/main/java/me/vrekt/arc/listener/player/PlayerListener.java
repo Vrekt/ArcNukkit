@@ -4,10 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerGameModeChangeEvent;
-import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.event.player.PlayerItemConsumeEvent;
-import cn.nukkit.event.player.PlayerTeleportEvent;
+import cn.nukkit.event.player.*;
 import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.player.FastUse;
@@ -27,7 +24,7 @@ public final class PlayerListener implements Listener {
     private final FastUse fastUse;
 
     public PlayerListener() {
-        fastUse = (FastUse) Arc.getInstance().getCheckManager().getCheck(CheckType.FAST_USE);
+        fastUse = Arc.getInstance().getCheckManager().getCheck(CheckType.FAST_USE);
     }
 
     /**

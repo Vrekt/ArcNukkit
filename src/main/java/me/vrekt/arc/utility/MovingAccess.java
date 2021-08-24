@@ -7,7 +7,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityBoat;
 import cn.nukkit.level.Location;
 import cn.nukkit.math.BlockFace;
-import me.vrekt.arc.compatibility.block.BlockAccess;
+import me.vrekt.arc.utility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.utility.math.MathUtil;
 
@@ -59,7 +59,7 @@ public final class MovingAccess {
     public static boolean isOnIce(Location location) {
         return BlockAccess.isIce(location.getLevelBlock()) ||
                 BlockAccess.isIce(location.getLevelBlock().getSide(BlockFace.DOWN)) ||
-                BlockAccess.hasIceAt(location, location.getLevel(), 0.3, -0.01, 0.3);
+                BlockAccess.hasIceAt(location, location.getLevel(), 0.1, -0.01, 0.1);
     }
 
     /**
@@ -70,7 +70,7 @@ public final class MovingAccess {
      */
     public static boolean isOnBoat(Player player) {
         for (Entity entity : player.getLevel().getNearbyEntities(player.boundingBox)) {
-            if (entity instanceof EntityBoat && entity.y < player.y) return true;
+            if (entity instanceof EntityBoat && entity.y <= player.y) return true;
         }
         return false;
     }
@@ -114,8 +114,6 @@ public final class MovingAccess {
 
             // Set ground location with the cloned location.
             data.ground(cloneTo);
-
-            // TODO: Work on slime-block compatibility.
 
             final boolean isOnIce = MovingAccess.isOnIce(cloneTo);
             final boolean wasOnIce = MovingAccess.isOnIce(cloneFrom);
@@ -174,6 +172,15 @@ public final class MovingAccess {
         final double distance = MathUtil.vertical(cloneFrom, cloneTo);
         data.lastVertical(data.vertical());
         data.vertical(distance);
+
+        final double horizontal = MathUtil.horizontal(cloneFrom, cloneTo);
+        data.setLastHorizontal(data.getHorizontal());
+        data.setHorizontal(horizontal);
+
+        final double ground = MathUtil.distance(data.ground(), cloneTo);
+        final double hGround = MathUtil.horizontal(data.ground(), cloneTo);
+        data.setGroundDistance(ground);
+        data.setGroundHorizontalDistance(hGround);
 
         // calculate ascending/descending
         final boolean ascending = distance > 0.0 && cloneTo.getY() > cloneFrom.getY();

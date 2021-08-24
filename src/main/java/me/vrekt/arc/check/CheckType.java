@@ -59,7 +59,7 @@ public enum CheckType {
     /**
      * Checks if the player is walking on water.
      */
-    WATER_WALK("WaterWalk", CheckCategory.MOVING);
+    LIQUID_WALK("LiquidWalk", CheckCategory.MOVING);
 
     /**
      * The name

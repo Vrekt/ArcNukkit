@@ -16,6 +16,11 @@ public final class ViolationHistory {
     private final Map<CheckType, Integer> violations = new HashMap<>();
 
     /**
+     * Map of last violation times
+     */
+    private final Map<CheckType, Long> lastViolationTime = new HashMap<>();
+
+    /**
      * The time when this history was created
      */
     private long timeCreated;
@@ -59,6 +64,16 @@ public final class ViolationHistory {
     }
 
     /**
+     * Get the last time the player violated the provided check
+     *
+     * @param check the check
+     * @return the level
+     */
+    public long getLastViolationTime(CheckType check) {
+        return lastViolationTime.getOrDefault(check, 0L);
+    }
+
+    /**
      * Increment the violation level
      *
      * @param check the check
@@ -66,6 +81,7 @@ public final class ViolationHistory {
     public int incrementViolationLevel(CheckType check) {
         final int level = getViolationLevel(check) + 1;
         violations.put(check, level);
+        lastViolationTime.put(check, System.currentTimeMillis());
         return level;
     }
 

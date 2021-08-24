@@ -4,9 +4,10 @@ import cn.nukkit.Player;
 import cn.nukkit.level.Location;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
+import me.vrekt.arc.check.moving.configuration.MovingFlightConfig;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.compatibility.NukkitAccess;
-import me.vrekt.arc.compatibility.block.BlockAccess;
+import me.vrekt.arc.utility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.exemption.type.ExemptionType;
 import me.vrekt.arc.timings.CheckTimings;
@@ -14,50 +15,17 @@ import me.vrekt.arc.utility.MovingAccess;
 import me.vrekt.arc.utility.math.MathUtil;
 
 /**
- * Checks if the player is flying among other things
- * TODO: Trade-off: due to weird client behavior or maybe batching of packets
- * TODO: Player will send a vertical of 1.0+ during a normal jump.
- * TODO: This causes false positives, so added a ascend cooldown.
- * TODO: This allows step to bypass, but only once or twice until its flagged.
+ * Checks if the player is flying.
+ * <p>
+ * -> Player is ascending too high
+ * -> Player is ascending too long
+ * -> Player is climbing a ladder too fast
+ * -> Player is not falling fast enough (gliding)
+ * -> Etc.
  */
 public final class Flight extends Check {
 
-    /**
-     * The max jump distance.
-     * Max climbing speeds
-     * The amount of time a player has to be on a climbable
-     * <p>
-     * The distance (from the ground) required to start checking ascending stuff.
-     * The distance (from the ground) (horizontal) that is capped, if the hDist > capped, no check is executed.
-     * <p>
-     * Ground distance threshold is lenient here to account for bedrock movement.
-     */
-    private double maxJumpDistance, maxClimbSpeedUp, maxClimbSpeedDown, climbingCooldown, groundDistanceThreshold, groundDistanceHorizontalCap;
-
-    /**
-     * The max ascend time
-     * The amount to add to {@code maxAscendTime} when the player has jump boost.
-     * Ascend cooldown work around.
-     * Max time allowed to b e hovering
-     */
-    private int maxAscendTime, jumpBoostAscendAmplifier, ascendCooldown, maxInAirHoverTime, noGlideDifferenceMax;
-
-    /**
-     * No reset ascend checks if the player is ascending too high.
-     * Players previously could bypass regular ascend check by ascending slowly and descending every now and again.
-     * This check does not reset the players ascend time if they descend.
-     * <p>
-     * The distance needed away from ground to start checking a no reset ascend.
-     * The max amount of ascending moves allowed.
-     */
-    private double noResetAscendGroundDistanceThreshold, maxNoResetAscendMoves;
-
-    /**
-     * The minimum time needed to be descending to check glide.
-     * The minimum distance away from ground needed to check glide, 0.85 = player jump
-     * The max difference allowed between calculated fall velocity and actual fall velocity.
-     */
-    private double glideDescendTimeMin, glideDescendDistanceMin, glideMaxDifference;
+    private final MovingFlightConfig cc;
 
     public Flight() {
         super(CheckType.FLIGHT);
@@ -70,22 +38,8 @@ public final class Flight extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-jump-distance", 0.42);
-        addConfigurationValue("max-climbing-speed-up", 0.21);
-        addConfigurationValue("max-climbing-speed-down", 0.21);
-        addConfigurationValue("climbing-cooldown", 7);
-        addConfigurationValue("max-ascend-time", 7);
-        addConfigurationValue("ascend-cooldown", 3);
-        addConfigurationValue("jump-boost-ascend-amplifier", 3);
-        addConfigurationValue("ground-distance-threshold", 2.0);
-        addConfigurationValue("ground-distance-horizontal-cap", 0.50);
-        addConfigurationValue("max-in-air-hover-time", 6);
-        addConfigurationValue("no-glide-difference-max", 2);
-        addConfigurationValue("no-reset-ascend-ground-distance-threshold", 1);
-        addConfigurationValue("max-no-reset-ascend-moves", 10);
-        addConfigurationValue("glide-descend-time-min", 5);
-        addConfigurationValue("glide-descend-distance-min", 1.6);
-        addConfigurationValue("glide-max-difference", 0.010);
+        cc = new MovingFlightConfig();
+        cc.write(configuration);
 
         if (enabled()) load();
     }
@@ -135,7 +89,7 @@ public final class Flight extends Check {
             // return here since we don't want the rest of the check interfering with setback.
             //  final boolean failed = checkIfMovedThroughSolidBlock(player, result, safe, from, to, vertical);
             if (!hasVerticalModifier) {
-                checkVerticalMove(player, data, ground, from, to, vertical, distanceToGround, data.ascendingTime(), result);
+                checkVerticalMove(player, data, ground, from, vertical, distanceToGround, data.ascendingTime(), result);
             }
         }
 
@@ -149,7 +103,7 @@ public final class Flight extends Check {
 
         if (data.hasClimbable()) {
             // the ascending cooldown, will need to be reversed if descending.
-            final double cooldown = climbingCooldown - (vertical * 2);
+            final double cooldown = cc.climbingCooldown - (vertical * 2);
             if (data.climbTime() >= cooldown) checkClimbingMovement(player, data, from, vertical, cooldown, result);
         }
 
@@ -166,13 +120,12 @@ public final class Flight extends Check {
      * @param data          their data
      * @param ground        ground location
      * @param from          the from
-     * @param to            movedTo
      * @param vertical      vertical
      * @param distance      distance from ground
      * @param ascendingTime ascendingTime
      * @param result        result
      */
-    private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to, double vertical, double distance, int ascendingTime, CheckResult result) {
+    private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, double vertical, double distance, int ascendingTime, CheckResult result) {
         if (data.ascending()) {
             final boolean hasSlimeblock = data.hasSlimeblock();
             if (hasSlimeblock && vertical > 0.42 && distance > 1f) {
@@ -180,38 +133,38 @@ public final class Flight extends Check {
             }
 
             // tighter distance check, more moves allowed though, don't use ascend that resets.
-            if (distance >= noResetAscendGroundDistanceThreshold) {
+            if (distance >= cc.noResetAscendGroundDistanceThreshold) {
                 // check ascending moves, no reset.
                 final int moves = data.getNoResetAscendTime();
 
-                if (moves >= maxNoResetAscendMoves
+                if (moves >= cc.maxNoResetAscendMoves
                         && !data.hasSlimeBlockLaunch()) {
                     // we have a few moves here to work with.
                     result.setFailed("Ascending too long")
                             .withParameter("distance", distance)
                             .withParameter("moves", moves)
-                            .withParameter("max", maxNoResetAscendMoves);
+                            .withParameter("max", cc.maxNoResetAscendMoves);
                     handleCheckViolationAndReset(player, result, ground);
                 }
             }
 
-            if (distance >= groundDistanceThreshold) {
+            if (distance >= cc.groundDistanceThreshold) {
                 // high off ground (hopefully) check.
                 // make sure we are within the limits of the ground.
                 // we don't want a flag when the player is wildly jumping around.
-                final double hDist = MathUtil.horizontal(ground, to);
-                if (ascendingTime >= 5 && hDist < groundDistanceHorizontalCap && !data.hasSlimeBlockLaunch()) {
+                final double hDist = data.getGroundHorizontalDistance();
+                if (ascendingTime >= 5 && hDist < cc.groundDistanceHorizontalCap && !data.hasSlimeBlockLaunch()) {
                     result.setFailed("Vertical distance from ground greater than allowed within limits.")
                             .withParameter("distance", distance)
-                            .withParameter("threshold", groundDistanceThreshold)
+                            .withParameter("threshold", cc.groundDistanceThreshold)
                             .withParameter("hDist", hDist)
-                            .withParameter("cap", groundDistanceHorizontalCap);
+                            .withParameter("cap", cc.groundDistanceHorizontalCap);
                     handleCheckViolationAndReset(player, result, ground);
                 }
             }
 
             // TODO: Maybe in the future, watch slime-block movement.
-            // TODO: But for now, movement is too weird, and haven't seen any cheats yet.
+            // TODO: Redo all the below, since movement is fixed now.
 
             // ensure we didn't walk up a block that modifies your vertical
             final double maxJumpHeight = getJumpHeight(player);
@@ -219,11 +172,9 @@ public final class Flight extends Check {
             // go back to where we were.
             // maybe ground later.
 
-            // TODO: Workaround here with the ascend cooldown.
-            // TODO: Bedrock movement is weird!
             // If vertical is greater than 1.44, ignore the cooldown.
-            // Vertical is too high for the player so its sketchy.
-            if (vertical > maxJumpHeight && (vertical >= 1.44 || ascendingTime >= ascendCooldown)
+            // Vertical is too high for the player, so it's sketchy.
+            if (vertical > maxJumpHeight && (vertical >= 1.44 || ascendingTime >= cc.ascendCooldown)
                     && !data.hasSlimeBlockLaunch()) {
 
                 // Check if player is ascending off stairs.
@@ -242,14 +193,14 @@ public final class Flight extends Check {
             // add to our modifier if we have a jump effect.
             // this will need to be amplified by the amplifier.
             final int modifier = player.hasEffect(NukkitAccess.JUMP_BOOST_EFFECT)
-                    ? player.getEffect(NukkitAccess.JUMP_BOOST_EFFECT).getAmplifier() + jumpBoostAscendAmplifier
+                    ? player.getEffect(NukkitAccess.JUMP_BOOST_EFFECT).getAmplifier() + cc.jumpBoostAscendAmplifier
                     : 0;
 
-            if (ascendingTime > (maxAscendTime + modifier) && !data.hadClimbable() && !data.hasSlimeBlockLaunch()) {
+            if (ascendingTime > (cc.maxAscendTime + modifier) && !data.hadClimbable() && !data.hasSlimeBlockLaunch()) {
                 result.setFailed("Ascending for too long")
                         .withParameter("vertical", vertical)
                         .withParameter("time", data.ascendingTime())
-                        .withParameter("max", (maxAscendTime + modifier));
+                        .withParameter("max", (cc.maxAscendTime + modifier));
                 handleCheckViolationAndReset(player, result, ground);
             }
         }
@@ -272,7 +223,7 @@ public final class Flight extends Check {
         // check no ground stuff
         // TODO: Can be bypassed, needs to be improved, see comment below.
         if (!data.onGround() && (data.getNoResetDescendTime() >= 5 || data.getNoResetAscendTime() >= 5)) {
-            final double horizontal = MathUtil.horizontal(ground, to);
+            final double horizontal = data.getGroundHorizontalDistance();
             if (horizontal > 3f && data.getInAirTime() >= 15) {
                 // player is far from ground, so we should expect to be a certain distance by this point.
                 // This can still be abused here, so in the future calculate what we should expect.
@@ -304,7 +255,7 @@ public final class Flight extends Check {
                 data.setNoGlideTime(data.getNoGlideTime() - 1);
             }
 
-            if (data.getNoGlideTime() > noGlideDifferenceMax) {
+            if (data.getNoGlideTime() > cc.noGlideDifferenceMax) {
                 // check off slab movements.
                 final boolean mod = BlockAccess.hasVerticalModifierAt(from, from.getLevel(), 0.3, -0.1, 0.3);
                 if (!mod) {
@@ -313,7 +264,7 @@ public final class Flight extends Check {
                             .withParameter("last", data.lastVertical())
                             .withParameter("delta", delta)
                             .withParameter("time", data.getNoGlideTime())
-                            .withParameter("max", noGlideDifferenceMax);
+                            .withParameter("max", cc.noGlideDifferenceMax);
                     handleCheckViolationAndReset(player, result, ground);
                 }
             }
@@ -322,9 +273,9 @@ public final class Flight extends Check {
             // ensure we have been falling though, and have at-least decent distance.
             // Check horizontal distance as-well since its possible to glide pretty far
             // before hitting the vertical distance required.
-            if (data.getNoResetDescendTime() >= glideDescendTimeMin
-                    && ((distance >= glideDescendDistanceMin)
-                    || MathUtil.horizontal(ground, to) >= glideDescendDistanceMin)) {
+            if (data.getNoResetDescendTime() >= cc.glideDescendTimeMin
+                    && ((distance >= cc.glideDescendDistanceMin)
+                    || data.getGroundHorizontalDistance() >= cc.glideDescendDistanceMin)) {
 
                 final int time = data.getInAirTime();
 
@@ -338,12 +289,12 @@ public final class Flight extends Check {
                 final double difference = expected - delta;
 
                 // TODO: Check for fast falling players.
-                if (difference >= glideMaxDifference) {
+                if (difference >= cc.glideMaxDifference) {
                     result.setFailed("Gliding delta not expected")
                             .withParameter("delta", delta)
                             .withParameter("e", expected)
                             .withParameter("diff", difference)
-                            .withParameter("max", glideMaxDifference);
+                            .withParameter("max", cc.glideMaxDifference);
                     handleCheckViolationAndReset(player, result, ground);
                 }
             }
@@ -361,8 +312,8 @@ public final class Flight extends Check {
      * @param result   the result
      */
     private void checkClimbingMovement(Player player, MovingData data, Location from, double vertical, double cooldown, CheckResult result) {
-        final double modifiedCooldown = data.ascending() ? cooldown : (climbingCooldown) + (vertical * 2);
-        final double max = data.ascending() ? maxClimbSpeedUp : maxClimbSpeedDown;
+        final double modifiedCooldown = data.ascending() ? cooldown : (cc.climbingCooldown) + (vertical * 2);
+        final double max = data.ascending() ? cc.maxClimbSpeedUp : cc.maxClimbSpeedDown;
         final int time = data.ascending() ? data.ascendingTime() : data.descendingTime();
 
         if (time >= modifiedCooldown && vertical > max) {
@@ -407,12 +358,12 @@ public final class Flight extends Check {
 
         if (!temp.onGround() && temp.vertical() == 0.0 && !MovingAccess.isOnBoat(player)) {
             // player is hovering
-            if (inAirTime >= maxInAirHoverTime) {
+            if (inAirTime >= cc.maxInAirHoverTime) {
                 // flag player, hovering too long.
                 final CheckResult result = new CheckResult();
                 result.setFailed("Hovering off the ground for too long")
                         .withParameter("inAirTime", inAirTime)
-                        .withParameter("max", maxInAirHoverTime);
+                        .withParameter("max", cc.maxInAirHoverTime);
 
                 handleCheckViolation(player, result, data.ground());
             }
@@ -449,7 +400,7 @@ public final class Flight extends Check {
      * @return the jump height.
      */
     private double getJumpHeight(Player player) {
-        double current = maxJumpDistance;
+        double current = cc.maxJumpDistance;
 
         if (player.hasEffect(NukkitAccess.JUMP_BOOST_EFFECT)) {
             current += (0.4) * player.getEffect(NukkitAccess.JUMP_BOOST_EFFECT).getAmplifier();
@@ -464,23 +415,7 @@ public final class Flight extends Check {
 
     @Override
     public void load() {
-        maxJumpDistance = configuration.getDouble("max-jump-distance");
-        maxClimbSpeedUp = configuration.getDouble("max-climbing-speed-up");
-        maxClimbSpeedDown = configuration.getDouble("max-climbing-speed-down");
-        climbingCooldown = configuration.getDouble("climbing-cooldown");
-        maxAscendTime = configuration.getInt("max-ascend-time");
-        ascendCooldown = configuration.getInt("ascend-cooldown");
-        jumpBoostAscendAmplifier = configuration.getInt("jump-boost-ascend-amplifier");
-        groundDistanceThreshold = configuration.getDouble("ground-distance-threshold");
-        groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
-        maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
-        noGlideDifferenceMax = configuration.getInt("no-glide-difference-max");
-        noResetAscendGroundDistanceThreshold = configuration.getDouble("no-reset-ascend-ground-distance-threshold");
-        maxNoResetAscendMoves = configuration.getDouble("max-no-reset-ascend-moves");
-        glideDescendTimeMin = configuration.getInt("glide-descend-time-min");
-        glideDescendDistanceMin = configuration.getDouble("glide-descend-distance-min");
-        glideMaxDifference = configuration.getDouble("glide-max-difference");
-
+        cc.load(configuration);
         CheckTimings.registerTiming(checkType);
     }
 }

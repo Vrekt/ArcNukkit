@@ -46,11 +46,16 @@ public final class FastClick extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-swing-packets-per-second", 12);
-        addConfigurationValue("max-block-swing-packets", 30);
-        addConfigurationValue("min-swing-delta", 50);
-        addConfigurationValue("min-last-block-interact-required", 500);
-        addConfigurationValue("cancel-attacks", true);
+        addConfigurationValueWithComment("max-swing-packets-per-second", 12,
+                "The max amount of swing packets allowed per second.");
+        addConfigurationValueWithComment("max-block-swing-packets", 30,
+                "The max amount of swing packets allowed when breaking a block.");
+        addConfigurationValueWithComment("min-swing-delta", 50,
+                "The minimum time allowed between (currentTime - lastSwingTime)");
+        addConfigurationValueWithComment("min-last-block-interact-required", 500,
+                "The minimum time between the current time and the last time a player interacted with a block to check FastClick.");
+        addConfigurationValueWithComment("cancel-attacks", true,
+                "If attacks should be cancelled if the player violates this check.");
         if (enabled()) load();
     }
 

@@ -26,11 +26,6 @@ public final class Permissions {
     public static final String ARC_BYPASS = "arc.bypass";
 
     /**
-     * The administrator permission
-     */
-    public static final String ARC_ADMINISTRATOR = "arc.administrator";
-
-    /**
      * The base command permission.
      */
     public static final String ARC_COMMANDS_BASE = "arc.commands.base";

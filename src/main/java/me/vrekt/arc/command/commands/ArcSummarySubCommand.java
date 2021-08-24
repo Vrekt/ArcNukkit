@@ -41,10 +41,6 @@ public final class ArcSummarySubCommand extends ArcSubCommand {
             return;
         }
 
-        final int device = player.getLoginChainData().getDeviceOS();
-        final int gameMode = player.getGamemode();
-        final boolean op = player.isOp();
-
         final List<String> bypass = Permissions.getChecksCanBypass(player)
                 .stream().map(CheckType::getName)
                 .collect(Collectors.toList());
@@ -72,14 +68,12 @@ public final class ArcSummarySubCommand extends ArcSubCommand {
 
         final ViolationHistory history = Arc.getInstance().getViolationManager().getHistory().get(player.getUniqueId());
         if (history != null) {
-            history.getViolations().forEach((check, level) -> {
-                message.parameterPrefix(player.getName())
-                        .message(" failed ")
-                        .parameter(check.getName())
-                        .parameter(" " + level)
-                        .message(" times.")
-                        .newLine();
-            });
+            history.getViolations().forEach((check, level) -> message.parameterPrefix(player.getName())
+                    .message(" failed ")
+                    .parameter(check.getName())
+                    .parameter(" " + level)
+                    .message(" times.")
+                    .newLine());
         }
 
         message.send();
