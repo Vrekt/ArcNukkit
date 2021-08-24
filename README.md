@@ -76,6 +76,9 @@ Please note not all checks are finished, and not all checks fully block that cer
 - Prevents the player from bouncing really high on slimeblocks
 - work-in-progress
 
+###### Speed
+- Prevents the player from moving too fast in a variety of conditions
+
 ###### FastUse
 - Checks if the player is eating or drinking potions too fast.
 
@@ -95,6 +98,9 @@ Please note not all checks are finished, and not all checks fully block that cer
 
 ###### KillAura
 - Ensures the player is looking at the entity when attacking.
+
+##### WaterWalk
+- Ensures the player is not walking on liquids.
 
 ## Configuration
 
