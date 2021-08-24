@@ -76,7 +76,7 @@ public final class FastBreak extends Check {
                     .withParameter("breakDelta", delta)
                     .withParameter("limit", maxBreakDelta);
         }
-        return false;
+        return checkViolation(player, result);
     }
 
     @Override
