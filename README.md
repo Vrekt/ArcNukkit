@@ -51,6 +51,7 @@ Arc has a very extensive permissions system. You can choose to bypass all checks
 - `arc.commands.debug` Allows a player to view debug information with each violation.
 - `arc.commands.timings` Allows a player to view check timings.
 - `arc.commands.violationhistory` Allows a player to view violation history of another player.
+- `arc.commands.summary` Allows a player to view basic information and violations of another player.
 
 *Bypass all checks*
 - `arc.bypass` Allows you to bypass all checks.
@@ -94,17 +95,20 @@ Please note not all checks are finished, and not all checks fully block that cer
 - Prevents the player from breaking blocks too fast.
 
 ###### FastClick
-- Prevents the player from clicking too fast.
+- Prevents the player from clicking/interacting with blocks too fast.
 
 ###### KillAura
 - Ensures the player is looking at the entity when attacking.
 
-##### WaterWalk
-- Ensures the player is not walking on liquids.
+##### LiduidWalk
+- Prevents the player from walking on water and lava.
 
 ## Configuration
 
-You can view each configuration value and what they mean/do in the wiki [here](https://github.com/Vrekt/ArcNukkit/wiki)
+Once Arc is ran at-least once on a server, you can find every configuration value and a explantation of what it does in your plugins folder under 'Arc'.
+
+You can also view other basic information [here](https://github.com/Vrekt/ArcNukkit/wiki)
+
 
 ## In-depth 
 
