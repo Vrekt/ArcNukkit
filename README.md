@@ -100,7 +100,7 @@ Please note not all checks are finished, and not all checks fully block that cer
 ###### KillAura
 - Ensures the player is looking at the entity when attacking.
 
-##### LiduidWalk
+##### LiquidWalk
 - Prevents the player from walking on water and lava.
 
 ## Configuration
