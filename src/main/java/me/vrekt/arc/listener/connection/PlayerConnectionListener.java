@@ -23,7 +23,9 @@ public final class PlayerConnectionListener implements Listener {
         Arc.getInstance().getViolationManager().onPlayerJoin(player);
         Arc.getInstance().getExemptionManager().onPlayerJoin(player);
 
-        MovingAccess.calculateMovement(player, MovingData.get(player), player.getLocation(), player.getLocation());
+        final MovingData data = MovingData.get(player);
+        data.setPlayerJoinTime(System.currentTimeMillis());
+        MovingAccess.calculateMovement(player, data, player.getLocation(), player.getLocation());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

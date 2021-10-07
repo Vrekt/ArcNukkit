@@ -184,6 +184,12 @@ public final class Flight extends Check {
                     return;
                 }
 
+                // Check if player just joined.
+                // Players have an extreme vertical velocity when joining.
+                if (vertical >= 1.0 && (data.getPlayerJoinTime() == 0 || (System.currentTimeMillis() - data.getPlayerJoinTime() <= 1500))) {
+                    return; // ignore this result.
+                }
+
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);

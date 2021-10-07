@@ -100,7 +100,7 @@ public final class MovingData {
      * The last moving update.
      */
     private long lastMovingUpdate;
-
+    private long playerJoinTime;
     /**
      * Total amount of move player packets
      */
@@ -657,5 +657,11 @@ public final class MovingData {
         this.lastLowJumpBoost = lastLowJumpBoost;
     }
 
+    public long getPlayerJoinTime() {
+        return playerJoinTime;
+    }
 
+    public void setPlayerJoinTime(long playerJoinTime) {
+        this.playerJoinTime = playerJoinTime;
+    }
 }
