@@ -28,8 +28,11 @@ public final class Arc extends PluginBase {
 
     /**
      * IPL version
+     * "X.X.X" current version of arc
+     * "-XX" current year
+     * "-XXabcd..." XX = month and date, letter = current revision for that day
      */
-    public static final String VERSION_STRING = "1.7.1-106a-nukkit";
+    public static final String VERSION_STRING = "1.7.2-22-617a-nukkit";
 
     /**
      * The instance of this class

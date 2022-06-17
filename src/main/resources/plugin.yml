@@ -1,9 +1,9 @@
 name: Arc
 main: me.vrekt.arc.Arc
-version: 1.7.1
+version: 1.7.2
 description: An anticheat for Nukkit.
 author: Vrekt
-api: ["1.0.0"]
+api: [ "1.0.0" ]
 
 permissions:
   arc.commands.toggleviolations:
