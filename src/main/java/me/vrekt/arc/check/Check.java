@@ -231,6 +231,7 @@ public abstract class Check implements Configurable {
         if (result.failed()) {
             final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
             if (vr.cancel() && cancelTo != null) {
+                System.err.println(cancelTo);
                 player.teleport(cancelTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
             result.reset();

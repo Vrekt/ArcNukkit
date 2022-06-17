@@ -225,4 +225,13 @@ public final class Arc extends PluginBase {
     public ConfigurationDocumentationWriter getConfigurationDocumentationWriter() {
         return configurationDocumentationWriter;
     }
+
+    public static void debug(String information) {
+        getInstance().getServer().getOnlinePlayers().values().forEach(player -> {
+            if (getInstance().violationManager.isDebug(player)) {
+                player.sendMessage(information);
+            }
+        });
+    }
+
 }

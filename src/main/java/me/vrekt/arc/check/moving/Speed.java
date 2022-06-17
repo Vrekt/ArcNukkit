@@ -107,7 +107,7 @@ public final class Speed extends Check {
      */
     private void runOnGroundChecks(Player player, MovingData data, CheckResult result, Location setback,
                                    Location to, double horizontal, double vertical, double base, boolean hasStair) {
-        final boolean isOnIce = data.onIce();
+        final boolean isOnIce = data.onIce() || data.offIceTime() <= cc.minimumOffIceTime;
         final boolean hasBlockAboveHead = BlockAccess.hasSolidBlockAt(to, to.level, 0.3, 2, 0.3);
 
         // update vertical boost timer here before running player checks.
@@ -196,7 +196,8 @@ public final class Speed extends Check {
                     : data.getMaxLowJumpSpeedReached() == 0 ? 2 : cc.maxLowJumpSpeedReachedCooldown;
 
             // again, account for jump boosting.
-            if (vertical < cc.minimumVertical && data.getNoVerticalBoost() >= maxCooldown) {
+            if (vertical < cc.minimumVertical
+                    && data.getNoVerticalBoost() >= maxCooldown) {
                 data.setMaxLowJumpSpeedReached(0);
 
                 if (checkPossibleViolation(horizontal, base))
@@ -247,14 +248,18 @@ public final class Speed extends Check {
                                 Parameter.of("offIceTime", data.offIceTime()),
                                 Parameter.of("offIceTimeRequired", cc.minimumOffIceTime));
                 } else {
-                    if (data.getOffModifierTime() > cc.minimumOffModifierTime && checkPossibleViolation(horizontal, base))
+                    // TODO: Possible bypass with data.getNoVerticalBoost()
+                    if (data.getOffModifierTime() > cc.minimumOffModifierTime
+                            && data.getNoVerticalBoost() <= cc.noVerticalBoostRequired
+                            && checkPossibleViolation(horizontal, base))
                         populateViolationResult(player, result, setback, horizontal, base,
                                 Parameter.of("tags", "normal"),
                                 Parameter.of("lastJumpBoostTimeRequired", cc.timeRequiredSinceLastJumpBoost),
                                 Parameter.of("offIceTime", data.offIceTime()),
                                 Parameter.of("offIceTimeRequired", cc.minimumOffIceTime),
                                 Parameter.of("modTime", data.getOffModifierTime()),
-                                Parameter.of("offModTimeRequired", cc.minimumOffModifierTime));
+                                Parameter.of("offModTimeRequired", cc.minimumOffModifierTime),
+                                Parameter.of("noVerticalBoostRequired", cc.noVerticalBoostRequired));
                 }
             }
         }

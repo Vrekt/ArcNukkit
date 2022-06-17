@@ -206,6 +206,10 @@ public final class ViolationManager implements Configurable, Closeable {
         return false;
     }
 
+    public boolean isDebug(Player player) {
+        return violationViewers.getOrDefault(player, false);
+    }
+
     /**
      * Get the violation level
      *

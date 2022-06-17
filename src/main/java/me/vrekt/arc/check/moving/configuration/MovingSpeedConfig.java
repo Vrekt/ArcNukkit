@@ -25,6 +25,12 @@ public final class MovingSpeedConfig extends BasicCheckConfiguration {
     public double minimumVertical, maxIceSpeedReachedMin, maxIceSpeedReachedCooldownModifier, maxIceSpeedReachedCooldown;
 
     /**
+     * if greater than this number, will flag. Ensures no false positives on first lift off.
+     * TODO: Maybe bypass
+     */
+    public double noVerticalBoostRequired;
+
+    /**
      * The minimum speed required to boost the cooldown for preventing false flags.
      * The amount to multiply the max speed reached by to increase the cooldown.
      * The initial cooldown given to players who did not travel fast enough while low-jumping.
@@ -88,8 +94,10 @@ public final class MovingSpeedConfig extends BasicCheckConfiguration {
                 "The minimum off modifier time (slabs/stairs) required to start checking normal ground speed.");
         configuration.addConfigurationValueWithComment("setback-location-update-distance-criteria", 3.0,
                 "The minimum distance required between the last setback location to update it.");
-        configuration.addConfigurationValueWithComment("setback-location-update-last-violation-criteria", 1500,
+        configuration.addConfigurationValueWithComment("setback-location-update-last-violation-criteria", 5000,
                 "The minimum time required since the last violation to update the setback location.");
+        configuration.addConfigurationValueWithComment("no-vertical-boost-required", 1,
+                "The maximum amount of time allowed before checking normal speed checks.");
     }
 
     @Override
@@ -113,5 +121,6 @@ public final class MovingSpeedConfig extends BasicCheckConfiguration {
         minimumOffIceTime = configuration.getInt("minimum-off-ice-time");
         minimumOffModifierTime = configuration.getInt("minimum-off-modifier-time");
         minimumOnGroundTime = configuration.getInt("minimum-on-ground-time");
+        noVerticalBoostRequired = configuration.getInt("no-vertical-boost-required");
     }
 }

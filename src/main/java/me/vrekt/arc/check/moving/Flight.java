@@ -2,16 +2,17 @@ package me.vrekt.arc.check.moving;
 
 import cn.nukkit.Player;
 import cn.nukkit.level.Location;
+import me.vrekt.arc.Arc;
 import me.vrekt.arc.check.Check;
 import me.vrekt.arc.check.CheckType;
 import me.vrekt.arc.check.moving.configuration.MovingFlightConfig;
 import me.vrekt.arc.check.result.CheckResult;
 import me.vrekt.arc.compatibility.NukkitAccess;
-import me.vrekt.arc.utility.block.BlockAccess;
 import me.vrekt.arc.data.moving.MovingData;
 import me.vrekt.arc.exemption.type.ExemptionType;
 import me.vrekt.arc.timings.CheckTimings;
 import me.vrekt.arc.utility.MovingAccess;
+import me.vrekt.arc.utility.block.BlockAccess;
 import me.vrekt.arc.utility.math.MathUtil;
 
 /**
@@ -127,6 +128,9 @@ public final class Flight extends Check {
      */
     private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, double vertical, double distance, int ascendingTime, CheckResult result) {
         if (data.ascending()) {
+
+            Arc.debug("v=" + vertical + ", dist=" + distance + ", time=" + ascendingTime);
+
             final boolean hasSlimeblock = data.hasSlimeblock();
             if (hasSlimeblock && vertical > 0.42 && distance > 1f) {
                 data.setHasSlimeBlockLaunch(true);
@@ -165,31 +169,12 @@ public final class Flight extends Check {
 
             // TODO: Maybe in the future, watch slime-block movement.
             // TODO: Redo all the below, since movement is fixed now.
+            // TODO: Ignore that comment? i don't know what needs to be done looks fine
 
             // ensure we didn't walk up a block that modifies your vertical
             final double maxJumpHeight = getJumpHeight(player);
 
-            // go back to where we were.
-            // maybe ground later.
-
-            // If vertical is greater than 1.44, ignore the cooldown.
-            // Vertical is too high for the player, so it's sketchy.
-            if (vertical > maxJumpHeight && (vertical >= 1.44 || ascendingTime >= cc.ascendCooldown)
-                    && !data.hasSlimeBlockLaunch()) {
-
-                // Check if player is ascending off stairs.
-                // TODO: Unsure if this works yet.
-                final boolean ascendingFromStairs = BlockAccess.hasStairAt(from, from.level, 0.3, -0.5, 0.3);
-                if (ascendingFromStairs) {
-                    return;
-                }
-
-                // Check if player just joined.
-                // Players have an extreme vertical velocity when joining.
-                if (vertical >= 1.0 && (data.getPlayerJoinTime() == 0 || (System.currentTimeMillis() - data.getPlayerJoinTime() <= 1500))) {
-                    return; // ignore this result.
-                }
-
+            if (vertical > maxJumpHeight) {
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);

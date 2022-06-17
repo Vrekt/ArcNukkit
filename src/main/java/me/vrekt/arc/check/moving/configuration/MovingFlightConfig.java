@@ -47,7 +47,7 @@ public final class MovingFlightConfig extends BasicCheckConfiguration {
 
     @Override
     public void write(CheckConfiguration configuration) {
-        configuration.addConfigurationValueWithComment("max-jump-distance", 0.42,
+        configuration.addConfigurationValueWithComment("max-jump-distance", 0.422,
                 "The max height a player can jump normally.");
         configuration.addConfigurationValueWithComment("max-climbing-speed-up", 0.21,
                 "The max speed at which a player can climb a ladder.");
